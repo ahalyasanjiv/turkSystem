@@ -1,25 +1,6 @@
-<!DOCTYPE html>
-<html>
-	<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>JAJ Turk System</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
-	</head>
-	<body>
-	<nav class="navbar" role="navigation" aria-label="main navigation">
-	<div class="navbar-brand">
-	<p class="navbar-item">JAJ Turk</p>
-	</div>
-	<div class="navbar-start">
-	<!-- navbar items -->
-	  <a class="navbar-item" href="/browse">Browse</a>
-	  <a class="navbar-item" href="/browse">Apply</a>
-	</div>
-	</div>
-	</nav>
+{% extends "base.html" %}
 
+{% block content %}
 	<section class="hero is-warning">
 	<div class="hero-body">
 	  <div class="container">
@@ -62,5 +43,4 @@
 			</div>
 		</div>
 	</div>
-  </body>
-</html>
+{% endblock %}
