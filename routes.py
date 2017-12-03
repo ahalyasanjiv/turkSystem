@@ -14,8 +14,8 @@ def dashboard():
 @app.route("/browse")
 def browse():
     active_demands = Demand.get_all_active_demands()
-
     active_demands_info = []
+    
     for demand in active_demands:
         active_demands_info.append(Demand.get_info(demand))
 
@@ -24,7 +24,6 @@ def browse():
 @app.route("/user/<name>")
 def user(name):
     info = User.get_user_info(name)
-
     return render_template("profile.html", info=info)
 
 @app.route("/apply")
