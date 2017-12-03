@@ -1,1 +1,1 @@
-id,username,password_hash,first_name,last_name,email,phone,credit_card,type_of_user
+username,password,first_name,last_name,email,phone,credit_card,type_of_user,about
