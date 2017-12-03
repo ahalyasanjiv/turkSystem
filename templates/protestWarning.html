@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<section class="hero is-warning">
+	<div class="hero-body">
+	  <div class="container">
+	    <h1 class="title">
+	      Protest a warning
+	    </h1>
+	  </div>
+	</div>
+	</section>
+	<div class ="hero-body">
+		<div class="container ">
+  			<div class="columns">
+  				<div class="column is-one-quarter">
+  				</div>
+  				<div class="column is-half">
+  					<h1 class="title is-2">
+						File protest against warning
+				    </h1>
+					<div class="field">
+					  <label class="label">Select warning to protest</label>
+					  <div class="control">
+					    <span class="select">
+					      <select>
+					        <option>Warning 1</option>
+					        <option>Warning 2</option>
+					      </select>
+					    </span>
+					  </div>
+					</div>
+
+					<div class="field">
+						<textarea class="textarea" placeholder="Give reason for protesting warning" rows="10"></textarea>
+					</div>
+					
+					<div class="has-text-centered">
+					<a class="button is-info has-text-centered">Submit</a>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
