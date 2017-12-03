@@ -11,10 +11,10 @@
 
             <div class="column is-three-quarters">
               <h1 class="title">
-                {{ first_name }} {{ last_name }}
+                {{ info.first_name }} {{ info.last_name }}
               </h1>
               <h2 class="subtitle">
-                {{ type_of_user }}
+                {{ info.type_of_user }}
               </h2>
               <p class="subtitle">
                 <i class="fa fa-star" aria-hidden="true"></i>
@@ -36,7 +36,7 @@
             <div class="notification">
               <h2 class="title is-4">About</h2>
               <p class="content">
-                {{ about }}
+                {{ info.about }}
               </p>
             </div>
 
@@ -98,9 +98,9 @@
             <div class="notification">
               <h2 class="title is-4">Contact</h2>
                 <div class="content">
-                  <strong>Email:</strong> {{ email }}
+                  <strong>Email:</strong> {{ info.email }}
                   <br>
-                  <strong>Phone: </strong> {{ phone }}
+                  <strong>Phone: </strong> {{ info.phone }}
                   <br>
                   <strong>Resume</strong>
                 </div>
