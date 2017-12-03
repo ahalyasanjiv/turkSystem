@@ -11,10 +11,10 @@
 
             <div class="column is-three-quarters">
               <h1 class="title">
-                Ariel Li
+                {{ first_name }} {{ last_name }}
               </h1>
               <h2 class="subtitle">
-                Developer
+                {{ type_of_user }}
               </h2>
               <p class="subtitle">
                 <i class="fa fa-star" aria-hidden="true"></i>
@@ -36,9 +36,7 @@
             <div class="notification">
               <h2 class="title is-4">About</h2>
               <p class="content">
-                Hello, I am Ariel! I am a software developer from New York, and I love to code! My specialty is
-                front-end development, and I have experience in using the frameworks React...
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+                {{ about }}
               </p>
             </div>
 
@@ -100,9 +98,9 @@
             <div class="notification">
               <h2 class="title is-4">Contact</h2>
                 <div class="content">
-                  <strong>Email:</strong> arielli@jaj.com
+                  <strong>Email:</strong> {{ email }}
                   <br>
-                  <strong>Phone: </strong> 12345678
+                  <strong>Phone: </strong> {{ phone }}
                   <br>
                   <strong>Resume</strong>
                 </div>

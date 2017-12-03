@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import hashlib
 import datetime
+import re
 
 class User:
     """
@@ -10,21 +11,29 @@ class User:
     def __init__(self, first_name, last_name, email, phone, credit_card, type_of_user):
         df = pd.read_csv('database/User.csv')
 
-        # hashed = self.hash_password(password)
-
         df.loc[len(df)] = pd.Series(data=[first_name, last_name, email, phone, credit_card, type_of_user],
                            index=['first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user'])
         df.to_csv('database/User.csv', index=False)
 
-    def validate_user_id(self, user_id):
+    def set_credentials(self, username, password, email):
         """
-        Validates the temporary user id, which should be unique from other user IDs.
-        Returns True if the user ID is valid. Returns False otherwise.
+        After a user is approved, the user can set his/her official username and password.
+        This method stores this information in the User table.
         """
         df = pd.read_csv('database/User.csv')
-        tmp = df.loc[df['temp_user_id'] == user_id]
+        df.loc[df.email == email, 'username'] = username
+        df.loc[df.email == email, 'password'] = hash_password(password)
+        df.to_csv('database/User.csv', index=False)
 
-        return tmp.empty
+    def has_user_id(self, username):
+        """
+        Returns True if the username exists in the User table.
+        Returns False otherwise.
+        """
+        df = pd.read_csv('database/User.csv')
+        tmp = df.loc[df['username'] == username]
+
+        return not tmp.empty
 
     def validate_password(self, password):
         """
@@ -39,6 +48,57 @@ class User:
         """
         hash_object = hashlib.sha256(password.encode())
         return hash_object.hexdigest()
+
+    @staticmethod
+    def get_user_info(username):
+        """
+        Returns a dictionary of the user's information.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+
+        if not user.empty:
+            return {'username': username,
+                    'first_name': user['first_name'][0],
+                    'last_name': user['last_name'][0],
+                    'email': user['email'][0],
+                    'phone': user['phone'][0],
+                    'type_of_user': user['type_of_user'][0],
+                    'about': user['about'][0]}
+
+    @staticmethod
+    def set_about(username, about):
+        """
+        Modifies the user's about/info.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+
+        if not user.empty:
+            df.loc[df.username == username, 'about'] = about
+            df.to_csv('database/User.csv')
+
+class Client:
+    """
+    Client class. Has methods that inserts to and reads from the Client table.
+    """
+    def __init__(self, user_id):
+        df = pd.read_csv('database/Client.csv')
+
+        df.loc[len(df)] = pd.Series(data=[user_id, 0, 0, 0, 0],
+            index=['user_id', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.to_csv('database/Client.csv', index=False)
+
+class Developer:
+    """
+    Developer class. Has methods that inserts to and reads from the Developer table.
+    """
+    def __init__(self, user_id):
+        df = pd.read_csv('database/Developer.csv')
+
+        df.loc[len(df)] = pd.Series(data=[user_id, 0, 0, 0, 0],
+            index=['user_id', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.to_csv('database/Developer.csv', index=False)
 
 class Applicant:
     """
@@ -71,17 +131,19 @@ class Applicant:
 
         # also validate the format of the email using regex
 
+
         return tmp.empty
 
-    def validate_user_id(self, user_id):
+    def has_user_id(self, user_id):
         """
         Validates the temporary user id, which should be unique from other user IDs.
-        Returns True if the user ID is valid. Returns False otherwise.
+        Returns True if the user ID already exists in the Applicant table.
+        Returns False if the user ID does not already exist.
         """
         df = pd.read_csv('database/Applicant.csv')
         tmp = df.loc[df['temp_user_id'] == user_id]
 
-        return tmp.empty
+        return not tmp.empty
 
     def validate_password(self, password):
         """
@@ -103,50 +165,38 @@ class Applicant:
         Approves the applicant and adds the user to the User table.
         After adding to the User table, the applicant's status is changed to approved.
         """
-        df = pd.read_csv('database/Applicant.csv')
         # get the applicant's information from the table
+        df = pd.read_csv('database/Applicant.csv')
         user = df.loc[df.user_id == user_id]
 
-        # create a new row in the User table
-        User(user['first_name'][0], user['last_name'][0], user['email'][0], user['phone'][0],
-            user['credit_card'][0], user['type_of_user'][0])
+        if not user.empty:
+            if user['status'][0] == 'pending':
+                # create a new row in the User table
+                User(user['first_name'][0], user['last_name'][0], user['email'][0], user['phone'][0],
+                    user['credit_card'][0], user['type_of_user'][0])
 
-        # update status
-        df.loc[df.user_id == user_id, 'status'] = 'approved'
-        df.to_csv('database/Applicant.csv', index=False)
+                # update status
+                df.loc[df.user_id == user_id, 'status'] = 'approved'
+                df.to_csv('database/Applicant.csv', index=False)
+
+                # add the user to the corresponding table
+                if user['type_of_user'][0] == 'client':
+                    Client(user_id)
+                elif user['type_of_user'][0] == 'developer':
+                    Developer(user_id)
 
     @staticmethod
     def reject(user_id):
         """
-        Reject the applicant.
+        Reject the applicant. The applicant's status is changed to rejected.
         """
         df = pd.read_csv('database/Applicant.csv')
+        user = df.loc[df.user_id == user_id]
 
-        # update status
-        df.loc[df.user_id == user_id, 'status'] = 'rejected'
-        df.to_csv('database/Applicant.csv', index=False)
-
-class Client:
-    """
-    Client class. Has methods that inserts to and reads from the Client table.
-    """
-    def __init__(self, user_id):
-        df = pd.read_csv('database/Client.csv')
-
-        df.loc[len(df)] = pd.Series(data=[user_id, 0, 0, 0, 0],
-            index=['user_id', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
-        df.to_csv('database/Client.csv', index=False)
-
-class Developer:
-    """
-    Developer class. Has methods that inserts to and reads from the Developer table.
-    """
-    def __init__(self, user_id):
-        df = pd.read_csv('database/Developer.csv')
-
-        df.loc[len(df)] = pd.Series(data=[user_id, 0, 0, 0, 0],
-            index=['user_id', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
-        df.to_csv('database/Developer.csv', index=False)
+        if user['status'][0] == 'pending':
+            # update status
+            df.loc[df.user_id == user_id, 'status'] = 'rejected'
+            df.to_csv('database/Applicant.csv', index=False)
 
 class Demand:
     """
