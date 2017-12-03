@@ -3,6 +3,43 @@ import pandas as pd
 import hashlib
 import datetime
 
+class User:
+    """
+    User class. Has methods that inserts to and reads from the User table.
+    """
+    def __init__(self, first_name, last_name, email, phone, credit_card, type_of_user):
+        df = pd.read_csv('database/User.csv')
+
+        # hashed = self.hash_password(password)
+
+        df.loc[len(df)] = pd.Series(data=[first_name, last_name, email, phone, credit_card, type_of_user],
+                           index=['first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user'])
+        df.to_csv('database/User.csv', index=False)
+
+    def validate_user_id(self, user_id):
+        """
+        Validates the temporary user id, which should be unique from other user IDs.
+        Returns True if the user ID is valid. Returns False otherwise.
+        """
+        df = pd.read_csv('database/User.csv')
+        tmp = df.loc[df['temp_user_id'] == user_id]
+
+        return tmp.empty
+
+    def validate_password(self, password):
+        """
+        Validates the password, which should be longer than 8 characters.
+        Returns True if the password is valid. Returns False otherwise.
+        """
+        return len(password) > 8
+
+    def hash_password(self, password):
+        """
+        Returns the hash of the given password.
+        """
+        hash_object = hashlib.sha256(password.encode())
+        return hash_object.hexdigest()
+
 class Applicant:
     """
     Applicant class. Has methods that inserts to and reads from the Applicant table.
@@ -17,10 +54,10 @@ class Applicant:
         hashed = self.hash_password(password)
 
         df.loc[len(df)] = pd.Series(data=[first_name, last_name, email,
-                            phone, card_info, temp_user_id, hashed, type_of_user],
+                            phone, card_info, temp_user_id, hashed, type_of_user, 'pending'],
                            index=['first_name', 'last_name',
-                           'email', 'phone', 'credit_card', 'temp_user_id',
-                           'temp_password', 'type_of_user'])
+                           'email', 'phone', 'credit_card', 'user_id',
+                           'password', 'type_of_user', 'status'])
         df.to_csv('database/Applicant.csv', index=False)
 
     def validate_email(self, email):
@@ -60,42 +97,34 @@ class Applicant:
         hash_object = hashlib.sha256(password.encode())
         return hash_object.hexdigest()
 
-class User:
-    """
-    User class. Has methods that inserts to and reads from the User table.
-    """
-    def __init__(self, username, password, first_name, last_name, email, phone, credit_card, type_of_user):
-        df = pd.read_csv('database/User.csv')
-
-        hashed = self.hash_password(password)
-
-        df.loc[len(df)] = pd.Series(data=[username, hashed, first_name, last_name, email, phone, credit_card, type_of_user],
-                           index=['username', 'password_hash', 'first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user'])
-        df.to_csv('database/User.csv', index=False)
-
-    def validate_user_id(self, user_id):
+    @staticmethod
+    def approve(user_id):
         """
-        Validates the temporary user id, which should be unique from other user IDs.
-        Returns True if the user ID is valid. Returns False otherwise.
+        Approves the applicant and adds the user to the User table.
+        After adding to the User table, the applicant's status is changed to approved.
         """
         df = pd.read_csv('database/Applicant.csv')
-        tmp = df.loc[df['temp_user_id'] == user_id]
+        # get the applicant's information from the table
+        user = df.loc[df.user_id == user_id]
 
-        return tmp.empty
+        # create a new row in the User table
+        User(user['first_name'][0], user['last_name'][0], user['email'][0], user['phone'][0],
+            user['credit_card'][0], user['type_of_user'][0])
 
-    def validate_password(self, password):
-        """
-        Validates the password, which should be longer than 8 characters.
-        Returns True if the password is valid. Returns False otherwise.
-        """
-        return len(password) > 8
+        # update status
+        df.loc[df.user_id == user_id, 'status'] = 'approved'
+        df.to_csv('database/Applicant.csv', index=False)
 
-    def hash_password(self, password):
+    @staticmethod
+    def reject(user_id):
         """
-        Returns the hash of the given password.
+        Reject the applicant.
         """
-        hash_object = hashlib.sha256(password.encode())
-        return hash_object.hexdigest()
+        df = pd.read_csv('database/Applicant.csv')
+
+        # update status
+        df.loc[df.user_id == user_id, 'status'] = 'rejected'
+        df.to_csv('database/Applicant.csv', index=False)
 
 class Client:
     """
@@ -123,10 +152,14 @@ class Demand:
     """
     Demand class. Has methods that inserts to, reads from, and modifies Demand table.
     """
-    def __init__(self, client_id, title, specifications, bidding_deadline):
+    def __init__(self, client_id, date_posted, title, specifications, bidding_deadline):
         df = pd.read_csv('database/Demand.csv')
-        df.loc[len(df)] = pd.Series(data=[client_id, title, specifications, bidding_deadline],
-            index=['client_id', 'title', 'specifications', 'bidding_deadline'])
+
+        now = datetime.datetime.now()
+        date_posted = "{}-{}-{}".format(now.year, now.month, now.day)
+
+        df.loc[len(df)] = pd.Series(data=[client_id, date_posted, title, specifications, bidding_deadline],
+            index=['client_id', 'date_posted', 'title', 'specifications', 'bidding_deadline'])
         df.to_csv('database/Demand.csv', index=False)
 
 class Bid:
@@ -155,4 +188,20 @@ class BlacklistedUser:
             index=['user_id', 'blacklisted_until'])
         df.to_csv('database/BlacklistedUser.csv', index=False)
 
-test = BlacklistedUser(123)
+class SuperUser:
+    """
+    SuperUser class.
+    """
+    def __init__(self, username, password):
+        df = pd.read_csv('database/SuperUser.csv')
+
+        hashed = self.hash_password(password)
+        df.loc[len(df)] = pdf.Series(data=[username, hashed],
+            index=['username', 'password'])
+
+    def hash_password(self, password):
+        """
+        Returns the hash of the given password.
+        """
+        hash_object = hashlib.sha256(password.encode())
+        return hash_object.hexdigest()
