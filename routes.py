@@ -44,6 +44,7 @@ def login():
        			if username in row[1]:
        				user_exists = True
        	
+
     	
 
 	return render_template("login.html")
