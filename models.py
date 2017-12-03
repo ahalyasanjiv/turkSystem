@@ -3,6 +3,7 @@ import pandas as pd
 import hashlib
 import datetime
 import re
+from werkzeug import generate_password_hash, check_password_hash
 
 class User:
     """
@@ -48,6 +49,21 @@ class User:
         """
         hash_object = hashlib.sha256(password.encode())
         return hash_object.hexdigest()
+
+    @staticmethod
+    def check_password(username, password):
+        """
+        Checks if the password of a username match. 
+        Returns true if password given matches the password for username 
+        given and false if the password does not match.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            pwhash = user['password'][0]
+            return check_password_hash(pwhash,generate_password_hash(password))
+        return False
+        
 
     @staticmethod
     def get_user_info(username):

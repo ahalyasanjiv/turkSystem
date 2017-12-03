@@ -60,15 +60,21 @@ def login():
         username = form.username.data
         password = form.password.data
         # Check if username exists and if password matches
-        with open('database/User.csv', 'r') as f:
-            csvreader = reader(f, delimiter=',')
-            for row in csvreader:
-                if username in row[0] and password in row[1]:
-                    session['username'] = username
-                    return redirect(url_for('dashboard'))
+        if User.check_password(username, password):
+            session['username'] = username
+            return redirect(url_for('dashboard'))
+            
+        # with open('database/User.csv', 'r') as f:
+        #     csvreader = reader(f, delimiter=',')
+        #     for row in csvreader:
+        #         if username in row[0] and password in row[1]:
+        #             session['username'] = username
+        #             return redirect(url_for('dashboard'))
+
         # If username or password is invalid, notify user
-        flash('Invalid username or password.')
-        return render_template('login.html', form=form)
+        else:
+            flash('Invalid username or password.')
+            return render_template('login.html', form=form)
 
     elif request.method == 'GET':
         return render_template('login.html', form=form)
@@ -79,7 +85,7 @@ def login():
 @app.route("/logout")
 def logout():
     """
-    The '/logout' will remove the user from the current session if there is one.
+    The '/logout' route will remove the user from the current session if there is one.
     """
     session.pop('username', None)
     return redirect(url_for('index'))
