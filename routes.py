@@ -1,8 +1,11 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, flash, render_template, request, session, redirect, url_for
 from csv import reader
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser
+from forms import SignupForm, LoginForm
 
 app = Flask(__name__)
+app.secret_key = 'development-key'
+
 
 @app.route("/")
 def index():
@@ -26,38 +29,58 @@ def user(name):
 
 @app.route("/apply")
 def apply():
-	return render_template("application.html")
+    if 'username' in session:
+        return redirect(url_for('dashboard'))
+
+    form = SignupForm()
+
+    if request.method == 'POST':
+        if form.validate():
+            newuser = User(form.first_name.data, form.last_name.data, form.email.data,
+                           form.password.data, form.username.data, form.role.data)
+            db.session.add(newuser)
+            db.session.commit()
+
+            session['username'] = newuser.username
+            session['role'] = newuser.role
+            return redirect(url_for('dashboard'))
+        else:
+            return render_template('application.html', form=form)
+
+
+    elif request.method == 'GET':
+        return render_template('application.html', form=form)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-	""" 
-	The "/login" route will direct users to the login page if they are not logged in. 
-	If the user is already logged in, they will be redirected to their dashboard.
-	"""
-	# If user is already logged in, redirect them to dashboard
-	if 'username' in session:
+    if 'username' in session:
         return redirect(url_for('dashboard'))
-
     form = LoginForm()
     if request.method == 'POST' and form.validate():
-    	username = form.username.data
+        username = form.username.data
         password = form.password.data
-        user_exists = False
-        with open('/database/User.csv', 'r') as f:
-        	csvreader = reader(f, delimiter=',')
-        	for row in csvreader:
-       			if username in row[1]:
-       				user_exists = True
-       	
+        # Check if username exists and if password matches
+        with open('database/User.csv', 'r') as f:
+            csvreader = reader(f, delimiter=',')
+            for row in csvreader:
+                if username in row[0] and password in row[1]:
+                    session['username'] = username
+                    return redirect(url_for('dashboard'))
+        # If username or password is invalid, notify user
+        flash('Invalid username or password.')
+        return render_template('login.html', form=form)
 
-    	
+    elif request.method == 'GET':
+        return render_template('login.html', form=form)
+    
+    return render_template('login.html', form=form)
 
-	return render_template("login.html")
 
 @app.route("/logout")
 def logout():
     """
-    The '/logout' will remove the user from the current session."""
+    The '/logout' will remove the user from the current session if there is one.
+    """
     session.pop('username', None)
     return redirect(url_for('index'))
 
