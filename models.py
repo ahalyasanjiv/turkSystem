@@ -1,0 +1,417 @@
+import numpy as np
+import pandas as pd
+import hashlib
+import datetime
+from werkzeug import generate_password_hash, check_password_hash
+
+class User:
+    """
+    User class. Has methods that inserts to and reads from the User table.
+    """
+    def __init__(self, first_name, last_name, email, phone, credit_card, type_of_user):
+        df = pd.read_csv('database/User.csv')
+
+        df.loc[len(df)] = pd.Series(data=[first_name, last_name, email, phone, credit_card, type_of_user],
+                           index=['first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user'])
+        df.to_csv('database/User.csv', index=False)
+
+    def set_credentials(self, username, password, email):
+        """
+        After a user is approved, the user can set his/her official username and password.
+        This method stores this information in the User table.
+        """
+        df = pd.read_csv('database/User.csv')
+        df.loc[df.email == email, 'username'] = username
+        df.loc[df.email == email, 'password'] = hash_password(password)
+        df.to_csv('database/User.csv', index=False)
+
+    def has_user_id(self, username):
+        """
+        Returns True if the username exists in the User table.
+        Returns False otherwise.
+        """
+        df = pd.read_csv('database/User.csv')
+        tmp = df.loc[df['username'] == username]
+
+        return not tmp.empty
+
+    def validate_password(self, password):
+        """
+        Validates the password, which should be longer than 8 characters.
+        Returns True if the password is valid. Returns False otherwise.
+        """
+        return len(password) > 8
+
+    def hash_password(self, password):
+        """
+        Returns the hash of the given password.
+        """
+        hash_object = hashlib.sha256(password.encode())
+        return hash_object.hexdigest()
+
+    @staticmethod
+    def check_password(username, password):
+        """
+        Checks if the password of a username match. 
+        Returns true if password given matches the password for username 
+        given and false if the password does not match.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            pwhash = user['password'][0]
+            return check_password_hash(pwhash,generate_password_hash(password))
+        return False
+        
+
+    @staticmethod
+    def get_user_info(username):
+        """
+        Returns a dictionary of the user's information.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+
+        if not user.empty:
+            return {'username': username,
+                    'first_name': user['first_name'].item(),
+                    'last_name': user['last_name'].item(),
+                    'email': user['email'].item(),
+                    'phone': user['phone'].item(),
+                    'type_of_user': user['type_of_user'].item(),
+                    'about': user['about'].item(),
+                    'link_to_user': '/user/' + username}
+
+    @staticmethod
+    def set_about(username, about):
+        """
+        Modifies the user's about/info.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+
+        if not user.empty:
+            df.loc[df.username == username, 'about'] = about
+            df.to_csv('database/User.csv')
+
+class Client:
+    """
+    Client class. Has methods that inserts to and reads from the Client table.
+    """
+    def __init__(self, username):
+        df = pd.read_csv('database/Client.csv')
+
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.to_csv('database/Client.csv', index=False)
+
+    @staticmethod
+    def get_info(username):
+        """
+        Returns a dictionary of information for the given developer.
+        """
+        df = pd.read_csv('database/Client.csv')
+        client = df.loc[df.username == username]
+
+        return {'username': username,
+                'avg_rating': client['avg_rating'].item(),
+                'avg_given_rating': client['avg_given_rating'].item(),
+                'num_of_completed_projects': client['num_of_completed_projects'].item(),
+                'num_of_warnings': client['num_of_warnings'].item()}
+
+    @staticmethod
+    def get_projects_posted(username):
+        """
+        Returns a list of all demands that the client posted.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[df.client_username == username]
+
+        return projects.index.tolist()
+
+class Developer:
+    """
+    Developer class. Has methods that inserts to and reads from the Developer table.
+    """
+    def __init__(self, username):
+        df = pd.read_csv('database/Developer.csv')
+
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.to_csv('database/Developer.csv', index=False)
+
+    @staticmethod
+    def get_info(username):
+        """
+        Returns a dictionary of information for the given developer.
+        """
+        df = pd.read_csv('database/Developer.csv')
+        developer = df.loc[df.username == username]
+
+        return {'username': username,
+                'avg_rating': developer['avg_rating'].item(),
+                'avg_given_rating': developer['avg_given_rating'].item(),
+                'num_of_completed_projects': developer['num_of_completed_projects'].item(),
+                'num_of_warnings': developer['num_of_warnings'].item()}
+
+    @staticmethod
+    def get_past_projects(username):
+        """
+        Returns a list of past demands that the developer worked on.
+        These past demands are ones that are completed.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[(df.chosen_developer_username == username) & (df.is_completed)]
+
+        return projects.index.tolist()
+
+class Applicant:
+    """
+    Applicant class. Has methods that inserts to and reads from the Applicant table.
+    """
+    def __init__(self, type_of_user, first_name, last_name, email, phone,
+                 card_info, temp_user_id, password):
+        """
+        Create a new applicant and store the information in the database.
+        """
+        df = pd.read_csv('database/Applicant.csv')
+
+        hashed = self.hash_password(password)
+
+        df.loc[len(df)] = pd.Series(data=[first_name, last_name, email,
+                            phone, card_info, temp_user_id, hashed, type_of_user, 'pending'],
+                           index=['first_name', 'last_name',
+                           'email', 'phone', 'credit_card', 'user_id',
+                           'password', 'type_of_user', 'status'])
+        df.to_csv('database/Applicant.csv', index=False)
+
+    def validate_email(self, email):
+        """
+        Validates the email, which should be unique from other emails.
+        The email should also be in the correc format.
+        Returns True if the email is valid. Returns False otherwise.
+        """
+        df = pd.read_csv('database/Applicant.csv')
+        tmp = df.loc[df['email'] == email]
+
+        return tmp.empty
+
+    def has_user_id(self, user_id):
+        """
+        Validates the temporary user id, which should be unique from other user IDs.
+        Returns True if the user ID already exists in the Applicant table.
+        Returns False if the user ID does not already exist.
+        """
+        df = pd.read_csv('database/Applicant.csv')
+        tmp = df.loc[df['temp_user_id'] == user_id]
+
+        return not tmp.empty
+
+    def validate_password(self, password):
+        """
+        Validates the password, which should be longer than 8 characters.
+        Returns True if the password is valid. Returns False otherwise.
+        """
+        return len(password) > 8
+
+    def hash_password(self, password):
+        """
+        Returns the hash of the given password.
+        """
+        hash_object = hashlib.sha256(password.encode())
+        return hash_object.hexdigest()
+
+    @staticmethod
+    def approve(user_id):
+        """
+        Approves the applicant and adds the user to the User table.
+        After adding to the User table, the applicant's status is changed to approved.
+        """
+        # get the applicant's information from the table
+        df = pd.read_csv('database/Applicant.csv')
+        user = df.loc[df.user_id == user_id]
+
+        if not user.empty:
+            if user['status'].item() == 'pending':
+                # create a new row in the User table
+                User(user['first_name'].item(), user['last_name'].item(), user['email'].item(), user['phone'].item(),
+                    user['credit_card'].item(), user['type_of_user'].item())
+
+                # update status
+                df.loc[df.user_id == user_id, 'status'] = 'approved'
+                df.to_csv('database/Applicant.csv', index=False)
+
+                # add the user to the corresponding table
+                if user['type_of_user'].item() == 'client':
+                    Client(user_id)
+                elif user['type_of_user'].item() == 'developer':
+                    Developer(user_id)
+
+    @staticmethod
+    def reject(user_id):
+        """
+        Reject the applicant. The applicant's status is changed to rejected.
+        """
+        df = pd.read_csv('database/Applicant.csv')
+        user = df.loc[df.user_id == user_id]
+
+        if user['status'].item() == 'pending':
+            # update status
+            df.loc[df.user_id == user_id, 'status'] = 'rejected'
+            df.to_csv('database/Applicant.csv', index=False)
+
+class Demand:
+    """
+    Demand class. Has methods that inserts to, reads from, and modifies Demand table.
+    """
+    def __init__(self, client_username, title, tags, specifications, bidding_deadline, submission_deadline):
+        df = pd.read_csv('database/Demand.csv')
+
+        now = datetime.datetime.now()
+        format = '%m-%d-%Y %I:%M %p'
+        date_posted = now.strftime(format)
+        
+        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False],
+            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed'])
+
+        df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def get_info(demand_id):
+        """
+        Returns a dictionary of information for the specified demand.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        demand = df.loc[int(demand_id)]
+
+        now = datetime.datetime.now()
+        deadline_passed = datetime.datetime.strptime(demand['bidding_deadline'], '%m-%d-%Y %I:%M %p') < now
+
+        if not demand.empty:
+            return {'client_username': demand['client_username'],
+                    'date_posted': demand['date_posted'],
+                    'title': demand['title'],
+                    'tags': demand['tags'],
+                    'specifications': demand['specifications'],
+                    'bidding_deadline': demand['bidding_deadline'],
+                    'submission_deadline': demand['submission_deadline'],
+                    'is_completed': demand['is_completed'],
+                    'bidding_deadline_passed': deadline_passed,
+                    'link_to_client': '/user/' + demand['client_username'],
+                    'link_to_demand': '/bid/' + str(demand_id)}
+
+    @staticmethod
+    def get_all_demands():
+        """
+        Returns a list of all demands.
+        The demands are ordered from most recent to least recent.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        return df.index.tolist()[::-1]
+
+    @staticmethod
+    def get_all_active_demands():
+        """
+        Returns a list of active demands. The bidding deadline for active demands have not passed yet.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        now = datetime.datetime.now().date()
+        active_demands = []
+
+        for index, row in df.iterrows():
+            tmp_date = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p').date()
+            if tmp_date > now:
+                # active_demands.append(row['title'])
+                active_demands.append(row.index.tolist()[0])
+
+        return active_demands
+
+# Demand('jane', 'new demand', 'blah blah blah tags', 'specifications', '01-13-2017 11:59 PM', '02-01-2017 11:59 PM')
+
+class Bid:
+    """
+    Bid class. Has methods that inserts to Bid table.
+    """
+    def __init__(self, demand_id, developer_username, bid_amount):
+        df = pd.read_csv('database/Bid.csv')
+        now = datetime.datetime.now()
+        format = '%m-%d-%Y %I:%M %p'
+        date_bidded = now.strftime(format)
+
+        df.loc[len(df)] = pd.Series(data=[demand_id, developer_username, bid_amount, date_bidded],
+            index=['demand_id', 'developer_username', 'bid_amount', 'date_bidded'])
+        df.to_csv('database/Bid.csv', index=False)
+
+    @staticmethod
+    def get_info(bid_id):
+        """
+        Returns a dictionary of information for the bid specified by the given index.
+        Argument bid_id is the index of the row for the bid in the Bid table.
+        """
+        df = pd.read_csv('database/Bid.csv')
+        bid = df.loc[int(bid_id)]
+
+        # get time since bid was made
+        now = datetime.datetime.now()
+        bid_made = datetime.datetime.strptime(bid['date_bidded'], '%m-%d-%Y %I:%M %p')
+        time_diff = now - bid_made
+
+        if time_diff.days > 0:
+            td = str(time_diff.days) + 'd'
+        else:
+            seconds = time_diff.seconds
+
+            if seconds // 3600 > 0:
+                td = str(seconds // 3600) + 'h'
+            else:
+                td = str(seconds // 60) + 'm'
+
+        return {'demand_id': bid['demand_id'],
+                'developer_username': bid['developer_username'],
+                'bid_amount': format(bid['bid_amount'], '.2f'),
+                'time_diff': td}
+
+    @staticmethod
+    def get_bids_for_demand(demand_id):
+        """
+        Returns a list of bid_ids or indexes where the bids are located in the Bid table.
+        The list is sorted from lowest bid to highest bid.
+        """
+        df = pd.read_csv('database/Bid.csv')
+        bids = df.loc[df['demand_id'] == int(demand_id)].sort_values(['bid_amount'], ascending=[True])
+
+        return bids.index.tolist()
+
+class BlacklistedUser:
+    """
+    BlacklistedUser class. Has methods that inserts to and reads from BlacklistedUser table.
+    """
+    def __init__(self, user_id):
+        df = pd.read_csv('database/BlacklistedUser.csv')
+
+        # get date for when the user can be taken off of blacklist
+        # it is a year from the day when the user is put on the blacklist
+        now = datetime.datetime.now()
+        date = "{}-{}-{}".format(now.year + 1, now.month, now.day)
+
+        df.loc[len(df)] = pd.Series(data=[user_id, date],
+            index=['user_id', 'blacklisted_until'])
+        df.to_csv('database/BlacklistedUser.csv', index=False)
+
+class SuperUser:
+    """
+    SuperUser class.
+    """
+    def __init__(self, username, password):
+        df = pd.read_csv('database/SuperUser.csv')
+
+        hashed = self.hash_password(password)
+        df.loc[len(df)] = pdf.Series(data=[username, hashed],
+            index=['username', 'password'])
+
+    def hash_password(self, password):
+        """
+        Returns the hash of the given password.
+        """
+        hash_object = hashlib.sha256(password.encode())
+        return hash_object.hexdigest()

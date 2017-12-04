@@ -18,11 +18,14 @@
   				  	<div class="media-content">
 				    <div class="content">
 				    	<p>
-				        <strong>John Smith</strong> <small>&emsp;|&emsp;<a>@john.smith24</a>&emsp;|&emsp;</small> <small><strong>Posted:</strong> 11/07/17&emsp;|&emsp;</small> <small><strong>Bidding Deadline:</strong> 11/25/17</small>
+				        <strong>{{ client_info.first_name }} {{ client_info.last_name }}</strong> <small><a>@{{ demand_info.client_username }}</a></small>
 				        <br>
-				        	Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. 
+				        <small><strong>Posted:</strong> {{ demand_info.date_posted }}</small>
+				        <br><small><strong>Bidding Deadline:</strong> {{ demand_info.bidding_deadline }}</small>
+				        <br>
+				        <small><strong>Specifications:</strong></small><br>
+				        	{{ demand_info.specifications }}
 				      	</p>
-				      	<p><a>Read more</a></p>
 				      	<div class="has-text-centered">
 							<div class="columns">
 				  				<div class="column is-one-third">
@@ -55,7 +58,13 @@
 					</div>
   				</div>
   				<div class="column is-one-third">
-	  				<h1 class="title is-2"><strong>Current Bid: </strong> $1,500</h1>
+                    {% if lowest_bid != 'None' %}
+	  				<h1 class="title is-2"><strong>Current Bid: </strong> ${{ lowest_bid }}</h1>
+                    {% else %}
+                    <h1 class="title is-2"><strong>No bids yet!</strong></h1>
+                    {% endif %}
+
+	  				{% for bid_info in bids_info %}
 	  				<article class="media">
 					  <figure class="media-left">
 					    <p class="image is-32x32">
@@ -65,82 +74,15 @@
 					  <div class="media-content">
 					    <div class="content">
 					      <p>
-					        <strong>Paul Simon</strong> <small>@pSimon</small> <small>45m</small>
+					        <strong>{{ bidders_info[bid_info.developer_username].first_name }} {{ bidders_info[bid_info.developer_username].last_name }} </strong> <small><a href="{{ bidders_info[bid_info.developer_username].link_to_user }}">@{{ bid_info.developer_username }}</a></small> <small>{{ bid_info.time_diff }}</small>
 					      </p>
 					    </div> 
 					  </div>
 					  <div class="media-right">
-					    <a class="button is-link">$1,500</a>
+					    <a class="button is-link">${{ bid_info.bid_amount }}</a>
 					  </div>
 					</article>
-					<article class="media">
-					  <figure class="media-left">
-					    <p class="image is-32x32">
-					      <img src="https://bulma.io/images/placeholders/64x64.png">
-					    </p>
-					  </figure>
-					  <div class="media-content">
-					    <div class="content">
-					      <p>
-					        <strong>Caroline Brown</strong> <small>@cBrown</small> <small>1h</small>
-					      </p>
-					    </div> 
-					  </div>
-					  <div class="media-right">
-					    <a class="button is-link">$2,500</a>
-					  </div>
-					</article>
-					<article class="media">
-					  <figure class="media-left">
-					    <p class="image is-32x32">
-					      <img src="https://bulma.io/images/placeholders/64x64.png">
-					    </p>
-					  </figure>
-					  <div class="media-content">
-					    <div class="content">
-					      <p>
-					        <strong>Jennifer Palmer</strong> <small>@jennPalm</small> <small>2d</small>
-					      </p>
-					    </div> 
-					  </div>
-					  <div class="media-right">
-					    <a class="button is-link">$2,800</a>
-					  </div>
-					</article>
-					<article class="media">
-					  <figure class="media-left">
-					    <p class="image is-32x32">
-					      <img src="https://bulma.io/images/placeholders/64x64.png">
-					    </p>
-					  </figure>
-					  <div class="media-content">
-					    <div class="content">
-					      <p>
-					        <strong>Bobby Johnson</strong> <small>@bobby</small> <small>3d</small>
-					      </p>
-					    </div> 
-					  </div>
-					  <div class="media-right">
-					    <a class="button is-link">$3,000</a>
-					  </div>
-					</article>
-					<article class="media">
-					  <figure class="media-left">
-					    <p class="image is-32x32">
-					      <img src="https://bulma.io/images/placeholders/64x64.png">
-					    </p>
-					  </figure>
-					  <div class="media-content">
-					    <div class="content">
-					      <p>
-					        <strong>Phillip Hill</strong> <small>@phillipHill</small> <small>5d</small>
-					      </p>
-					    </div> 
-					  </div>
-					  <div class="media-right">
-					    <a class="button is-link">$4,500</a>
-					  </div>
-					</article>
+	  				{% endfor %}
 			  	</div>
   			</div>
   		</div>

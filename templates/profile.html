@@ -11,17 +11,25 @@
 
             <div class="column is-three-quarters">
               <h1 class="title">
-                Ariel Li
+                {{ info.first_name }} {{ info.last_name }}
               </h1>
               <h2 class="subtitle">
-                Developer
+                {{ info.type_of_user }}
               </h2>
               <p class="subtitle">
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star-half-o" aria-hidden="true"></i>
-                <i class="fa fa-star-o" aria-hidden="true"></i>
+                {% for full_star in range(rating) %}
+                  <i class="fa fa-star" aria-hidden="true"></i>
+                {% endfor %}
+                {% if half_star %}
+                  <i class="fa fa-star-half-o" aria-hidden="true"></i>
+                  {% for empty_star in range(4 - rating) %}
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                  {% endfor %}
+                {% else %}
+                  {% for empty_star in range(5 - rating) %}
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                  {% endfor %}
+                {% endif %}
               </p>
             </div>
           </div>
@@ -36,14 +44,17 @@
             <div class="notification">
               <h2 class="title is-4">About</h2>
               <p class="content">
-                Hello, I am Ariel! I am a software developer from New York, and I love to code! My specialty is
-                front-end development, and I have experience in using the frameworks React...
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+                {{ info.about }}
               </p>
             </div>
 
             <div class="notification">
-              <h2 class="title is-4">Past Projects</h2>
+              {% if info.type_of_user == 'client' %}
+                <h2 class="title is-4">Projects Posted</h2>
+              {% elif info.type_of_user == 'developer' %}
+                <h2 class="title is-4">Past Projects</h2>
+              {% endif %}
+              {% for project in projects %}
                 <article class="media">
                   <figure class="media-left">
                    <p class="image is-64x64">
@@ -53,63 +64,25 @@
                   <div class="media-content">
                     <div class="content">
                       <p>
-                        <strong>Project Name</strong> <small>Posted by Client</small>
+                        <strong><a href="{{ project.link_to_demand }}">{{ project.title }}</a></strong> <small>Posted by <a href="{{ project.link_to_client }}">{{ project.client_username }}</a></small>
                         <br>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+                        {{ project.specifications }}
                       </p>
                     </div>
                   </div>
                 </article>
-
-                <article class="media">
-                  <figure class="media-left">
-                   <p class="image is-64x64">
-                    <img src="https://bulma.io/images/placeholders/128x128.png">
-                  </p>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <p>
-                        <strong>Project Name</strong> <small>Posted by Client</small>
-                        <br>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                      </p>
-                    </div>
-                  </div>
-                </article>
-
-                <article class="media">
-                  <figure class="media-left">
-                   <p class="image is-64x64">
-                    <img src="https://bulma.io/images/placeholders/128x128.png">
-                  </p>
-                  </figure>
-                  <div class="media-content">
-                    <div class="content">
-                      <p>
-                        <strong>Project Name</strong> <small>Posted by Client</small>
-                        <br>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                      </p>
-                    </div>
-                  </div>
-                </article>
+              {% endfor %}
             </div>
           </div>
+
           <div class="column is-4">
             <div class="notification">
               <h2 class="title is-4">Contact</h2>
-                <div class="content">
-                  <strong>Email:</strong> arielli@jaj.com
-                  <br>
-                  <strong>Phone: </strong> 12345678
-                  <br>
-                  <strong>Resume</strong>
-                </div>
-              <h2 class="title is-4">Sample</h2>
-                <div class="content">
-                  My work can be found here.
-                </div>
+              <div class="content">
+                <strong>Email:</strong> {{ info.email }}
+                <br>
+                <strong>Phone: </strong> {{ info.phone }}
+              </div>
             </div>
           </div>
         </div>

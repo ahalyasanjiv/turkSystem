@@ -18,92 +18,134 @@
     <div class="container">
       <div class="columns">
         <div class="column is-8">
-          <article class="media">
+          {% for demand in demands_info%}
+            <article class="media">
               <figure class="media-left">
                <p class="image is-64x64">
                 <img src="https://bulma.io/images/placeholders/128x128.png">
               </p>
               </figure>
-              <div class="media-content">
-                <div class="content">
-                  <p>
-                    <strong>Project Name</strong> <small>Posted by Client on 1/1/2018 11:59 PM</small>
-                    <br>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                    <br>
-                    <small><em>Closes: 2/1/2018 11:50 PM</em></small>
-                  </p>
-                </div>
-              </div>
-          </article>
 
-          <article class="media">
-              <figure class="media-left">
-               <p class="image is-64x64">
-                <img src="https://bulma.io/images/placeholders/128x128.png">
-              </p>
-              </figure>
               <div class="media-content">
                 <div class="content">
                   <p>
-                    <strong>Project Name</strong> <small>Posted by Client on 1/1/2018 11:59 PM</small>
+                    <strong>
+                      <a href="{{ demand.link_to_demand }}">{{ demand.title }}</a>
+                    </strong>
+                    <small>Posted by <a href="{{ demand.link_to_client }}">@{{ demand.client_username }}</a> on {{ demand.date_posted }}</small>
                     <br>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+                    {{ demand.specifications }}
                     <br>
-                    <small><em>Closes: 2/1/2018 11:50 PM</em></small>
+                    {% if demand.bidding_deadline_passed %}
+                      <small><em>Closed on {{ demand.bidding_deadline }}</em></small>
+                    {% else %}
+                      <small><em>Closes: {{ demand.bidding_deadline }}</em></small>
+                    {% endif %}
                   </p>
                 </div>
               </div>
-          </article>
-          <article class="media">
-              <figure class="media-left">
-               <p class="image is-64x64">
-                <img src="https://bulma.io/images/placeholders/128x128.png">
-              </p>
-              </figure>
-              <div class="media-content">
-                <div class="content">
-                  <p>
-                    <strong>Project Name</strong> <small>Posted by Client on 1/1/2018 11:59 PM</small>
-                    <br>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                    <br>
-                    <small><em>Closes: 2/1/2018 11:50 PM</em></small>
-                  </p>
-                </div>
-              </div>
-          </article>
-
-          <article class="media">
-              <figure class="media-left">
-               <p class="image is-64x64">
-                <img src="https://bulma.io/images/placeholders/128x128.png">
-              </p>
-              </figure>
-              <div class="media-content">
-                <div class="content">
-                  <p>
-                    <strong>Project Name</strong> <small>Posted by Client on 1/1/2018 11:59 PM</small>
-                    <br>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                    <br>
-                    <small><em>Closes: 2/1/2018 11:50 PM</em></small>
-                  </p>
-                </div>
-              </div>
-          </article>
+            </article>
+          {% endfor %}
         </div>
+
         <div class="column is-4">
           <aside class="menu">
             <p class="menu-label">
               Filter
             </p>
-            <ul class="menu-list">
-              <li><a>By Date Posted</a></li>
-              <li><a>By Client</a></li>
-              <li><a>By Client Rating</a></li>
-              <li><a>By Bid Price</a></li>
-            </ul>
+
+            <div class="field">
+              <ul class="menu-list">
+                <li>
+                  <label><strong>By Date Posted</strong></label>
+                  <div class="control">
+                    <div class="columns">
+                      <div class="column is-half">
+                        <small>Before</small>
+                        <input class="input" type="date">
+                      </div>
+                      <div class="column is-half">
+                        <small>After</small>
+                        <input class="input" type="date">
+                      </div>
+                    </div>
+                  </div>
+                  <br>
+                </li>
+
+                <li>
+                  <label><strong>By Client</strong></label>
+                  <div class="control">
+                    <input class="input" type="text" placeholder="Client's username">
+                  </div>
+                  <br>
+                </li>
+
+                <li>
+                  <label><strong>By Client Rating</strong></label>
+                  <div class="control">
+                    <input type="radio" name="rating">
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
+                    <input type="radio" name="rating">
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
+                    <input type="radio" name="rating">
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
+                    <input type="radio" name="rating">
+                    <i class="fa fa-star" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                    <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
+                  </div>
+                  <br>
+                </li>
+
+                <li>
+                  <label><strong>By Bid Price</strong></label>
+                  <div class="control">
+                    <div class="columns">
+                      <div class="column is-half">
+                        <small>Min Price</small>
+                        <input class="input" type="number" placeholder="0.00">
+                      </div>
+                      <div class="column is-half">
+                        <small>Max Price</small>
+                        <input class="input" type="number" placeholder="99.99">
+                      </div>
+                    </div>
+                  </div>
+                  <br>
+                </li>
+
+                <li>
+                  <label><strong>By Tags</strong></label>
+                  <div class="control">
+                    <input class="input" type="text" placeholder="Tags">
+                  </div>
+                  <br>
+                </li>
+
+                <li>
+                  <div class="control">
+                    <button class="button is-link">Filter</button>
+                  </div>
+                </li>
+                
+              </ul>
+            </div>
+
           </aside>
         </div>
       </div>
