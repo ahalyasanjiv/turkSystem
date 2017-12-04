@@ -75,12 +75,12 @@ class User:
 
         if not user.empty:
             return {'username': username,
-                    'first_name': user['first_name'][0],
-                    'last_name': user['last_name'][0],
-                    'email': user['email'][0],
-                    'phone': user['phone'][0],
-                    'type_of_user': user['type_of_user'][0],
-                    'about': user['about'][0]}
+                    'first_name': user['first_name'].item(),
+                    'last_name': user['last_name'].item(),
+                    'email': user['email'].item(),
+                    'phone': user['phone'].item(),
+                    'type_of_user': user['type_of_user'].item(),
+                    'about': user['about'].item()}
 
     @staticmethod
     def set_about(username, about):
@@ -186,19 +186,19 @@ class Applicant:
         user = df.loc[df.user_id == user_id]
 
         if not user.empty:
-            if user['status'][0] == 'pending':
+            if user['status'].item() == 'pending':
                 # create a new row in the User table
-                User(user['first_name'][0], user['last_name'][0], user['email'][0], user['phone'][0],
-                    user['credit_card'][0], user['type_of_user'][0])
+                User(user['first_name'].item(), user['last_name'].item(), user['email'].item(), user['phone'].item(),
+                    user['credit_card'].item(), user['type_of_user'].item())
 
                 # update status
                 df.loc[df.user_id == user_id, 'status'] = 'approved'
                 df.to_csv('database/Applicant.csv', index=False)
 
                 # add the user to the corresponding table
-                if user['type_of_user'][0] == 'client':
+                if user['type_of_user'].item() == 'client':
                     Client(user_id)
-                elif user['type_of_user'][0] == 'developer':
+                elif user['type_of_user'].item() == 'developer':
                     Developer(user_id)
 
     @staticmethod
@@ -209,7 +209,7 @@ class Applicant:
         df = pd.read_csv('database/Applicant.csv')
         user = df.loc[df.user_id == user_id]
 
-        if user['status'][0] == 'pending':
+        if user['status'].item() == 'pending':
             # update status
             df.loc[df.user_id == user_id, 'status'] = 'rejected'
             df.to_csv('database/Applicant.csv', index=False)
@@ -218,15 +218,50 @@ class Demand:
     """
     Demand class. Has methods that inserts to, reads from, and modifies Demand table.
     """
-    def __init__(self, client_id, date_posted, title, specifications, bidding_deadline):
+    def __init__(self, client_username, title, tags, specifications, bidding_deadline, submission_deadline):
         df = pd.read_csv('database/Demand.csv')
 
         now = datetime.datetime.now()
-        date_posted = "{}-{}-{}".format(now.year, now.month, now.day)
+        format = '%m-%d-%Y %I:%M %p'
+        date_posted = now.strftime(format)
+        
+        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline],
+            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline'])
 
-        df.loc[len(df)] = pd.Series(data=[client_id, date_posted, title, specifications, bidding_deadline],
-            index=['client_id', 'date_posted', 'title', 'specifications', 'bidding_deadline'])
         df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def get_info(title): # need to add id column so we can get demand by id instead
+        """
+        Returns a dictionary of information for the specified demand.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        demand = df.loc[df.title == title]
+
+        if not demand.empty:
+            return {'client_username': demand['client_username'].item(),
+                    'date_posted': demand['date_posted'].item(),
+                    'title': demand['title'].item(),
+                    'tags': demand['tags'].item(),
+                    'specifications': demand['specifications'].item(),
+                    'bidding_deadline': demand['bidding_deadline'].item(),
+                    'submission_deadline': demand['submission_deadline'].item()}
+
+    @staticmethod
+    def get_all_active_demands():
+        """
+        Returns a list of active demands. The bidding deadline for Active demands have not passed yet.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        now = datetime.datetime.now().date()
+        active_demands = []
+
+        for index, row in df.iterrows():
+            tmp_date = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p').date()
+            if tmp_date > now:
+                active_demands.append(row['title'])
+
+        return active_demands
 
 class Bid:
     """
