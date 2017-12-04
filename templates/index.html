@@ -1,5 +1,72 @@
 {% extends "base.html" %}
 
 {% block content %}
-hello world
+	<section class="hero is-light is-medium">
+		<div class="hero-body">
+			<div class="container">
+				<h1 class="title">Welcome to the JAJ Turk System</h1>
+				<h2 class="subtitle">Find a project or create your own.</h2>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="columns has-text-centered">
+			<div class="column is-one-third">
+				<h3 class="subtitle">Browse demands.</h3>
+				<span class="icon is-large"><i class="fa fa-search fa-3x" aria-hidden="true"></i></span>
+				<p class="content"><br> Look through our large collection of demands and projects posted by clients.</p>
+			</div>
+			<div class="column is-one-third">
+				<h3 class="subtitle">Clients create demands.</h3>
+				<span class="icon is-large"><i class="fa fa-file-text fa-3x" aria-hidden="true"></i></span>
+				<p class="content"><br> Become a client to post your own projects and start your business.</p>
+			</div>
+			<div class="column is-one-third">
+				<h3 class="subtitle">Developers bid on demands.</h3>
+				<span class="icon is-large"><i class="fa fa-money fa-3x" aria-hidden="true"></i></span>
+				<p class="content"><br> Or apply to be a developer to get some projects to work on and get paid.</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="section">
+		<div class="container has-text-centered">
+		  	<a class="button is-medium" href="/browse"> Browse Demands</a>
+		  	<a class="button is-primary is-medium" href="/apply">Apply Today</a>
+		</div>
+	  </section>
+
+	<section class="section">
+		<div class="container">
+		<hr>
+			<div class="level">
+		    	<div class="level-item has-text-centered">
+		      	<div>
+		        	<p class="heading">Number of Clients</p>
+		        	<p class="title">3,456</p>
+		      	</div>
+		    	</div>
+		    	<div class="level-item has-text-centered">
+		      		<div>
+		        	<p class="heading">Number of Developers</p>
+		        	<p class="title">123</p>
+		      		</div>
+		    	</div>
+				<div class="level-item has-text-centered">
+		      		<div>
+		        	<p class="heading">Top Clients</p>
+		        	<p class="title">Names Names</p>
+		      		</div>
+		    	</div>
+		    	<div class="level-item has-text-centered">
+		      		<div>
+		        	<p class="heading">Most Profitable Developers</p>
+		        	<p class="title">Names names</p>
+		      		</div>
+		    	</div>
+		  	</div>
+	  	</div>
+	  </section>
+
 {% endblock %}
