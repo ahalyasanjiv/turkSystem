@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField
+from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 class SignupForm(FlaskForm):
@@ -7,10 +7,16 @@ class SignupForm(FlaskForm):
 	first_name = StringField(label='First Name', id='first_name', validators=[DataRequired('Please enter your first name.')])
 	last_name = StringField(label='Last Name', id='last_name', validators=[DataRequired('Please enter your last name.')])
 	email = StringField(label='Email Address', id='email', validators=[DataRequired('Please enter an email address.'), Email(message='Please enter a valid email address.')])
+	phone = StringField(label='Phone Number', id='phone', validators=[DataRequired('Please enter a phone number.')])
 	username = StringField(label='Username', id='username', validators=[DataRequired('Please enter a username.')])
-	password = StringField(label='Password', id='password', validators=[DataRequired('Please enter a password.'), Length(min=8, message='Your password must have at least 8 characters.')])
-	confirm_password = PasswordField('Input Password Again')
-	role = RadioField(label='Role', id='role', validators=[DataRequired('Please choose a role.')], choices = [('client','Client'),('developer','Developer')],)
+	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter a password.'), Length(min=8, message='Your password must have at least 8 characters.')])
+	confirm_password = PasswordField(label='Confirm Password', id ='confirm_password', validators=[DataRequired('Please confirm your password.')])
+	credit_card = StringField(label='Credit Card Number', id='credit_card', validators=[DataRequired('Please enter the credit card number.')])
+	credit_card_name = StringField(label='Name of Credit Card Holder', id='credit_card_number', validators=[DataRequired('Please enter the name of the credit card holder.')])
+	exp_date = DateField(label='Expiration Date', id='credit_card_exp_date', validators=[DataRequired('Please enter the credit card exporation date.')], format='%Y-%m-%d')
+	security_code = StringField(label='Security Code', id='security_code', validators=[DataRequired('Please enter the security code.')])
+	billing_address = StringField(label='Billing Address', id='billing_address', validators=[DataRequired('Please enter the billing address.')])
+	role = SelectField(label='Role', id='role', validators=[DataRequired('Please choose a role.')], choices = [('client','Client'),('developer','Developer')],)
 	submit = SubmitField('Sign up')
 
 class LoginForm(FlaskForm):

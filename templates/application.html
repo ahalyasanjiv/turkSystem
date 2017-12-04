@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="hero is-link">
+<section class="hero is-primary">
 	<div class="hero-body">
 	  <div class="container">
 	    <h1 class="title">
@@ -20,102 +20,174 @@
   					<h2 class="title is-3 has-text-centered">
 				        User Application
 				    </h2>
-					<div class="field">
-						<div class="columns">
-							<div class="column is-half">
-							  <div class="control">
-							    <input class="input" type="text" placeholder="First Name">
-							  </div>
-							</div>
-							<div class="column is-half">
-							  <div class="control">
-							    <input class="input" type="text" placeholder="Last Name">
-							  </div>
-							</div>
+				    <form method="POST" action="/signup/">
+						
+						<h2 class="subtitle">
+					        User Information
+					    </h2>
+						<!-- First Name -->
+						<div class="field">
+						  	<div class="control">
+					        	{{ form.first_name(placeholder="First Name", class="form-control input is-medium") }}
+					    	</div>
+					    	{% if form.first_name.errors %}
+				              {% for error in form.first_name.errors %}
+				                <p class="is-danger">{{ error }}</p>
+				              {% endfor %}
+				            {% endif %}
 						</div>
-					</div>
-
-					<div class="field">
-						<div class="control has-icons-left has-icons-right">
-						    <input class="input" type="text" placeholder="Phone Number or Email">
-						    <span class="icon is-small is-left">
-					          <i class="fa fa-envelope"></i>
-					        </span>
-					        <span class="icon is-small is-right">
-					          <i class="fa fa-check"></i>
-					        </span>
+							
+						<!-- Last Name -->
+						<div class="field">
+						    <div class="control">
+						    	{{ form.last_name(placeholder="Last Name", class="form-control input is-medium") }}
+						    </div>
+							{% if form.last_name.errors %}
+				            	{% for error in form.last_name.errors %}
+				            		<p class="is-danger">{{ error }}</p>
+				            	{% endfor %}
+				            {% endif %}
 						</div>
 
-					</div>
+						<!-- Email Address" -->
+						<div class="field">
+				        	<div class="control has-icons-left">
+				        		{{ form.email(placeholder="Email Address", class="form-control input is-medium") }}
+				        		<span class="icon is-small is-left">
+						          <i class="fa fa-envelope"></i>
+						        </span>
+				        	</div>
+					        {% if form.email.errors %}
+					          	{% for error in form.email.errors %}
+					            	<p class="is-danger">{{ error }}</p>
+					          	{% endfor %}
+					        {% endif %}
+				      	</div>
 
-					<div class="field">
-						<div class="control">
-						    <input class="input" type="text" placeholder="User ID (must be unique)">
+				      	<!-- Phone Number -->
+				      	<div class="field">
+				        	<div class="control has-icons-left">
+				        		{{ form.phone(placeholder="Phone Number", class="form-control input is-medium") }}
+				        		<span class="icon is-small is-left">
+						          <i class="fa fa-phone"></i>
+						        </span>
+				     		</div>
+					        {% if form.phone.errors %}
+					          	{% for error in form.phone.errors %}
+					            	<p class="is-danger">{{ error }}</p>
+					          	{% endfor %}
+					        {% endif %}
+				      	</div>
+
+
+				      	<br>
+						<h2 class="subtitle">
+					        Login Credentials
+					    </h2>
+				      	<!-- Username -->
+						<div class="field">
+							<div class="control">{{ form.username(placeholder="Username", class="form-control input is-medium") }}</div>
+					        {% if form.username.errors %}
+					          	{% for error in form.username.errors %}
+					            	<p class="is-danger">{{ error }}</p>
+					          	{% endfor %}
+					        {% endif %}
 						</div>
-					</div>
 
-					<div class="field">
-						<div class="control">
-						    <input class="input" type="text" placeholder="Password (must be greater than 8 characters)">
+				      	<!-- Password -->
+				      	<div class="field">
+							<div class="control">{{ form.password(placeholder="Password (must be at least 8 characters)", class="form-control input is-medium") }}</div>
+					        {% if form.password.errors %}
+					          	{% for error in form.password.errors %}
+					            	<p class="is-danger">{{ error }}</p>
+					          	{% endfor %}
+					        {% endif %}
 						</div>
-					</div>
-					<br>
-					<h2 class="subtitle">
-				        Payment Method
-				    </h2>
 
-				    <div class="field">
-						<div class="columns">
-							<div class="column is-half">
-							  <div class="control">
-							    <input class="input" type="text" placeholder="Name on card">
-							  </div>
+						<!-- Confirm Password -->
+						<div class="field">
+							<div class="control">{{ form.confirm_password(placeholder="Confirm Password", class="form-control input is-medium") }}</div>
+					        {% if form.confirm_password.errors %}
+					          	{% for error in form.confirm_password.errors %}
+					            	<p class="is-danger">{{ error }}</p>
+					          	{% endfor %}
+					        {% endif %}
+						</div>
+						<br>
+						<h2 class="subtitle">
+					        Role
+					    </h2>
+						<!-- Type of User -->
+						<div class="field">
+					        <div class="control"><div class="select">{{ form.role(placeholder="Select a role", class="is-medium") }}</div></div>
+					        {% if form.role.errors %}
+					          {% for error in form.role.errors %}
+					            <p class="is-danger">{{ error }}</p>
+					          {% endfor %}
+					        {% endif %}
+				      	</div>
+
+						<br>
+						<h2 class="subtitle">
+					        Payment Method
+					    </h2>
+
+							<div class="columns">
+								<div class="column is-half">
+									<!-- Name on Credit Card -->
+									<div class="field">
+										<div class="control">{{ form.credit_card_name(placeholder="Name of Credit Card Holder", class="form-control input is-medium") }}</div>
+								        {% if form.credit_card_name.errors %}
+								          	{% for error in form.credit_card_name.errors %}
+								            	<p class="is-danger">{{ error }}</p>
+								          	{% endfor %}
+								        {% endif %}
+									</div>
+									<!-- Credit Card Number -->
+									<div class="field">
+										<div class="control">{{ form.credit_card(placeholder="Credit Card Number", class="form-control input is-medium") }}</div>
+								        {% if form.credit_card.errors %}
+								          	{% for error in form.credit_card.errors %}
+								            	<p class="is-danger">{{ error }}</p>
+								          	{% endfor %}
+								        {% endif %}
+									</div>
+									<!-- Expiration Date -->
+									<div class="field">
+										<div class="control">{{ form.exp_date(placeholder="Expiration Date (MM/DD/YYYY)", class='datepicker form-control input is-medium') }}</div>
+										{% if form.exp_date.errors %}
+											{% for error in form.exp_date.errors %}
+									        	<p class="is-danger">{{ error }}</p>
+									        {% endfor %}
+								        {% endif %}
+									</div>
+									<!-- Security Code -->
+									<div class="field">
+										<div class="control">{{ form.security_code(placeholder="Security Code", class="form-control input is-medium") }}</div>
+								        {% if form.security_code.errors %}
+								          	{% for error in form.security_code.errors %}
+								            	<p class="is-danger">{{ error }}</p>
+								          	{% endfor %}
+								        {% endif %}
+									</div>
+									<!-- Billing Address -->
+									<div class="field">
+										<div class="control">{{ form.billing_address(placeholder="Billing Address", class="form-control input is-medium") }}</div>
+								        {% if form.billing_address.errors %}
+								          	{% for error in form.billing_address.errors %}
+								            	<p class="is-danger">{{ error }}</p>
+								          	{% endfor %}
+								        {% endif %}
+									</div>
+								</div>
+								
 							</div>
-							<div class="column is-half">
-							  <div class="control">
-							    <input class="input" type="text" placeholder="Card Number">
-							  </div>
-							</div>
+						
+						<!--  Submit Button -->
+						<div class="has-text-centered">
+							{{ form.submit(class="button is-link") }}
 						</div>
-					</div>
-
-					<div class="field">
-					  <p class="control has-icons-left">
-					  	<p>Expiration Date</p>
-					  	<div class="columns">
-							<div class="column is-one-fifth">
-							    <span class="select">
-							      <select>
-							        <option selected>MM</option>
-							      </select>
-							    </span>
-							</div>
-							<div class="column is-one-fifth">
-							    <span class="select">
-							      <select>
-							        <option selected>YY</option>
-							      </select>
-							    </span>
-							</div>
-						</div>
-					  </p>
-					</div>
-
-					<div class="field">
-					  <p class="control has-icons-left">
-					  	<p>Security Code</p>
-					  	<div class="columns">
-							<div class="column is-one-fifth">
-							    <div class="control">
-							    <input class="input" type="text" placeholder="Code">
-							  </div>
-							</div>
-						</div>
-					  </p>
-					</div>
-					<div class="has-text-centered">
-					<a class="button is-primary has-text-centered">Submit Application</a>
-					</div>
+					</form>
 
 				</div>
 			</div>

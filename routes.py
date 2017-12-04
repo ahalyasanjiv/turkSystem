@@ -39,7 +39,7 @@ def apply():
 
     if request.method == 'POST':
         if form.validate():
-            newuser = User(form.first_name.data, form.last_name.data, form.email.data,
+            newuser = Applicant(form.first_name.data, form.last_name.data, form.email.data,
                            form.password.data, form.username.data, form.role.data)
             db.session.add(newuser)
             db.session.commit()
