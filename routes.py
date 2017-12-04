@@ -17,8 +17,7 @@ def dashboard():
 
 @app.route("/browse")
 def browse():
-    demands = Demand.get_all_demands()
-    # demands = Demand.get_all_active_demands()
+    demands = Demand.get_filtered_demands()
     demands_info = []
     
     for demand in demands:
@@ -104,7 +103,6 @@ def login():
     
     return render_template('login.html', form=form)
 
-
 @app.route("/logout")
 def logout():
     """
@@ -145,4 +143,3 @@ def createDemand():
 
 if __name__ == "__main__":
     app.run(debug=True)
-

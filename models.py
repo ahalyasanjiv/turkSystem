@@ -3,6 +3,7 @@ import pandas as pd
 import hashlib
 import datetime
 from werkzeug import generate_password_hash, check_password_hash
+import re
 
 class User:
     """
@@ -310,23 +311,64 @@ class Demand:
         return df.index.tolist()[::-1]
 
     @staticmethod
-    def get_all_active_demands():
+    def get_filtered_demands(start_date=None, end_date=None, client=None, 
+        client_rating=None, tags=None, min_bid=None, active=False):
         """
-        Returns a list of active demands. The bidding deadline for active demands have not passed yet.
+        Returns a list of demands that are filtered.
+        The demands are ordered from most recent to least recent.
         """
-        df = pd.read_csv('database/Demand.csv')
-        now = datetime.datetime.now().date()
-        active_demands = []
+        filtered = pd.read_csv('database/Demand.csv')
+        now = datetime.datetime.now()
+        filtered['date_posted'] = pd.to_datetime(filtered['date_posted'])
+        filtered['bidding_deadline'] = pd.to_datetime(filtered['bidding_deadline'])
 
-        for index, row in df.iterrows():
-            tmp_date = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p').date()
-            if tmp_date > now:
-                # active_demands.append(row['title'])
-                active_demands.append(row.index.tolist()[0])
+        # filter by date
+        if start_date is not None:
+            filtered = filtered.loc[filtered.date_posted >= start_date]
 
-        return active_demands
+        if end_date is not None:
+            filtered = filtered.loc[filtered.date_posted <= end_date]
 
-# Demand('jane', 'new demand', 'blah blah blah tags', 'specifications', '01-13-2017 11:59 PM', '02-01-2017 11:59 PM')
+        # filter by client's username
+        if client is not None:
+            filtered = filtered.loc[filtered.client_username == client]
+
+        # filter by active status
+        if active:
+            filtered = filtered.loc[(filtered.bidding_deadline > now) & (filtered.is_completed == False)]
+
+        # filter by client_rating
+        if client_rating is not None:
+            client_df = pd.read_csv('database/Client.csv')
+            merged = pd.merge(filtered, client_df, how='left', left_on=['client_username'], right_on=['username'])
+            filtered = merged.loc[merged.avg_rating >= client_rating]
+
+        # filter by the minimum bid amount
+        if min_bid is not None:
+            def lowest_bid(demand_id):
+                bids = Bid.get_bids_for_demand(demand_id)
+                return float(Bid.get_info(bids[0])['bid_amount']) if len(bids) > 0 else None
+
+            filtered['lowest_bid'] = pd.Series(filtered.index.map(lowest_bid))
+            filtered = filtered.loc[(filtered.lowest_bid >= min_bid) | (filtered.lowest_bid is None)]
+
+        # filter by tags
+        if tags is not None:
+            # remove punctuation, change words to lowercase
+            tags = map(lambda x: x.lower(), re.findall(r'[^\s!,.?":;0-9]+', tags))
+            tags = set(tags)
+
+            def has_tag(demand_id):
+                demand_tags = map(lambda x: x.lower(), re.findall(r'[^\s!,.?":;0-9]+', Demand.get_info(demand_id)['tags']))
+                demand_tags = set(demand_tags)
+
+                # if there is an intersection between the sets, there are matching tags
+                return len(tags & demand_tags) > 0
+
+            filtered['has_tag'] = pd.Series(filtered.index.map(has_tag))
+            filtered = filtered.loc[filtered.has_tag == True]
+
+        return filtered.sort_values(['date_posted'], ascending=[True]).index.tolist()[::-1]
 
 class Bid:
     """
