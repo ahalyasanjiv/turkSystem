@@ -18,7 +18,7 @@
     <div class="container">
       <div class="columns">
         <div class="column is-8">
-          {% for demand in active_demands_info%}
+          {% for demand in demands_info%}
             <article class="media">
               <figure class="media-left">
                <p class="image is-64x64">
@@ -29,11 +29,18 @@
               <div class="media-content">
                 <div class="content">
                   <p>
-                    <strong>{{ demand.title }}</strong> <small>Posted by {{ demand.client_username }} on {{ demand.date_posted }}</small>
+                    <strong>
+                      <a href="{{ demand.link_to_demand }}">{{ demand.title }}</a>
+                    </strong>
+                    <small>Posted by <a href="{{ demand.link_to_client }}">{{ demand.client_username }}</a> on {{ demand.date_posted }}</small>
                     <br>
                     {{ demand.specifications }}
                     <br>
-                    <small><em>Closes: {{ demand.bidding_deadline }}</em></small>
+                    {% if demand.bidding_deadline_passed %}
+                      <small><em>Closed on {{ demand.bidding_deadline }}</em></small>
+                    {% else %}
+                      <small><em>Closes: {{ demand.bidding_deadline }}</em></small>
+                    {% endif %}
                   </p>
                 </div>
               </div>

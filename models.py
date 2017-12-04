@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import hashlib
 import datetime
-import re
 from werkzeug import generate_password_hash, check_password_hash
 
 class User:
@@ -238,6 +237,9 @@ class Demand:
         df = pd.read_csv('database/Demand.csv')
         demand = df.loc[df.title == title]
 
+        now = datetime.datetime.now()
+        deadline_passed = datetime.datetime.strptime(demand['bidding_deadline'].item(), '%m-%d-%Y %I:%M %p') < now
+
         if not demand.empty:
             return {'client_username': demand['client_username'].item(),
                     'date_posted': demand['date_posted'].item(),
@@ -245,7 +247,23 @@ class Demand:
                     'tags': demand['tags'].item(),
                     'specifications': demand['specifications'].item(),
                     'bidding_deadline': demand['bidding_deadline'].item(),
-                    'submission_deadline': demand['submission_deadline'].item()}
+                    'submission_deadline': demand['submission_deadline'].item(),
+                    'bidding_deadline_passed': deadline_passed,
+                    'link_to_client': '/user/' + demand['client_username'].item(),
+                    'link_to_demand': '/bid/' + str(demand.index[0])}
+
+    @staticmethod
+    def get_all_demands():
+        """
+        Returns a list of all demands.
+        The demands are ordered from most recent to least recent.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        demands = []
+
+        for index, row in df.iterrows():
+            demands.append(row['title'])
+        return demands[::-1]
 
     @staticmethod
     def get_all_active_demands():
