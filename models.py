@@ -300,15 +300,16 @@ class Bid:
 
         return {'demand_id': bid['demand_id'],
                 'developer_username': bid['developer_username'],
-                'bid_amount': bid['bid_amount']}
+                'bid_amount': format(bid['bid_amount'], '.2f')}
 
     @staticmethod
     def get_bids_for_demand(demand_id):
         """
         Returns a list of bid_ids or indexes where the bids are located in the Bid table.
+        The list is sorted from lowest bid to highest bid.
         """
         df = pd.read_csv('database/Bid.csv')
-        bids = df.loc[df['demand_id'] == int(demand_id)]
+        bids = df.loc[df['demand_id'] == int(demand_id)].sort_values(['bid_amount'], ascending=[True])
 
         return bids.index.tolist()
 

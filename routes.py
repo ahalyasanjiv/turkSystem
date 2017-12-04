@@ -107,6 +107,9 @@ def bidInfo(demand_id):
     bids_info = []
     bidders_info = {}
 
+    if (len(bids) > 0):
+        lowest_bid = Bid.get_info(bids[0])['bid_amount']
+
     for bid in bids:
         info = Bid.get_info(bid)
         bids_info.append(info)
@@ -114,7 +117,7 @@ def bidInfo(demand_id):
         if info['developer_username'] not in bidders_info:
             bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
 
-    return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info)
+    return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid)
 
 @app.route("/createDemand")
 def createDemand():
