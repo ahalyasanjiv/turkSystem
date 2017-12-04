@@ -56,6 +56,8 @@
   				</div>
   				<div class="column is-one-third">
 	  				<h1 class="title is-2"><strong>Current Bid: </strong> $1,500</h1>
+
+	  				{% for bid_info in bids_info %}
 	  				<article class="media">
 					  <figure class="media-left">
 					    <p class="image is-32x32">
@@ -65,82 +67,15 @@
 					  <div class="media-content">
 					    <div class="content">
 					      <p>
-					        <strong>Paul Simon</strong> <small>@pSimon</small> <small>45m</small>
+					        <strong>{{ bidders_info[bid_info.developer_username].first_name }} {{ bidders_info[bid_info.developer_username].last_name }} </strong> <small><a href="{{ bidders_info[bid_info.developer_username].link_to_user }}">@{{ bid_info.developer_username }}</a></small> <small>45m</small>
 					      </p>
 					    </div> 
 					  </div>
 					  <div class="media-right">
-					    <a class="button is-link">$1,500</a>
+					    <a class="button is-link">${{ bid_info.bid_amount }}</a>
 					  </div>
 					</article>
-					<article class="media">
-					  <figure class="media-left">
-					    <p class="image is-32x32">
-					      <img src="https://bulma.io/images/placeholders/64x64.png">
-					    </p>
-					  </figure>
-					  <div class="media-content">
-					    <div class="content">
-					      <p>
-					        <strong>Caroline Brown</strong> <small>@cBrown</small> <small>1h</small>
-					      </p>
-					    </div> 
-					  </div>
-					  <div class="media-right">
-					    <a class="button is-link">$2,500</a>
-					  </div>
-					</article>
-					<article class="media">
-					  <figure class="media-left">
-					    <p class="image is-32x32">
-					      <img src="https://bulma.io/images/placeholders/64x64.png">
-					    </p>
-					  </figure>
-					  <div class="media-content">
-					    <div class="content">
-					      <p>
-					        <strong>Jennifer Palmer</strong> <small>@jennPalm</small> <small>2d</small>
-					      </p>
-					    </div> 
-					  </div>
-					  <div class="media-right">
-					    <a class="button is-link">$2,800</a>
-					  </div>
-					</article>
-					<article class="media">
-					  <figure class="media-left">
-					    <p class="image is-32x32">
-					      <img src="https://bulma.io/images/placeholders/64x64.png">
-					    </p>
-					  </figure>
-					  <div class="media-content">
-					    <div class="content">
-					      <p>
-					        <strong>Bobby Johnson</strong> <small>@bobby</small> <small>3d</small>
-					      </p>
-					    </div> 
-					  </div>
-					  <div class="media-right">
-					    <a class="button is-link">$3,000</a>
-					  </div>
-					</article>
-					<article class="media">
-					  <figure class="media-left">
-					    <p class="image is-32x32">
-					      <img src="https://bulma.io/images/placeholders/64x64.png">
-					    </p>
-					  </figure>
-					  <div class="media-content">
-					    <div class="content">
-					      <p>
-					        <strong>Phillip Hill</strong> <small>@phillipHill</small> <small>5d</small>
-					      </p>
-					    </div> 
-					  </div>
-					  <div class="media-right">
-					    <a class="button is-link">$4,500</a>
-					  </div>
-					</article>
+	  				{% endfor %}
 			  	</div>
   			</div>
   		</div>

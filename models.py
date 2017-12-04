@@ -79,7 +79,8 @@ class User:
                     'email': user['email'].item(),
                     'phone': user['phone'].item(),
                     'type_of_user': user['type_of_user'].item(),
-                    'about': user['about'].item()}
+                    'about': user['about'].item(),
+                    'link_to_user': '/user/' + username}
 
     @staticmethod
     def set_about(username, about):
@@ -290,6 +291,29 @@ class Bid:
         df.loc[len(df)] = pd.Series(data=[demand_id, developer_id, bid_amount],
             index=['demand_id', 'developer_id', 'bid_amount'])
         df.to_csv('database/Bid.csv', index=False)
+
+    @staticmethod
+    def get_info(bid_id):
+        """
+        Returns a dictionary of information for the bid specified by the given index.
+        Argument bid_id is the index of the row for the bid in the Bid table.
+        """
+        df = pd.read_csv('database/Bid.csv')
+        bid = df.loc[bid_id]
+
+        return {'demand_id': bid['demand_id'],
+                'developer_username': bid['developer_username'],
+                'bid_amount': bid['bid_amount']}
+
+    @staticmethod
+    def get_bids_for_demand(demand_id):
+        """
+        Returns a list of bid_ids or indexes where the bids are located in the Bid table.
+        """
+        df = pd.read_csv('database/Bid.csv')
+        bids = df.loc[df['demand_id'] == int(demand_id)]
+
+        return bids.index.tolist()
 
 class BlacklistedUser:
     """

@@ -27,9 +27,9 @@ def browse():
 
 @app.route("/user/<name>")
 def user(name):
-    if User.has_user_id(name):
-        info = User.get_user_info(name)
-        return render_template("profile.html", info=info)
+    # if User.has_user_id(name):
+    info = User.get_user_info(name)
+    return render_template("profile.html", info=info)
 
 @app.route("/apply")
 def apply():
@@ -98,9 +98,20 @@ def logout():
 def protestWarning():
     return render_template("protestWarning.html")
 
-@app.route("/bid/<bidName>")
-def bidInfo(bidName):
-    return render_template("bidPage.html")
+@app.route("/bid/<demand_id>")
+def bidInfo(demand_id):
+    bids = Bid.get_bids_for_demand(demand_id)
+    bids_info = []
+    bidders_info = {}
+
+    for bid in bids:
+        info = Bid.get_info(bid)
+        bids_info.append(info)
+
+        if info['developer_username'] not in bidders_info:
+            bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
+
+    return render_template("bidPage.html", bids_info=bids_info, bidders_info=bidders_info)
 
 @app.route("/createDemand")
 def createDemand():
