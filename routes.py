@@ -29,8 +29,26 @@ def browse():
 @app.route("/user/<name>")
 def user(name):
     # if User.has_user_id(name):
+    # get basic info
     info = User.get_user_info(name)
-    return render_template("profile.html", info=info)
+
+    if info['type_of_user'] == 'client':
+        rating = Client.get_info(name)['avg_rating']
+        projects = Client.get_projects_posted(name)
+    elif info['type_of_user'] == 'developer':
+        rating = Developer.get_info(name)['avg_rating']
+        projects = Developer.get_past_projects(name)
+
+    projects_info = []
+
+    for demand_id in projects:
+        projects_info.append(Demand.get_info(demand_id))
+
+    # round rating to the nearest 0.5
+    rating = round(0.5 * round(float(rating) / 0.5), 1)
+    has_half_star = rating % 1 == .5
+
+    return render_template("profile.html", info=info, rating=int(rating), half_star=has_half_star, projects=projects_info)
 
 @app.route("/apply")
 def apply():
@@ -109,6 +127,8 @@ def bidInfo(demand_id):
 
     if (len(bids) > 0):
         lowest_bid = Bid.get_info(bids[0])['bid_amount']
+    else:
+        lowest_bid = 'None'
 
     for bid in bids:
         info = Bid.get_info(bid)

@@ -98,23 +98,72 @@ class Client:
     """
     Client class. Has methods that inserts to and reads from the Client table.
     """
-    def __init__(self, user_id):
+    def __init__(self, username):
         df = pd.read_csv('database/Client.csv')
 
-        df.loc[len(df)] = pd.Series(data=[user_id, 0, 0, 0, 0],
-            index=['user_id', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
         df.to_csv('database/Client.csv', index=False)
+
+    @staticmethod
+    def get_info(username):
+        """
+        Returns a dictionary of information for the given developer.
+        """
+        df = pd.read_csv('database/Client.csv')
+        client = df.loc[df.username == username]
+
+        return {'username': username,
+                'avg_rating': client['avg_rating'].item(),
+                'avg_given_rating': client['avg_given_rating'].item(),
+                'num_of_completed_projects': client['num_of_completed_projects'].item(),
+                'num_of_warnings': client['num_of_warnings'].item()}
+
+    @staticmethod
+    def get_projects_posted(username):
+        """
+        Returns a list of all demands that the client posted.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[df.client_username == username]
+
+        return projects.index.tolist()
 
 class Developer:
     """
     Developer class. Has methods that inserts to and reads from the Developer table.
     """
-    def __init__(self, user_id):
+    def __init__(self, username):
         df = pd.read_csv('database/Developer.csv')
 
-        df.loc[len(df)] = pd.Series(data=[user_id, 0, 0, 0, 0],
-            index=['user_id', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
         df.to_csv('database/Developer.csv', index=False)
+
+    @staticmethod
+    def get_info(username):
+        """
+        Returns a dictionary of information for the given developer.
+        """
+        df = pd.read_csv('database/Developer.csv')
+        developer = df.loc[df.username == username]
+
+        return {'username': username,
+                'avg_rating': developer['avg_rating'].item(),
+                'avg_given_rating': developer['avg_given_rating'].item(),
+                'num_of_completed_projects': developer['num_of_completed_projects'].item(),
+                'num_of_warnings': developer['num_of_warnings'].item()}
+
+    @staticmethod
+    def get_past_projects(username):
+        """
+        Returns a list of past demands that the developer worked on.
+        These past demands are ones that are completed.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[(df.chosen_developer_username == username) & (df.is_completed)]
+
+        return projects.index.tolist()
 
 class Applicant:
     """
@@ -144,9 +193,6 @@ class Applicant:
         """
         df = pd.read_csv('database/Applicant.csv')
         tmp = df.loc[df['email'] == email]
-
-        # also validate the format of the email using regex
-
 
         return tmp.empty
 
@@ -225,8 +271,8 @@ class Demand:
         format = '%m-%d-%Y %I:%M %p'
         date_posted = now.strftime(format)
         
-        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline],
-            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline'])
+        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False],
+            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed'])
 
         df.to_csv('database/Demand.csv', index=False)
 
@@ -249,6 +295,7 @@ class Demand:
                     'specifications': demand['specifications'],
                     'bidding_deadline': demand['bidding_deadline'],
                     'submission_deadline': demand['submission_deadline'],
+                    'is_completed': demand['is_completed'],
                     'bidding_deadline_passed': deadline_passed,
                     'link_to_client': '/user/' + demand['client_username'],
                     'link_to_demand': '/bid/' + str(demand_id)}
@@ -278,6 +325,8 @@ class Demand:
                 active_demands.append(row.index.tolist()[0])
 
         return active_demands
+
+# Demand('jane', 'new demand', 'blah blah blah tags', 'specifications', '01-13-2017 11:59 PM', '02-01-2017 11:59 PM')
 
 class Bid:
     """

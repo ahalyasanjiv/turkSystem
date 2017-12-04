@@ -58,7 +58,11 @@
 					</div>
   				</div>
   				<div class="column is-one-third">
+                    {% if lowest_bid != 'None' %}
 	  				<h1 class="title is-2"><strong>Current Bid: </strong> ${{ lowest_bid }}</h1>
+                    {% else %}
+                    <h1 class="title is-2"><strong>No bids yet!</strong></h1>
+                    {% endif %}
 
 	  				{% for bid_info in bids_info %}
 	  				<article class="media">
