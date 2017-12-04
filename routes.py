@@ -1,5 +1,6 @@
 from flask import Flask, flash, render_template, request, session, redirect, url_for
 from csv import reader
+import datetime
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser
 from forms import SignupForm, LoginForm
 
@@ -17,9 +18,28 @@ def dashboard():
 
 @app.route("/browse")
 def browse():
-    demands = Demand.get_filtered_demands()
+    start_date = request.args.get('start_date', default=None, type=str)
+    end_date = request.args.get('end_date', default=None, type=str)
+    client = request.args.get('client', default=None, type=str)
+
+    client_rating = None
+    for i in range(1,5):
+        if request.args.get('rating' + str(i)) == 'on':
+            client_rating = i
+            break
+
+    tags = request.args.get('tags', default=None, type=str)
+    min_bid = request.args.get('min_bid', default=None, type=float)
+    active = request.args.get('show_active', default=False)
+
+    demands = Demand.get_filtered_demands(start_date=start_date,
+                                          end_date=end_date,
+                                          client=client,
+                                          client_rating=client_rating,
+                                          tags=tags,
+                                          min_bid=min_bid,
+                                          active=active)
     demands_info = []
-    
     for demand in demands:
         demands_info.append(Demand.get_info(demand))
 

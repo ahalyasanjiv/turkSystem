@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField
+from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 
 class SignupForm(FlaskForm):
@@ -24,6 +24,4 @@ class ProtestForm(FlaskForm):
 	warning = SelectField(label='Warning to Protest', choices = [('warning1','Warning#1'),('warning2','Warning#2')])
 	reason = TextAreaField(label='Reason for Protest', id='reason', validators=[DataRequired('Please enter a reason for protesting this complaint.')])
 	submit = SubmitField('Submit Protest')
-
-
 

@@ -54,103 +54,104 @@
               Filter
             </p>
 
-            <div class="field">
-              <ul class="menu-list">
-                <li>
-                  <label><strong>By Date Posted</strong></label>
-                  <div class="control">
-                    <div class="columns">
-                      <div class="column is-half">
-                        <small>Before</small>
-                        <input class="input" type="date">
-                      </div>
-                      <div class="column is-half">
-                        <small>After</small>
-                        <input class="input" type="date">
-                      </div>
-                    </div>
-                  </div>
-                  <br>
-                </li>
-
-                <li>
-                  <label><strong>By Client</strong></label>
-                  <div class="control">
-                    <input class="input" type="text" placeholder="Client's username">
-                  </div>
-                  <br>
-                </li>
-
-                <li>
-                  <label><strong>By Client Rating</strong></label>
-                  <div class="control">
-                    <input type="radio" name="rating">
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
-                    <input type="radio" name="rating">
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
-                    <input type="radio" name="rating">
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
-                    <input type="radio" name="rating">
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i>
-                    <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
-                  </div>
-                  <br>
-                </li>
-
-                <li>
-                  <label><strong>By Bid Price</strong></label>
-                  <div class="control">
-                    <div class="columns">
-                      <div class="column is-half">
-                        <small>Min Price</small>
-                        <input class="input" type="number" placeholder="0.00">
+            <form action="/browse" method="GET" id="filter">
+              <div class="field">
+                <ul class="menu-list">
+                  <li>
+                    <label><strong>By Date Posted</strong></label>
+                    <div class="control">
+                      <div class="columns">
+                        <div class="column is-half">
+                          <small>After This Date</small>
+                          <input class="input" type="date" name="start_date">
+                        </div>
+                        <div class="column is-half">
+                          <small>Before This Date</small>
+                          <input class="input" type="date" name="end_date">
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <br>
-                </li>
+                    <br>
+                  </li>
 
-                <li>
-                  <label><strong>By Tags</strong></label>
-                  <div class="control">
-                    <input class="input" type="text" placeholder="Tags">
-                  </div>
-                  <br>
-                </li>
+                  <li>
+                    <label><strong>By Client</strong></label>
+                    <div class="control">
+                      <input class="input" type="text" placeholder="Client's username" name="client">
+                    </div>
+                    <br>
+                  </li>
 
-                <li>
-                  <div class="control">
-                    <label class="checkbox">
-                    <input type="checkbox" name="show-active">
-                    <strong>Show Active Only</strong></label>
-                  </div>
-                  <br>
-                </li>
+                  <li>
+                    <label><strong>By Client Rating</strong></label>
+                    <div class="control">
+                      <input type="radio" name="rating4">
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
+                      <input type="radio" name="rating3">
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
+                      <input type="radio" name="rating2">
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
+                      <input type="radio" name="rating1">
+                      <i class="fa fa-star" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i>
+                      <i class="fa fa-star-o" aria-hidden="true"></i><small> &amp; Up</small><br>
+                    </div>
+                    <br>
+                  </li>
 
-                <li>
-                  <div class="control">
-                    <button class="button is-link">Filter</button>
-                  </div>
-                </li>
+                  <li>
+                    <label><strong>By Bid Price</strong></label>
+                    <div class="control">
+                      <div class="columns">
+                        <div class="column is-half">
+                          <small>Minimum Bid</small>
+                          <input class="input" type="number" placeholder="0.00" name="min_bid">
+                        </div>
+                      </div>
+                    </div>
+                    <br>
+                  </li>
 
-              </ul>
-            </div>
+                  <li>
+                    <label><strong>By Tags</strong></label>
+                    <div class="control">
+                      <input class="input" type="text" placeholder="Tags" name="tags">
+                    </div>
+                    <br>
+                  </li>
 
+                  <li>
+                    <div class="control">
+                      <label class="checkbox">
+                      <input type="checkbox" name="show_active">
+                      <strong>Show Active Only</strong></label>
+                    </div>
+                    <br>
+                  </li>
+
+                  <li>
+                    <div class="control">
+                      <button type="submit" class="button is-link" form="filter">Filter</button>
+                    </div>
+                  </li>
+
+                </ul>
+              </div>
+            </form>
           </aside>
         </div>
       </div>

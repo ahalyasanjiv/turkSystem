@@ -311,8 +311,7 @@ class Demand:
         return df.index.tolist()[::-1]
 
     @staticmethod
-    def get_filtered_demands(start_date=None, end_date=None, client=None, 
-        client_rating=None, tags=None, min_bid=None, active=False):
+    def get_filtered_demands(start_date, end_date, client, client_rating, tags, min_bid, active):
         """
         Returns a list of demands that are filtered.
         The demands are ordered from most recent to least recent.
@@ -323,18 +322,18 @@ class Demand:
         filtered['bidding_deadline'] = pd.to_datetime(filtered['bidding_deadline'])
 
         # filter by date
-        if start_date is not None:
+        if start_date is not None and start_date != '':
             filtered = filtered.loc[filtered.date_posted >= start_date]
 
-        if end_date is not None:
+        if end_date is not None and end_date != '':
             filtered = filtered.loc[filtered.date_posted <= end_date]
 
         # filter by client's username
-        if client is not None:
+        if client is not None and client != '':
             filtered = filtered.loc[filtered.client_username == client]
 
         # filter by active status
-        if active:
+        if active != False:
             filtered = filtered.loc[(filtered.bidding_deadline > now) & (filtered.is_completed == False)]
 
         # filter by client_rating
@@ -350,10 +349,10 @@ class Demand:
                 return float(Bid.get_info(bids[0])['bid_amount']) if len(bids) > 0 else None
 
             filtered['lowest_bid'] = pd.Series(filtered.index.map(lowest_bid))
-            filtered = filtered.loc[(filtered.lowest_bid >= min_bid) | (filtered.lowest_bid is None)]
+            filtered = filtered.loc[(filtered.lowest_bid >= min_bid) | (filtered.lowest_bid.isnull())]
 
         # filter by tags
-        if tags is not None:
+        if tags is not None and tags != '':
             # remove punctuation, change words to lowercase
             tags = map(lambda x: x.lower(), re.findall(r'[^\s!,.?":;0-9]+', tags))
             tags = set(tags)
