@@ -18,11 +18,14 @@
   				  	<div class="media-content">
 				    <div class="content">
 				    	<p>
-				        <strong>John Smith</strong> <small>&emsp;|&emsp;<a>@john.smith24</a>&emsp;|&emsp;</small> <small><strong>Posted:</strong> 11/07/17&emsp;|&emsp;</small> <small><strong>Bidding Deadline:</strong> 11/25/17</small>
+				        <strong>{{ client_info.first_name }} {{ client_info.last_name }}</strong> <small><a>@{{ demand_info.client_username }}</a></small>
 				        <br>
-				        	Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus. 
+				        <small><strong>Posted:</strong> {{ demand_info.date_posted }}</small>
+				        <br><small><strong>Bidding Deadline:</strong> {{ demand_info.bidding_deadline }}</small>
+				        <br>
+				        <small><strong>Specifications:</strong></small><br>
+				        	{{ demand_info.specifications }}
 				      	</p>
-				      	<p><a>Read more</a></p>
 				      	<div class="has-text-centered">
 							<div class="columns">
 				  				<div class="column is-one-third">

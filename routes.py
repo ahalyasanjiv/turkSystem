@@ -18,6 +18,7 @@ def dashboard():
 @app.route("/browse")
 def browse():
     demands = Demand.get_all_demands()
+    # demands = Demand.get_all_active_demands()
     demands_info = []
     
     for demand in demands:
@@ -100,6 +101,8 @@ def protestWarning():
 
 @app.route("/bid/<demand_id>")
 def bidInfo(demand_id):
+    demand_info = Demand.get_info(demand_id)
+    client_info = User.get_user_info(demand_info['client_username'])
     bids = Bid.get_bids_for_demand(demand_id)
     bids_info = []
     bidders_info = {}
@@ -111,7 +114,7 @@ def bidInfo(demand_id):
         if info['developer_username'] not in bidders_info:
             bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
 
-    return render_template("bidPage.html", bids_info=bids_info, bidders_info=bidders_info)
+    return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info)
 
 @app.route("/createDemand")
 def createDemand():

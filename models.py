@@ -231,27 +231,27 @@ class Demand:
         df.to_csv('database/Demand.csv', index=False)
 
     @staticmethod
-    def get_info(title): # need to add id column so we can get demand by id instead
+    def get_info(demand_id):
         """
         Returns a dictionary of information for the specified demand.
         """
         df = pd.read_csv('database/Demand.csv')
-        demand = df.loc[df.title == title]
+        demand = df.loc[int(demand_id)]
 
         now = datetime.datetime.now()
-        deadline_passed = datetime.datetime.strptime(demand['bidding_deadline'].item(), '%m-%d-%Y %I:%M %p') < now
+        deadline_passed = datetime.datetime.strptime(demand['bidding_deadline'], '%m-%d-%Y %I:%M %p') < now
 
         if not demand.empty:
-            return {'client_username': demand['client_username'].item(),
-                    'date_posted': demand['date_posted'].item(),
-                    'title': demand['title'].item(),
-                    'tags': demand['tags'].item(),
-                    'specifications': demand['specifications'].item(),
-                    'bidding_deadline': demand['bidding_deadline'].item(),
-                    'submission_deadline': demand['submission_deadline'].item(),
+            return {'client_username': demand['client_username'],
+                    'date_posted': demand['date_posted'],
+                    'title': demand['title'],
+                    'tags': demand['tags'],
+                    'specifications': demand['specifications'],
+                    'bidding_deadline': demand['bidding_deadline'],
+                    'submission_deadline': demand['submission_deadline'],
                     'bidding_deadline_passed': deadline_passed,
-                    'link_to_client': '/user/' + demand['client_username'].item(),
-                    'link_to_demand': '/bid/' + str(demand.index[0])}
+                    'link_to_client': '/user/' + demand['client_username'],
+                    'link_to_demand': '/bid/' + str(demand_id)}
 
     @staticmethod
     def get_all_demands():
@@ -260,16 +260,12 @@ class Demand:
         The demands are ordered from most recent to least recent.
         """
         df = pd.read_csv('database/Demand.csv')
-        demands = []
-
-        for index, row in df.iterrows():
-            demands.append(row['title'])
-        return demands[::-1]
+        return df.index.tolist()[::-1]
 
     @staticmethod
     def get_all_active_demands():
         """
-        Returns a list of active demands. The bidding deadline for Active demands have not passed yet.
+        Returns a list of active demands. The bidding deadline for active demands have not passed yet.
         """
         df = pd.read_csv('database/Demand.csv')
         now = datetime.datetime.now().date()
@@ -278,7 +274,8 @@ class Demand:
         for index, row in df.iterrows():
             tmp_date = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p').date()
             if tmp_date > now:
-                active_demands.append(row['title'])
+                # active_demands.append(row['title'])
+                active_demands.append(row.index.tolist()[0])
 
         return active_demands
 
@@ -299,7 +296,7 @@ class Bid:
         Argument bid_id is the index of the row for the bid in the Bid table.
         """
         df = pd.read_csv('database/Bid.csv')
-        bid = df.loc[bid_id]
+        bid = df.loc[int(bid_id)]
 
         return {'demand_id': bid['demand_id'],
                 'developer_username': bid['developer_username'],
