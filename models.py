@@ -283,10 +283,14 @@ class Bid:
     """
     Bid class. Has methods that inserts to Bid table.
     """
-    def __init__(self, demand_id, developer_id, bid_amount):
+    def __init__(self, demand_id, developer_username, bid_amount):
         df = pd.read_csv('database/Bid.csv')
-        df.loc[len(df)] = pd.Series(data=[demand_id, developer_id, bid_amount],
-            index=['demand_id', 'developer_id', 'bid_amount'])
+        now = datetime.datetime.now()
+        format = '%m-%d-%Y %I:%M %p'
+        date_bidded = now.strftime(format)
+
+        df.loc[len(df)] = pd.Series(data=[demand_id, developer_username, bid_amount, date_bidded],
+            index=['demand_id', 'developer_username', 'bid_amount', 'date_bidded'])
         df.to_csv('database/Bid.csv', index=False)
 
     @staticmethod
@@ -298,9 +302,25 @@ class Bid:
         df = pd.read_csv('database/Bid.csv')
         bid = df.loc[int(bid_id)]
 
+        # get time since bid was made
+        now = datetime.datetime.now()
+        bid_made = datetime.datetime.strptime(bid['date_bidded'], '%m-%d-%Y %I:%M %p')
+        time_diff = now - bid_made
+
+        if time_diff.days > 0:
+            td = str(time_diff.days) + 'd'
+        else:
+            seconds = time_diff.seconds
+
+            if seconds // 3600 > 0:
+                td = str(seconds // 3600) + 'h'
+            else:
+                td = str(seconds // 60) + 'm'
+
         return {'demand_id': bid['demand_id'],
                 'developer_username': bid['developer_username'],
-                'bid_amount': format(bid['bid_amount'], '.2f')}
+                'bid_amount': format(bid['bid_amount'], '.2f'),
+                'time_diff': td}
 
     @staticmethod
     def get_bids_for_demand(demand_id):
