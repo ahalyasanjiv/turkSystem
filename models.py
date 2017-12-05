@@ -95,6 +95,7 @@ class User:
             df.loc[df.username == username, 'about'] = about
             df.to_csv('database/User.csv')
 
+
 class Client:
     """
     Client class. Has methods that inserts to and reads from the Client table.
@@ -221,6 +222,17 @@ class Applicant:
         """
         hash_object = hashlib.sha256(password.encode())
         return hash_object.hexdigest()
+
+    @staticmethod
+    def is_unique_user_id(user_id):
+        """
+        Checks whether user_id is unique.
+        Returns True if user_id is unique and False if user_id is not unique.
+        """
+        df = pd.read_csv('database/Applicant.csv')
+        tmp = df.loc[df['user_id'] == user_id]
+
+        return tmp.empty
 
     @staticmethod
     def approve(user_id):
