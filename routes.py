@@ -1,5 +1,6 @@
 from flask import Flask, flash, render_template, request, session, redirect, url_for
 from csv import reader
+import datetime
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser
 from forms import SignupForm, LoginForm
 
@@ -17,18 +18,56 @@ def dashboard():
 
 @app.route("/browse")
 def browse():
-    active_demands = Demand.get_all_active_demands()
-    active_demands_info = []
-    
-    for demand in active_demands:
-        active_demands_info.append(Demand.get_info(demand))
+    start_date = request.args.get('start_date', default=None, type=str)
+    end_date = request.args.get('end_date', default=None, type=str)
+    client = request.args.get('client', default=None, type=str)
 
-    return render_template("browse.html", active_demands_info=active_demands_info)
+    client_rating = None
+    for i in range(1,5):
+        if request.args.get('rating' + str(i)) == 'on':
+            client_rating = i
+            break
+
+    tags = request.args.get('tags', default=None, type=str)
+    min_bid = request.args.get('min_bid', default=None, type=float)
+    active = request.args.get('show_active', default=False)
+
+    demands = Demand.get_filtered_demands(start_date=start_date,
+                                          end_date=end_date,
+                                          client=client,
+                                          client_rating=client_rating,
+                                          tags=tags,
+                                          min_bid=min_bid,
+                                          active=active)
+    demands_info = []
+    for demand in demands:
+        demands_info.append(Demand.get_info(demand))
+
+    return render_template("browse.html", demands_info=demands_info)
 
 @app.route("/user/<name>")
 def user(name):
+    # if User.has_user_id(name):
+    # get basic info
     info = User.get_user_info(name)
-    return render_template("profile.html", info=info)
+
+    if info['type_of_user'] == 'client':
+        rating = Client.get_info(name)['avg_rating']
+        projects = Client.get_projects_posted(name)
+    elif info['type_of_user'] == 'developer':
+        rating = Developer.get_info(name)['avg_rating']
+        projects = Developer.get_past_projects(name)
+
+    projects_info = []
+
+    for demand_id in projects:
+        projects_info.append(Demand.get_info(demand_id))
+
+    # round rating to the nearest 0.5
+    rating = round(0.5 * round(float(rating) / 0.5), 1)
+    has_half_star = rating % 1 == .5
+
+    return render_template("profile.html", info=info, rating=int(rating), half_star=has_half_star, projects=projects_info)
 
 @app.route("/apply", methods=["GET", "POST"])
 def apply():
@@ -75,7 +114,6 @@ def login():
     
     return render_template('login.html', form=form)
 
-
 @app.route("/logout")
 def logout():
     """
@@ -88,9 +126,27 @@ def logout():
 def protestWarning():
     return render_template("protestWarning.html")
 
-@app.route("/bid/<bidName>")
-def bidInfo(bidName):
-    return render_template("bidPage.html")
+@app.route("/bid/<demand_id>")
+def bidInfo(demand_id):
+    demand_info = Demand.get_info(demand_id)
+    client_info = User.get_user_info(demand_info['client_username'])
+    bids = Bid.get_bids_for_demand(demand_id)
+    bids_info = []
+    bidders_info = {}
+
+    if (len(bids) > 0):
+        lowest_bid = Bid.get_info(bids[0])['bid_amount']
+    else:
+        lowest_bid = 'None'
+
+    for bid in bids:
+        info = Bid.get_info(bid)
+        bids_info.append(info)
+
+        if info['developer_username'] not in bidders_info:
+            bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
+
+    return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid)
 
 @app.route("/createDemand")
 def createDemand():
@@ -98,4 +154,3 @@ def createDemand():
 
 if __name__ == "__main__":
     app.run(debug=True)
-

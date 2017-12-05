@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import hashlib
 import datetime
-import re
 from werkzeug import generate_password_hash, check_password_hash
+import re
 
 class User:
     """
@@ -80,7 +80,8 @@ class User:
                     'email': user['email'].item(),
                     'phone': user['phone'].item(),
                     'type_of_user': user['type_of_user'].item(),
-                    'about': user['about'].item()}
+                    'about': user['about'].item(),
+                    'link_to_user': '/user/' + username}
 
     @staticmethod
     def set_about(username, about):
@@ -98,23 +99,72 @@ class Client:
     """
     Client class. Has methods that inserts to and reads from the Client table.
     """
-    def __init__(self, user_id):
+    def __init__(self, username):
         df = pd.read_csv('database/Client.csv')
 
-        df.loc[len(df)] = pd.Series(data=[user_id, 0, 0, 0, 0],
-            index=['user_id', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
         df.to_csv('database/Client.csv', index=False)
+
+    @staticmethod
+    def get_info(username):
+        """
+        Returns a dictionary of information for the given developer.
+        """
+        df = pd.read_csv('database/Client.csv')
+        client = df.loc[df.username == username]
+
+        return {'username': username,
+                'avg_rating': client['avg_rating'].item(),
+                'avg_given_rating': client['avg_given_rating'].item(),
+                'num_of_completed_projects': client['num_of_completed_projects'].item(),
+                'num_of_warnings': client['num_of_warnings'].item()}
+
+    @staticmethod
+    def get_projects_posted(username):
+        """
+        Returns a list of all demands that the client posted.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[df.client_username == username]
+
+        return projects.index.tolist()
 
 class Developer:
     """
     Developer class. Has methods that inserts to and reads from the Developer table.
     """
-    def __init__(self, user_id):
+    def __init__(self, username):
         df = pd.read_csv('database/Developer.csv')
 
-        df.loc[len(df)] = pd.Series(data=[user_id, 0, 0, 0, 0],
-            index=['user_id', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
         df.to_csv('database/Developer.csv', index=False)
+
+    @staticmethod
+    def get_info(username):
+        """
+        Returns a dictionary of information for the given developer.
+        """
+        df = pd.read_csv('database/Developer.csv')
+        developer = df.loc[df.username == username]
+
+        return {'username': username,
+                'avg_rating': developer['avg_rating'].item(),
+                'avg_given_rating': developer['avg_given_rating'].item(),
+                'num_of_completed_projects': developer['num_of_completed_projects'].item(),
+                'num_of_warnings': developer['num_of_warnings'].item()}
+
+    @staticmethod
+    def get_past_projects(username):
+        """
+        Returns a list of past demands that the developer worked on.
+        These past demands are ones that are completed.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[(df.chosen_developer_username == username) & (df.is_completed)]
+
+        return projects.index.tolist()
 
 class Applicant:
     """
@@ -144,9 +194,6 @@ class Applicant:
         """
         df = pd.read_csv('database/Applicant.csv')
         tmp = df.loc[df['email'] == email]
-
-        # also validate the format of the email using regex
-
 
         return tmp.empty
 
@@ -225,53 +272,156 @@ class Demand:
         format = '%m-%d-%Y %I:%M %p'
         date_posted = now.strftime(format)
         
-        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline],
-            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline'])
+        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False],
+            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed'])
 
         df.to_csv('database/Demand.csv', index=False)
 
     @staticmethod
-    def get_info(title): # need to add id column so we can get demand by id instead
+    def get_info(demand_id):
         """
         Returns a dictionary of information for the specified demand.
         """
         df = pd.read_csv('database/Demand.csv')
-        demand = df.loc[df.title == title]
+        demand = df.loc[int(demand_id)]
+
+        now = datetime.datetime.now()
+        deadline_passed = datetime.datetime.strptime(demand['bidding_deadline'], '%m-%d-%Y %I:%M %p') < now
 
         if not demand.empty:
-            return {'client_username': demand['client_username'].item(),
-                    'date_posted': demand['date_posted'].item(),
-                    'title': demand['title'].item(),
-                    'tags': demand['tags'].item(),
-                    'specifications': demand['specifications'].item(),
-                    'bidding_deadline': demand['bidding_deadline'].item(),
-                    'submission_deadline': demand['submission_deadline'].item()}
+            return {'client_username': demand['client_username'],
+                    'date_posted': demand['date_posted'],
+                    'title': demand['title'],
+                    'tags': demand['tags'],
+                    'specifications': demand['specifications'],
+                    'bidding_deadline': demand['bidding_deadline'],
+                    'submission_deadline': demand['submission_deadline'],
+                    'is_completed': demand['is_completed'],
+                    'bidding_deadline_passed': deadline_passed,
+                    'link_to_client': '/user/' + demand['client_username'],
+                    'link_to_demand': '/bid/' + str(demand_id)}
 
     @staticmethod
-    def get_all_active_demands():
+    def get_all_demands():
         """
-        Returns a list of active demands. The bidding deadline for Active demands have not passed yet.
+        Returns a list of all demands.
+        The demands are ordered from most recent to least recent.
         """
         df = pd.read_csv('database/Demand.csv')
-        now = datetime.datetime.now().date()
-        active_demands = []
+        return df.index.tolist()[::-1]
 
-        for index, row in df.iterrows():
-            tmp_date = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p').date()
-            if tmp_date > now:
-                active_demands.append(row['title'])
+    @staticmethod
+    def get_filtered_demands(start_date, end_date, client, client_rating, tags, min_bid, active):
+        """
+        Returns a list of demands that are filtered.
+        The demands are ordered from most recent to least recent.
+        """
+        filtered = pd.read_csv('database/Demand.csv')
+        now = datetime.datetime.now()
+        filtered['date_posted'] = pd.to_datetime(filtered['date_posted'])
+        filtered['bidding_deadline'] = pd.to_datetime(filtered['bidding_deadline'])
 
-        return active_demands
+        # filter by date
+        if start_date is not None and start_date != '':
+            filtered = filtered.loc[filtered.date_posted >= start_date]
+
+        if end_date is not None and end_date != '':
+            filtered = filtered.loc[filtered.date_posted <= end_date]
+
+        # filter by client's username
+        if client is not None and client != '':
+            filtered = filtered.loc[filtered.client_username == client]
+
+        # filter by active status
+        if active != False:
+            filtered = filtered.loc[(filtered.bidding_deadline > now) & (filtered.is_completed == False)]
+
+        # filter by client_rating
+        if client_rating is not None:
+            client_df = pd.read_csv('database/Client.csv')
+            merged = pd.merge(filtered, client_df, how='left', left_on=['client_username'], right_on=['username'])
+            filtered = merged.loc[merged.avg_rating >= client_rating]
+
+        # filter by the minimum bid amount
+        if min_bid is not None:
+            def lowest_bid(demand_id):
+                bids = Bid.get_bids_for_demand(demand_id)
+                return float(Bid.get_info(bids[0])['bid_amount']) if len(bids) > 0 else None
+
+            filtered['lowest_bid'] = pd.Series(filtered.index.map(lowest_bid))
+            filtered = filtered.loc[(filtered.lowest_bid >= min_bid) | (filtered.lowest_bid.isnull())]
+
+        # filter by tags
+        if tags is not None and tags != '':
+            # remove punctuation, change words to lowercase
+            tags = map(lambda x: x.lower(), re.findall(r'[^\s!,.?":;0-9]+', tags))
+            tags = set(tags)
+
+            def has_tag(demand_id):
+                demand_tags = map(lambda x: x.lower(), re.findall(r'[^\s!,.?":;0-9]+', Demand.get_info(demand_id)['tags']))
+                demand_tags = set(demand_tags)
+
+                # if there is an intersection between the sets, there are matching tags
+                return len(tags & demand_tags) > 0
+
+            filtered['has_tag'] = pd.Series(filtered.index.map(has_tag))
+            filtered = filtered.loc[filtered.has_tag == True]
+
+        return filtered.sort_values(['date_posted'], ascending=[True]).index.tolist()[::-1]
 
 class Bid:
     """
     Bid class. Has methods that inserts to Bid table.
     """
-    def __init__(self, demand_id, developer_id, bid_amount):
+    def __init__(self, demand_id, developer_username, bid_amount):
         df = pd.read_csv('database/Bid.csv')
-        df.loc[len(df)] = pd.Series(data=[demand_id, developer_id, bid_amount],
-            index=['demand_id', 'developer_id', 'bid_amount'])
+        now = datetime.datetime.now()
+        format = '%m-%d-%Y %I:%M %p'
+        date_bidded = now.strftime(format)
+
+        df.loc[len(df)] = pd.Series(data=[demand_id, developer_username, bid_amount, date_bidded],
+            index=['demand_id', 'developer_username', 'bid_amount', 'date_bidded'])
         df.to_csv('database/Bid.csv', index=False)
+
+    @staticmethod
+    def get_info(bid_id):
+        """
+        Returns a dictionary of information for the bid specified by the given index.
+        Argument bid_id is the index of the row for the bid in the Bid table.
+        """
+        df = pd.read_csv('database/Bid.csv')
+        bid = df.loc[int(bid_id)]
+
+        # get time since bid was made
+        now = datetime.datetime.now()
+        bid_made = datetime.datetime.strptime(bid['date_bidded'], '%m-%d-%Y %I:%M %p')
+        time_diff = now - bid_made
+
+        if time_diff.days > 0:
+            td = str(time_diff.days) + 'd'
+        else:
+            seconds = time_diff.seconds
+
+            if seconds // 3600 > 0:
+                td = str(seconds // 3600) + 'h'
+            else:
+                td = str(seconds // 60) + 'm'
+
+        return {'demand_id': bid['demand_id'],
+                'developer_username': bid['developer_username'],
+                'bid_amount': format(bid['bid_amount'], '.2f'),
+                'time_diff': td}
+
+    @staticmethod
+    def get_bids_for_demand(demand_id):
+        """
+        Returns a list of bid_ids or indexes where the bids are located in the Bid table.
+        The list is sorted from lowest bid to highest bid.
+        """
+        df = pd.read_csv('database/Bid.csv')
+        bids = df.loc[df['demand_id'] == int(demand_id)].sort_values(['bid_amount'], ascending=[True])
+
+        return bids.index.tolist()
 
 class BlacklistedUser:
     """

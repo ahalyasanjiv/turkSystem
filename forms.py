@@ -31,5 +31,3 @@ class ProtestForm(FlaskForm):
 	reason = TextAreaField(label='Reason for Protest', id='reason', validators=[DataRequired('Please enter a reason for protesting this complaint.')])
 	submit = SubmitField('Submit Protest')
 
-
-
