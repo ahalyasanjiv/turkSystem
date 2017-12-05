@@ -79,8 +79,8 @@ def apply():
     if request.method == 'POST':
         if form.validate():
             new_user = Applicant(form.role.data, form.first_name.data, form.last_name.data, form.email.data, form.phone.data,
-                            form.credit_card.data, form.username.data, form.password.data)
-            session['username'] = form.username.data
+                            form.credit_card.data, form.user_id.data, form.password.data)
+            session['username'] = form.user_id.data
             session['role'] = form.role.data
             return redirect(url_for('dashboard'))
         else:
