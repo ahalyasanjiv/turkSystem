@@ -13,7 +13,7 @@ class SignupForm(FlaskForm):
 	confirm_password = PasswordField(label='Confirm Password', id ='confirm_password', validators=[DataRequired('Please confirm your password.')])
 	credit_card = StringField(label='Credit Card Number', id='credit_card', validators=[DataRequired('Please enter the credit card number.')])
 	credit_card_name = StringField(label='Name of Credit Card Holder', id='credit_card_number', validators=[DataRequired('Please enter the name of the credit card holder.')])
-	exp_date = DateField(label='Expiration Date', id='credit_card_exp_date', validators=[DataRequired('Please enter the credit card exporation date.')], format='%Y-%m-%d')
+	exp_date = DateField(label='Expiration Date', id='credit_card_exp_date', validators=[DataRequired('Please enter the credit card expiration date.')], format='%Y-%m-%d')
 	security_code = StringField(label='Security Code', id='security_code', validators=[DataRequired('Please enter the security code.')])
 	billing_address = StringField(label='Billing Address', id='billing_address', validators=[DataRequired('Please enter the billing address.')])
 	role = SelectField(label='Role', id='role', validators=[DataRequired('Please choose a role.')], choices = [('client','Client'),('developer','Developer')],)

@@ -30,7 +30,7 @@ def user(name):
     info = User.get_user_info(name)
     return render_template("profile.html", info=info)
 
-@app.route("/apply")
+@app.route("/apply", methods=["GET", "POST"])
 def apply():
     if 'username' in session:
         return redirect(url_for('dashboard'))
@@ -39,15 +39,13 @@ def apply():
 
     if request.method == 'POST':
         if form.validate():
-            newuser = Applicant(form.first_name.data, form.last_name.data, form.email.data,
-                           form.password.data, form.username.data, form.role.data)
-            db.session.add(newuser)
-            db.session.commit()
-
-            session['username'] = newuser.username
-            session['role'] = newuser.role
+            new_user = Applicant(form.role.data, form.first_name.data, form.last_name.data, form.email.data, form.phone.data,
+                            form.credit_card.data, form.username.data, form.password.data)
+            session['username'] = form.username.data
+            session['role'] = form.role.data
             return redirect(url_for('dashboard'))
         else:
+            flash('Applicant submission is invalid. Please check that all fields are filled correctly.')
             return render_template('application.html', form=form)
 
 
@@ -66,13 +64,6 @@ def login():
         if User.check_password(username, password):
             session['username'] = username
             return redirect(url_for('dashboard'))
-            
-        # with open('database/User.csv', 'r') as f:
-        #     csvreader = reader(f, delimiter=',')
-        #     for row in csvreader:
-        #         if username in row[0] and password in row[1]:
-        #             session['username'] = username
-        #             return redirect(url_for('dashboard'))
 
         # If username or password is invalid, notify user
         else:
