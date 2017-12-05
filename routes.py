@@ -82,6 +82,7 @@ def apply():
                             form.credit_card.data, form.user_id.data, form.password.data)
             session['username'] = form.user_id.data
             session['role'] = form.role.data
+            session['first_name'] = form.first_name.data
             return redirect(url_for('dashboard'))
         else:
             flash('Applicant submission is invalid. Please check that all fields are filled correctly.')
@@ -102,6 +103,7 @@ def login():
         # Check if username exists and if password matches
         if User.check_password(username, password):
             session['username'] = username
+            session['first_name'] = User.get_user_info(username)['first_name']
             return redirect(url_for('dashboard'))
 
         # If username or password is invalid, notify user

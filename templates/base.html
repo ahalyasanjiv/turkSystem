@@ -16,7 +16,13 @@
       <div class="navbar-start">
       <!-- navbar items -->
         <a class="navbar-item" href="/browse">Browse</a>
-        <a class="navbar-item" href="/apply">Apply</a>
+        <!-- <a class="navbar-item" href="/apply">Apply</a> -->
+        {% if session.username %}
+          <a class="navbar-item" href="/logout">Logout</a>
+        {% else %} 
+          <a class="navbar-item" href="/apply">Apply</a>
+          <a class="navbar-item" href="/login">Login</a>
+        {% endif %}
       </div>
      </div>
     </nav>
