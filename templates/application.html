@@ -20,11 +20,23 @@
   					<h2 class="title is-3 has-text-centered">
 				        User Application
 				    </h2>
-				    <form method="POST" action="/signup/">
-						
+				    <form method="POST" action="/apply">
+
+						{{ form.hidden_tag() }}
+			    		{% with messages = get_flashed_messages() %}
+					        {% if messages %}
+					            <div class=flashes>
+					            	{% for message in messages %}
+					                	{{ message }}
+					            	{% endfor %}
+					            </div>
+					        {% endif %}
+				        {% endwith %}
+
 						<h2 class="subtitle">
 					        User Information
 					    </h2>
+
 						<!-- First Name -->
 						<div class="field">
 						  	<div class="control">
