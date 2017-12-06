@@ -35,7 +35,7 @@ class LoginForm(FlaskForm):
 	Form for the page where the user signs in. 
 	"""
 	username = StringField(label='Username', id='username', validators=[DataRequired('Please enter your username.')])
-	password = StringField(label='Password', id='password', validators=[DataRequired('Please enter your password.')])
+	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter your password.')])
 	submit = SubmitField('Sign in')
 
 class ProtestForm(FlaskForm):
