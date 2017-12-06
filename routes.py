@@ -14,7 +14,19 @@ def index():
 
 @app.route("/dashboard")
 def dashboard():
-    return render_template("dashboard.html")
+    if session['username']:
+        first_name = User.get_user_info(session['username'])['first_name']
+        return render_template("dashboard.html", first_name=first_name)
+    else:
+        return render_template("index.html")
+
+@app.route("/dashboard_applicant")
+def dashboard_applicant():
+    if session['username']:
+        first_name = User.get_user_info(session['username'])['first_name']
+        return render_template("dashboard_applicant.html", irst_name=first_name)
+    else:
+        return render_template("index.html")
 
 @app.route("/browse")
 def browse():
@@ -83,7 +95,7 @@ def apply():
             session['username'] = form.user_id.data
             session['role'] = form.role.data
             session['first_name'] = form.first_name.data
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('dashboard_applicant'))
         else:
             flash('Applicant submission is invalid. Please check that all fields are filled correctly.')
             return render_template('application.html', form=form)
@@ -101,9 +113,8 @@ def login():
         username = form.username.data
         password = form.password.data
         # Check if username exists and if password matches
-        if User.check_password(username, password):
+        if User.check_password(username, password) or Applicant.check_password(username, password):
             session['username'] = username
-            session['first_name'] = User.get_user_info(username)['first_name']
             return redirect(url_for('dashboard'))
 
         # If username or password is invalid, notify user

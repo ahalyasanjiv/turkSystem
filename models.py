@@ -235,6 +235,20 @@ class Applicant:
         return tmp.empty
 
     @staticmethod
+    def check_password(username, password):
+        """
+        Checks if the password of a username match. 
+        Returns true if password given matches the password for username 
+        given and false if the password does not match.
+        """
+        df = pd.read_csv('database/Applicant.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            pwhash = user['password'][0]
+            return check_password_hash(pwhash,generate_password_hash(password))
+        return False
+
+    @staticmethod
     def approve(user_id):
         """
         Approves the applicant and adds the user to the User table.
