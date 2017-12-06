@@ -95,6 +95,14 @@ class User:
             df.loc[df.username == username, 'about'] = about
             df.to_csv('database/User.csv')
 
+    @staticmethod
+    def get_number_of_users():
+        """
+        Returns the number of users stored in the database. Excludes NaNs.
+        """
+        df = pd.read_csv('database/User.csv')
+        return df['username'].count() # does not count NaNs
+
 
 class Client:
     """
@@ -131,6 +139,29 @@ class Client:
 
         return projects.index.tolist()
 
+    @staticmethod
+    def get_number_of_clients():
+        """
+        Returns the number of clients in the client database. Excludes NaNs.
+        """
+        df = pd.read_csv('database/Client.csv')
+        return df['username'].count() # does not count NaNs
+
+    @staticmethod
+    def get_top_clients():
+        """
+        Returns the top 3 clients with the most projects completed.
+        """
+        df = pd.read_csv('database/Client.csv')
+        sorted_df = df.sort_values(by='num_of_completed_projects', ascending=False)
+        sorted_df = sorted_df.iloc[:3]
+
+        usernames = []
+        for index, row in sorted_df.iterrows():
+            usernames.append(row['username'])
+
+        return usernames
+
 class Developer:
     """
     Developer class. Has methods that inserts to and reads from the Developer table.
@@ -166,6 +197,14 @@ class Developer:
         projects = df.loc[(df.chosen_developer_username == username) & (df.is_completed)]
 
         return projects.index.tolist()
+
+    @staticmethod
+    def get_number_of_developers():
+        """
+        Returns the number of developers in the developer database. Excludes NaNs.
+        """
+        df = pd.read_csv('database/Developer.csv')
+        return df['username'].count() # does not count NaNs
 
 class Applicant:
     """

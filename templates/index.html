@@ -44,25 +44,29 @@
 		    	<div class="level-item has-text-centered">
 		      	<div>
 		        	<p class="heading">Number of Clients</p>
-		        	<p class="title">3,456</p>
+		        	<p class="title">{{ number_of_clients }}</p>
 		      	</div>
 		    	</div>
 		    	<div class="level-item has-text-centered">
 		      		<div>
 		        	<p class="heading">Number of Developers</p>
-		        	<p class="title">123</p>
+		        	<p class="title">{{ number_of_developers }}</p>
 		      		</div>
 		    	</div>
 				<div class="level-item has-text-centered">
 		      		<div>
 		        	<p class="heading">Top Clients</p>
-		        	<p class="title">Names Names</p>
+		        		{% for username in top_clients %}
+		        			<p class="title">{{ username }}</p>
+		        		{% endfor %}
 		      		</div>
 		    	</div>
 		    	<div class="level-item has-text-centered">
 		      		<div>
 		        	<p class="heading">Most Profitable Developers</p>
-		        	<p class="title">Names names</p>
+		        	{% for username in top_devs %}
+		        		<p class="title">{{ username }}</p>
+		        	{% endfor %}
 		      		</div>
 		    	</div>
 		  	</div>

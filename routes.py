@@ -10,7 +10,16 @@ app.secret_key = 'development-key'
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    number_of_clients = Client.get_number_of_clients()
+    number_of_developers = Developer.get_number_of_developers()
+    # clients with the most projects
+    top_clients = Client.get_top_clients()
+    # developers making the most money
+    top_devs =[]
+    return render_template("index.html",number_of_clients=number_of_clients, 
+                            number_of_developers=number_of_developers,
+                            top_clients = top_clients,
+                            top_devs = top_devs)
 
 @app.route("/dashboard")
 def dashboard():
