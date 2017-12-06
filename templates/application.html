@@ -166,7 +166,7 @@
 									</div>
 									<!-- Expiration Date -->
 									<div class="field">
-										<div class="control">{{ form.exp_date(placeholder="Expiration Date (MM/DD/YYYY)", class='datepicker form-control input is-medium') }}</div>
+										<div class="control">{{ form.exp_date(placeholder="Expiration Date (MM/YYYY)", class='datepicker form-control input is-medium') }}</div>
 										{% if form.exp_date.errors %}
 											{% for error in form.exp_date.errors %}
 									        	<p class="is-danger">{{ error }}</p>
