@@ -1,1 +1,2 @@
 username,password,first_name,last_name,email,phone,credit_card,type_of_user,about
+testuser1,07295b249f87e4540867d07f18a3919b3e458205a502fe63af547304157a0842,Test,User0,test0@test.com,1234567890,1.23457E+15,client,
