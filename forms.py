@@ -46,3 +46,21 @@ class ProtestForm(FlaskForm):
 	reason = TextAreaField(label='Reason for Protest', id='reason', validators=[DataRequired('Please enter a reason for protesting this complaint.')])
 	submit = SubmitField('Submit Protest')
 
+class DemandForm(FlaskForm):
+	"""
+	Form for clients to create and post a demand.
+	"""
+	title = StringField(label='System Title', id='title',
+						validators=[DataRequired('Please enter a title for your demand.')])
+	tags = StringField(label='Tags')
+	specifications = TextAreaField(label='System description',
+					 id='specifications',
+					 validators=[DataRequired('Please enter specifications for the demand.')])
+	bidding_deadline = DateField(label='Deadline for Bidding', id='bidding_deadline',
+					 validators=[DataRequired('Please provide a deadline for bidding.')])
+	submission_deadline = DateField(label='Deadline for Submitting the System', id='submission_deadline',
+					 validators=[DataRequired('Please provide a deadline for submitting the final system.')])
+	submit = SubmitField('Create Demand')
+
+
+

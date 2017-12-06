@@ -209,13 +209,6 @@ class Applicant:
 
         return not tmp.empty
 
-    def validate_password(self, password):
-        """
-        Validates the password, which should be longer than 8 characters.
-        Returns True if the password is valid. Returns False otherwise.
-        """
-        return len(password) > 8
-
     def hash_password(self, password):
         """
         Returns the hash of the given password.
