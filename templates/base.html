@@ -10,7 +10,11 @@
 <body>
 	<nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <p class="navbar-item">JAJ Turk</p>
+        {% if session.username %}
+          <a class="navbar-item" href="/dashboard">JAJ Turk</a>
+        {% else %}
+          <a class="navbar-item" href="/">JAJ Turk</a>
+        {% endif %}
       </div>
       <div class="navbar-menu">
       <div class="navbar-start">
