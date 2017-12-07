@@ -18,9 +18,9 @@
     <div class="container">
       <div class="columns">
         <div class="column is-4">
-          <h1 class="title is-4">
+          <h2 class="title is-4">
             Current Projects
-          </h1>
+          </h2>
                 <article class="media">
                   <figure class="media-left">
                    <p class="image is-64x64">
@@ -56,9 +56,9 @@
                 <br>
                 <div class="button">See All</div>
                 <hr>
-          <h1 class="title is-4">
+          <h2 class="title is-4">
             Bidding Projects
-          </h1>
+          </h2>
                 <article class="media">
                   <figure class="media-left">
                    <p class="image is-64x64">
@@ -95,24 +95,19 @@
                 <div class="button">See All</div>
         </div>
         <div class="column is-8">
-          <h1 class="title is-4">
+          <h2 class="title is-4" style="display:inline-flex">
             Notifications
-          </h1>
+          </h2> 
+          <button class="button" style="margin-left:10px">See All </button>
+          {% for notif in notifications %}
           <div class="notification">
             <p class="content">
-            You were chosen for <strong>Project</strong>! 
+            {{ notif.message }}
             <br>
-            <small>1/1/2018 11:59 PM</small>
+            <small>{{ notif.date_sent }}</small>
             </p>
           </div>
-          <div class="notification">
-            <p class="content">
-            You have received a payment for <strong>Project</strong>!
-            <br>
-            <small>1/1/2018 11:59 PM</small>
-            </p>
-          </div>
-
+          {% endfor %}
 
           <div class="notification is-info">
             <h2 class="title is-4">Suggested Projects</h2>
@@ -158,22 +153,39 @@
           </article>
           </div>
           
-
+        {% if new_user %}
           <div class="level">
             <div class="level-item has-text-centered">
               <div>
-                <p class="heading">Most Active/Similar Interest Clients</p>
+                <p class="heading">Most Active Clients</p>
                 <p class="title">Rainbow, Dragon, Salmon</p>
               </div>
             </div>
 
              <div class="level-item has-text-centered">
               <div>
-                <p class="heading">Most Active/Similar Interest Developers</p>
+                <p class="heading">Most Active Developers</p>
                 <p class="title">Mocha, Latte, Frappe</p>
               </div>
             </div>
           </div>
+        {% else %}
+        <div class="level">
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Clients with Similar Interests</p>
+                <p class="title">Rainbow, Dragon, Salmon</p>
+              </div>
+            </div>
+
+             <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Developers with Interests</p>
+                <p class="title">Mocha, Latte, Frappe</p>
+              </div>
+            </div>
+          </div>
+        {% endif %}
         </div>
       </div>
 

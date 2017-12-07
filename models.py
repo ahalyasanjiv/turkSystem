@@ -531,7 +531,7 @@ class SuperUser:
         hashed = hash_password(password)
         df.loc[len(df)] = pdf.Series(data=[username, hashed],
             index=['username', 'password'])
-
+    
     # def hash_password(self, password):
     #     """
     #     Returns the hash of the given password.
@@ -539,3 +539,39 @@ class SuperUser:
     #     hash_object = hashlib.sha256(password.encode())
     #     return hash_object.hexdigest()
 
+class Notification:
+    """
+    Notifications that show up on dashboard.
+    """
+    def __init__(self,recipient,sender,message):
+        df = pd.read_csv('database/Notification.csv')
+
+        now = datetime.datetime.now()
+        format = '%m-%d-%Y %I:%M %p'
+        date_sent = now.strftime(format)
+        
+        df.loc[len(df)] = pd.Series(data=[len(df), recipient, sender, date_sent, message, False],
+            index=['message_id','recipient', 'sender','date_sent', 'message', 'read_status'])
+
+        df.to_csv('database/Notification.csv', index=False)
+
+    @staticmethod
+    def get_notif_to_recipient(recipient, number):
+        """
+        Get messages to a certain recipient. The amount that is returned is number.
+        The most recent notifications are returned.
+        """
+        df = pd.read_csv('database/Notification.csv')
+        msgs = df.loc[df['recipient'] == recipient]
+        msgs_sorted = msgs.sort_values(by="message_id", ascending=False) # latest notif first
+
+        notifs = []
+        for index, row in msgs_sorted.iterrows():
+            if len(notifs) == number :
+                break
+            temp = { 'sender': row['sender'],
+                    'message': row['message'],
+                    'date_sent': row['date_sent'],
+                    'read_status': row['read_status']}
+            notifs.append(temp)
+        return notifs

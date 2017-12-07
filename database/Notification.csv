@@ -1,0 +1,4 @@
+message_id,recipient,sender,date_sent,message,read_status
+0,testuser1,testuser1,12-07-2017 01:16 AM,hi,False
+1,testuser1,testuser1,12-07-2017 01:16 AM,hi,False
+2,testuser1,testuser1,12-07-2017 01:16 AM,hi,False
