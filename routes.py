@@ -37,9 +37,8 @@ def dashboard_applicant():
     if session['username']:
         info = Applicant.get_applicant_info(session['username'])
         if (info == None):
-            return render_template("dashboard_applicant.html", first_name=" ")
-        first_name = info['first_name']
-        return render_template("dashboard_applicant.html", first_name=first_name)
+            return render_template("dashboard_applicant.html", info=info)
+        return render_template("dashboard_applicant.html", info=info)
     else:
         return render_template("index.html")
 

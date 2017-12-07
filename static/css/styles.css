@@ -1,3 +1,8 @@
 #loginBox h2 {
 	color:black;
 }
+
+#application_status {
+	color:green;
+	font-weight: bold;
+}
