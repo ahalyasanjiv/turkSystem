@@ -1,3 +1,3 @@
 username,password,first_name,last_name,email,phone,credit_card,type_of_user,about
- , ,Sam,Johnson,samjohn97@example.com,1234567890,1.23457E+15,client,
+samueljohnson,2ea8816bbb0cbbf6ab0db118fa4b947ec62742d054911f42a1adec60bc99f608,Sam,Johnson,samjohn97@example.com,1234567890,1.23E+15,client,
 testuser0,07295b249f87e4540867d07f18a3919b3e458205a502fe63af547304157a0842,test,user,test@user.com,2342342344,2342342344,developer,

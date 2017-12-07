@@ -102,6 +102,8 @@ class BecomeUserForm(FlaskForm):
 	"""
 	Form for when applicant wants to become user
 	"""
-	username = username = StringField(label='Username', id='username', validators=[DataRequired('Please enter your username.')])
-	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter your password.')])
+	use_prev_credentials = SelectField(label='Use previous login credentials', id='use_prev_credentials', validators=[DataRequired('Please choose a role.')], choices = [('yes','yes'),('no','no')],)
+	username = StringField(label='User ID', id='user_id', validators=[DataRequired('Please enter a user ID.'), validate_user_id])
+	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter a password.'), Length(min=8, message='Your password must have at least 8 characters.')])
 	confirm_password = PasswordField(label='Confirm Password', id ='confirm_password', validators=[DataRequired('Please confirm your password.')])
+	submit = SubmitField('Submit')
