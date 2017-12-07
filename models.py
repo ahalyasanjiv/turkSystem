@@ -13,8 +13,8 @@ class User:
     def __init__(self, first_name, last_name, email, phone, credit_card, type_of_user):
         df = pd.read_csv('database/User.csv')
 
-        df.loc[len(df)] = pd.Series(data=[first_name, last_name, email, phone, credit_card, type_of_user],
-                           index=['first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user'])
+        df.loc[len(df)] = pd.Series(data=[' ', ' ', first_name, last_name, email, phone, credit_card, type_of_user],
+                           index=['username', 'password', 'first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user'])
         df.to_csv('database/User.csv', index=False)
 
     def set_credentials(self, username, password, email):
@@ -268,6 +268,23 @@ class Applicant:
         return tmp0.empty and tmp1.empty and tmp2.empty
 
     @staticmethod
+    def is_unique_email(email):
+        """
+        Checks whether email is unique.
+        Returns True if email is unique and False if email is not unique.
+        """
+        df0 = pd.read_csv('database/Applicant.csv')
+        tmp0 = df0.loc[df0['email'] == email]
+
+        df1 = pd.read_csv('database/User.csv')
+        tmp1 = df1.loc[df1['email'] == email]
+
+        df2 = pd.read_csv('database/SuperUser.csv')
+        tmp2 = df2.loc[df2['email'] == email]
+
+        return tmp0.empty and tmp1.empty and tmp2.empty
+
+    @staticmethod
     def check_password(user_id, password):
         """
         Checks if the password of a user_id match. 
@@ -277,7 +294,7 @@ class Applicant:
         df = pd.read_csv('database/Applicant.csv')
         user = df.loc[df['user_id'] == user_id]
         if not user.empty:
-            pwhash = user['password'][0]
+            pwhash = user['password'].item()
             return pwhash == hash_password(password) 
 
     @staticmethod

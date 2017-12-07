@@ -6,9 +6,9 @@ from models import Applicant, Bid
 def validate_user_id(form,field):
 	"""
 	Custom validator for username
-	:returns: True if username is unique and False if username is not unique.
+	:returns: True if username is unique and is not equal to ' ', False if username is not unique or is equal to ' '.
 	"""
-	if not Applicant.is_unique_user_id(field.data):
+	if not Applicant.is_unique_user_id(field.data) or field.data == ' ':
 		raise ValidationError('User ID is taken. Please enter another User ID.')
 
 def validate_bid_amount(form, field):
@@ -28,13 +28,21 @@ def validate_bid_amount(form, field):
 	# 	if float(field.data) >= float(lowest_bid_amount):
 	# 		raise ValidationError('The current bid is lower than what you tried to bid. Please enter another bid amount.')
 
+def validate_email(form,field):
+	"""
+	Custom validator for username
+	:returns: True if username is unique and False if username is not unique.
+	"""
+	if not Applicant.is_unique_email(field.data):
+		raise ValidationError('There already exists an account with this email.')
+
 class SignupForm(FlaskForm):
 	""" 
 	Form for the page where the user signs up. 
 	"""
 	first_name = StringField(label='First Name', id='first_name', validators=[DataRequired('Please enter your first name.')])
 	last_name = StringField(label='Last Name', id='last_name', validators=[DataRequired('Please enter your last name.')])
-	email = StringField(label='Email Address', id='email', validators=[DataRequired('Please enter an email address.'), Email(message='Please enter a valid email address.')])
+	email = StringField(label='Email Address', id='email', validators=[DataRequired('Please enter an email address.'), Email(message='Please enter a valid email address.'), validate_email])
 	phone = StringField(label='Phone Number', id='phone', validators=[DataRequired('Please enter a phone number.')])
 	user_id = StringField(label='User ID', id='user_id', validators=[DataRequired('Please enter a user ID.'), validate_user_id])
 	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter a password.'), Length(min=8, message='Your password must have at least 8 characters.')])
@@ -54,6 +62,13 @@ class LoginForm(FlaskForm):
 	username = StringField(label='Username', id='username', validators=[DataRequired('Please enter your username.')])
 	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter your password.')])
 	submit = SubmitField('Sign in')
+
+class ApplicantApprovalForm(FlaskForm):
+	"""
+	Form for the page where the superuser 
+	"""
+	accept = SubmitField(label='Accept')
+	reject = SubmitField(label='Reject')
 
 class ProtestForm(FlaskForm):
 	""" 
@@ -85,3 +100,11 @@ class BidForm(FlaskForm):
 	"""
 	bid_amount = DecimalField(label='Bid Amount', id='bid_amount', validators=[DataRequired('Please enter an amount to bid.'), validate_bid_amount])
 	submit = SubmitField('Make a Bid')
+
+class BecomeUserForm(FlaskForm):
+	"""
+	Form for when applicant wants to become user
+	"""
+	username = username = StringField(label='Username', id='username', validators=[DataRequired('Please enter your username.')])
+	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter your password.')])
+	confirm_password = PasswordField(label='Confirm Password', id ='confirm_password', validators=[DataRequired('Please confirm your password.')])
