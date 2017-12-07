@@ -1,17 +1,36 @@
 {% extends "base.html" %}
 
 {% block content %}
-  <section class="hero is-light">
+
+<section class="hero is-light">
   <div class="hero-body">
     <div class="container">
       <h1 class="title">
         Welcome back, {{ info['first_name'] }}!
       </h1>
       <h2 class="subtitle">
-        Your application status is currently <span id="application_status">{{ info['status'] }}</span>
+        Your application status is <span id="application_status">{{ info['status'] }}</span>
       </h2>
     </div>
   </div>
 </section>
+
+{% if info['status'] == 'approved' %}
+<div class ="hero-body">
+  <div class="container ">
+    <div class="columns">
+      <div class="column is-one-quarter"></div>
+      <div class="column is-half has-text-centered">
+        
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+
+
+
+
 
 {% endblock %}

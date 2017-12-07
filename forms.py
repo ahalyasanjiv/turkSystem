@@ -6,10 +6,20 @@ from models import Applicant
 def validate_user_id(form,field):
 	"""
 	Custom validator for username
+	:returns: True if username is unique and is not equal to ' ', False if username is not unique or is equal to ' '.
+	"""
+	if not Applicant.is_unique_user_id(field.data) or field.data == ' ':
+		raise ValidationError('User ID is taken. Please enter another User ID.')
+
+def validate_email(form,field):
+	"""
+	Custom validator for username
 	:returns: True if username is unique and False if username is not unique.
 	"""
-	if not Applicant.is_unique_user_id(field.data):
-		raise ValidationError('User ID is taken. Please enter another User ID.')
+	if not Applicant.is_unique_email(field.data):
+		raise ValidationError('There already exists an account with this email.')
+
+
 
 class SignupForm(FlaskForm):
 	""" 
@@ -17,7 +27,7 @@ class SignupForm(FlaskForm):
 	"""
 	first_name = StringField(label='First Name', id='first_name', validators=[DataRequired('Please enter your first name.')])
 	last_name = StringField(label='Last Name', id='last_name', validators=[DataRequired('Please enter your last name.')])
-	email = StringField(label='Email Address', id='email', validators=[DataRequired('Please enter an email address.'), Email(message='Please enter a valid email address.')])
+	email = StringField(label='Email Address', id='email', validators=[DataRequired('Please enter an email address.'), Email(message='Please enter a valid email address.'), validate_email])
 	phone = StringField(label='Phone Number', id='phone', validators=[DataRequired('Please enter a phone number.')])
 	user_id = StringField(label='User ID', id='user_id', validators=[DataRequired('Please enter a user ID.'), validate_user_id])
 	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter a password.'), Length(min=8, message='Your password must have at least 8 characters.')])
@@ -44,7 +54,7 @@ class ApplicantApprovalForm(FlaskForm):
 	"""
 	accept = SubmitField(label='Accept')
 	reject = SubmitField(label='Reject')
-	
+
 class ProtestForm(FlaskForm):
 	""" 
 	Form for when user wants to protest a warning. 
@@ -53,3 +63,10 @@ class ProtestForm(FlaskForm):
 	reason = TextAreaField(label='Reason for Protest', id='reason', validators=[DataRequired('Please enter a reason for protesting this complaint.')])
 	submit = SubmitField('Submit Protest')
 
+class BecomeUserForm(FlaskForm):
+	"""
+	Form for when applicant wants to become user
+	"""
+	username = username = StringField(label='Username', id='username', validators=[DataRequired('Please enter your username.')])
+	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter your password.')])
+	confirm_password = PasswordField(label='Confirm Password', id ='confirm_password', validators=[DataRequired('Please confirm your password.')])
