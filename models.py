@@ -47,10 +47,6 @@ class User:
         df = pd.read_csv('database/User.csv')
         user = df.loc[df['username'] == username]
         if not user.empty:
-<<<<<<< HEAD
-            print(user)
-=======
->>>>>>> c5a0bacecb273dc4dc439b378fd477b8cbed5e8c
             pwhash = user['password'].item()
             return pwhash == hash_password(password)        
 
@@ -194,7 +190,8 @@ class Client:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                similar_clients.append(p['client_username'])
+                if demand['client_username'] not in similar_clients:
+                    similar_clients.append(demand['client_username'])
 
         return similar_clients
 
@@ -449,6 +446,7 @@ class Demand:
                     'submission_deadline': demand['submission_deadline'],
                     'is_completed': demand['is_completed'],
                     'bidding_deadline_passed': deadline_passed,
+                    'chosen_developer_username' : demand['chosen_developer_username'],
                     'link_to_client': '/user/' + demand['client_username'],
                     'link_to_demand': '/bid/' + str(demand_id)}
 
