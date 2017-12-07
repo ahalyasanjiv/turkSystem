@@ -2,7 +2,7 @@ from flask import Flask, flash, render_template, request, session, redirect, url
 import pandas as pd
 from csv import reader
 import datetime
-from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser
+from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, Notification
 from forms import SignupForm, LoginForm
 
 app = Flask(__name__)
@@ -24,11 +24,37 @@ def index():
 
 @app.route("/dashboard")
 def dashboard():
-    if session['username']:
+    if 'username' in session:
         info = User.get_user_info(session['username'])
-        return render_template("dashboard.html", info=info)
+        if (info == None):
+            return render_template("dashboard.html", first_name=" ")
+        first_name = info['first_name']
+
+        # Get notifications for this user.
+        notifications = Notification.get_notif_to_recipient(session['username'], 5)
+
+        # If the user has no projects in history, they are a new user.
+        new_user = True
+        user_type = User.get_user_info(session['username'])['type_of_user']
+
+        if user_type == 'client':
+            if Client.get_info(session['username'])['num_of_completed_projects'] > 0:
+                new_user = False
+        else:
+            if Developer.get_info(session['username'])['num_of_completed_projects'] > 0:
+                new_user = False
+        return render_template("dashboard.html", first_name=first_name, notifications=notifications,
+                                new_user=new_user)
     else:
-        return render_template("index.html")
+        return redirect(url_for('login'))
+
+@app.route("/dashboard/notifications")
+def view_notifications():
+    if 'username' in session:
+        notifications = Notification.get_all_notif_to_recipient(session['username'])
+        return render_template('notifications.html', notifications=notifications)
+    else:
+        return redirect(url_for('login'))
 
 @app.route("/dashboard_applicant")
 def dashboard_applicant():

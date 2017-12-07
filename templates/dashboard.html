@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+<<<<<<< HEAD
 <section class="hero is-light">
 <div class="hero-body">
   <div class="container">
@@ -10,10 +11,23 @@
     <h2 class="subtitle">
       Here's what happened recently.
     </h2>
+=======
+  <section class="hero is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        Welcome back, {{ first_name }}!
+      </h1>
+      <h2 class="subtitle">
+        Here's what happened recently.
+      </h2>
+    </div>
+>>>>>>> b09a58d413e16ee8dff317febc008f59812df769
   </div>
 </div>
 </section>
 
+<<<<<<< HEAD
 <section class="section">
   <div class="container">
     <div class="columns">
@@ -60,6 +74,106 @@
             Bidding Projects
           </h1>
           <article class="media">
+=======
+  <section class="section">
+    <div class="container">
+      <div class="columns">
+        <div class="column is-4">
+          <h2 class="title is-4">
+            Current Projects
+          </h2>
+                <article class="media">
+                  <figure class="media-left">
+                   <p class="image is-64x64">
+                    <img src="https://bulma.io/images/placeholders/128x128.png">
+                  </p>
+                  </figure>
+                  <div class="media-content">
+                    <div class="content">
+                      <p>
+                        <strong>Project Name</strong> <small>Posted by Client</small>
+                        <br>
+                        <small>Due: 1/1/2018 12:00 AM</small>
+                      </p>
+                    </div>
+                  </div>
+                </article>  
+                <article class="media">
+                  <figure class="media-left">
+                   <p class="image is-64x64">
+                    <img src="https://bulma.io/images/placeholders/128x128.png">
+                  </p>
+                  </figure>
+                  <div class="media-content">
+                    <div class="content">
+                      <p>
+                        <strong>Project Name</strong> <small>Posted by Client</small>
+                        <br>
+                        <small>Due: 1/1/2018 12:00 AM</small>
+                      </p>
+                    </div>
+                  </div>
+                </article> 
+                <br>
+                <div class="button">See All</div>
+                <hr>
+          <h2 class="title is-4">
+            Bidding Projects
+          </h2>
+                <article class="media">
+                  <figure class="media-left">
+                   <p class="image is-64x64">
+                    <img src="https://bulma.io/images/placeholders/128x128.png">
+                  </p>
+                  </figure>
+                  <div class="media-content">
+                    <div class="content">
+                      <p>
+                        <strong>Project Name</strong> <small>Posted by Client</small>
+                        <br>
+                        <small>Closes: 1/1/2018 12:00 AM</small>
+                      </p>
+                    </div>
+                  </div>
+                </article>  
+                <article class="media">
+                  <figure class="media-left">
+                   <p class="image is-64x64">
+                    <img src="https://bulma.io/images/placeholders/128x128.png">
+                  </p>
+                  </figure>
+                  <div class="media-content">
+                    <div class="content">
+                      <p>
+                        <strong>Project Name</strong> <small>Posted by Client</small>
+                                                <br>
+                        <small>Closes: 1/1/2018 12:00 AM</small>
+                      </p>
+                    </div>
+                  </div>
+                </article> 
+                <br>
+                <div class="button">See All</div>
+        </div>
+        <div class="column is-8">
+          <h2 class="title is-4" style="display:inline-flex">
+            Notifications
+          </h2> 
+          <a class="button" href="/dashboard/notifications" style="margin-left:10px">See All </a>
+          {% for notif in notifications %}
+          <div class="notification">
+            <p class="content">
+            {{ notif.message }}
+            <br>
+            <small>{{ notif.date_sent }}</small>
+            </p>
+          </div>
+          {% endfor %}
+
+          <div class="notification is-info">
+            <h2 class="title is-4">Suggested Projects</h2>
+                      <article class="media">
+>>>>>>> b09a58d413e16ee8dff317febc008f59812df769
             <figure class="media-left">
              <p class="image is-64x64">
               <img src="https://bulma.io/images/placeholders/128x128.png">
@@ -155,6 +269,7 @@
               </p>
             </div>
           </div>
+<<<<<<< HEAD
         </article>
         </div>
         
@@ -164,15 +279,50 @@
             <div>
               <p class="heading">Most Active/Similar Interest Clients</p>
               <p class="title">Rainbow, Dragon, Salmon</p>
+=======
+          
+        {% if new_user %}
+          <div class="level">
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Most Active Clients</p>
+                <p class="title">Rainbow, Dragon, Salmon</p>
+              </div>
+            </div>
+
+             <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Most Active Developers</p>
+                <p class="title">Mocha, Latte, Frappe</p>
+              </div>
+            </div>
+          </div>
+        {% else %}
+        <div class="level">
+            <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Clients with Similar Interests</p>
+                <p class="title">Rainbow, Dragon, Salmon</p>
+              </div>
+>>>>>>> b09a58d413e16ee8dff317febc008f59812df769
             </div>
           </div>
 
+<<<<<<< HEAD
            <div class="level-item has-text-centered">
             <div>
               <p class="heading">Most Active/Similar Interest Developers</p>
               <p class="title">Mocha, Latte, Frappe</p>
+=======
+             <div class="level-item has-text-centered">
+              <div>
+                <p class="heading">Developers with Interests</p>
+                <p class="title">Mocha, Latte, Frappe</p>
+              </div>
+>>>>>>> b09a58d413e16ee8dff317febc008f59812df769
             </div>
           </div>
+        {% endif %}
         </div>
       </div>
     </div>
