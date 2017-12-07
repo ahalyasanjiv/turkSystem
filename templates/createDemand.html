@@ -22,58 +22,82 @@
           <form method="POST" action="/createDemand">
             {{ form.hidden_tag() }}
 
+            <!-- System Title -->
             <div class="field">
               <div class="control">
-                {{ form.title(placeholder="System Title", class="form-contrl input is-medium") }}
+                {{ form.title(placeholder="System Title", class="form-control input is-medium") }}
               </div>
+              {% if form.title.errors %}
+                {% for error in form.title.errors %}
+                  <p class="is-danger">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <!-- Tags -->
+            <div class="field">
+              <div class="control has-icons-left">
+                {{ form.tags(placeholder="Tags",
+                class="form-control input is-medium") }}
+                <span class="icon is-small is-left">
+                  <i style="color:grey" class="fa fa-plus"></i>
+                </span>
+              </div>
+              {% if form.tags.errors %}
+                {% for error in form.title.errors %}
+                  <p class="is-danger">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <!-- System description -->
+            <div class="field">
+              <div class="control">
+                {{ form.specifications(placeholder="System description", class="form-control textarea is-medium", rows="10") }}
+              </div>
+              {% if form.specifications.errors %}
+                {% for error in form.specifications.errors %}
+                  <p class="is-danger">{{ error }}</p>
+                {% endfor %}
+              {% endif %}
+            </div>
+
+            <div class="columns">
+              <!-- Bidding Deadline -->
+              <div class="column is-half">
+                <div class="field">
+                  <div class="control">
+                    Bidding Deadline<br>
+                    {{ form.bidding_deadline(placeholder="mm/dd/yyyy", class="form-control input", type="date") }}
+                  </div>
+                  {% if form.bidding_deadline.errors %}
+                    {% for error in form.bidding_deadline.errors %}
+                      <p class="is-danger">{{ error }}</p>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Submission Deadline -->
+              <div class="column is-half">
+                <div class="field">
+                  <div class="control">
+                    Submission Deadline<br>
+                    {{ form.submission_deadline(placeholder="mm/dd/yyyy", class="form-control input", type="date") }}
+                  </div>
+                  {% if form.submission_deadline.errors %}
+                    {% for error in form.submission_deadline.errors %}
+                      <p class="is-danger">{{ error }}</p>
+                    {% endfor %}
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="has-text-centered">
+              {{ form.submit(class="button is-info is-medium") }}
             </div>
           </form>
-
-
-
-          <div class="field">
-            <div class="control">
-              <input class="input" type="text" placeholder="System Title">
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="control has-icons-left">
-              <input class="input" type="text" placeholder="Tags">
-              <span class="icon is-small is-left">
-                <i style="color:grey" class="fa fa-plus"></i>
-              </span>
-            </div>
-
-          </div>
-
-          <div class="field">
-            <textarea class="textarea" placeholder="System description" rows="10"></textarea>
-          </div>
-          <div class="columns">
-            <div class="column is-half">
-              <div class="field">
-                <div class="control">
-                  Bidding Deadline<br>
-                  <input class="input" type="date" placeholder="Bidding Deadline (MM/DD/YY)">
-                </div>
-              </div>
-            </div>
-            <div class="column is-half">
-              <div class="field">
-                <div class="control">
-                  Submission Deadline<br>
-                  <input class="input" type="date" placeholder="Submission Deadline (MM/DD/YY)">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="has-text-centered">
-          <a class="button is-info has-text-centered">Post Demand</a>
-          </div>
-
-
 
         </div>
       </div>

@@ -4,6 +4,7 @@ import hashlib
 import datetime
 from werkzeug import generate_password_hash, check_password_hash
 import re
+from helpers import hash_password
 
 class User:
     """
@@ -36,20 +37,6 @@ class User:
 
         return not tmp.empty
 
-    def validate_password(self, password):
-        """
-        Validates the password, which should be longer than 8 characters.
-        Returns True if the password is valid. Returns False otherwise.
-        """
-        return len(password) > 8
-
-    def hash_password(self, password):
-        """
-        Returns the hash of the given password.
-        """
-        hash_object = hashlib.sha256(password.encode())
-        return hash_object.hexdigest()
-
     @staticmethod
     def check_password(username, password):
         """
@@ -61,9 +48,7 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             pwhash = user['password'][0]
-            return check_password_hash(pwhash,generate_password_hash(password))
-        return False
-        
+            return pwhash == hash_password(password)        
 
     @staticmethod
     def get_user_info(username):
@@ -217,7 +202,7 @@ class Applicant:
         """
         df = pd.read_csv('database/Applicant.csv')
 
-        hashed = self.hash_password(password)
+        hashed = hash_password(password)
 
         df.loc[len(df)] = pd.Series(data=[first_name, last_name, email,
                             phone, card_info, temp_user_id, hashed, type_of_user, 'pending'],
@@ -248,12 +233,22 @@ class Applicant:
 
         return not tmp.empty
 
-    def hash_password(self, password):
+    @staticmethod
+    def get_applicant_info(user_id):
         """
-        Returns the hash of the given password.
+        Returns a dictionary of the applicant's information.
         """
-        hash_object = hashlib.sha256(password.encode())
-        return hash_object.hexdigest()
+        df = pd.read_csv('database/Applicant.csv')
+        user = df.loc[df['user_id'] == user_id]
+
+        if not user.empty:
+            return {'user_id': user_id,
+                    'first_name': user['first_name'].item(),
+                    'last_name': user['last_name'].item(),
+                    'email': user['email'].item(),
+                    'phone': user['phone'].item(),
+                    'type_of_user': user['type_of_user'].item(),
+                    'status': user['status'].item()}
 
     @staticmethod
     def is_unique_user_id(user_id):
@@ -265,6 +260,19 @@ class Applicant:
         tmp = df.loc[df['user_id'] == user_id]
 
         return tmp.empty
+
+    @staticmethod
+    def check_password(user_id, password):
+        """
+        Checks if the password of a user_id match. 
+        Returns true if password given matches the password for user_id 
+        given and false if the password does not match.
+        """
+        df = pd.read_csv('database/Applicant.csv')
+        user = df.loc[df['user_id'] == user_id]
+        if not user.empty:
+            pwhash = user['password'][0]
+            return pwhash == hash_password(password) 
 
     @staticmethod
     def approve(user_id):
@@ -310,16 +318,25 @@ class Demand:
     Demand class. Has methods that inserts to, reads from, and modifies Demand table.
     """
     def __init__(self, client_username, title, tags, specifications, bidding_deadline, submission_deadline):
+        """
+        Create a new demand by adding a row with the information to the Demand table.
+        Returns the demand_id, which is the index of the row that was just added.
+        """
         df = pd.read_csv('database/Demand.csv')
 
         now = datetime.datetime.now()
         format = '%m-%d-%Y %I:%M %p'
         date_posted = now.strftime(format)
-        
+
         df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False],
             index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed'])
 
         df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def get_most_recent_demand_id():
+        df = pd.read_csv('database/Demand.csv')
+        return df.index.values.tolist()[-1]
 
     @staticmethod
     def get_info(demand_id):
@@ -490,13 +507,14 @@ class SuperUser:
     def __init__(self, username, password):
         df = pd.read_csv('database/SuperUser.csv')
 
-        hashed = self.hash_password(password)
+        hashed = hash_password(password)
         df.loc[len(df)] = pdf.Series(data=[username, hashed],
             index=['username', 'password'])
 
-    def hash_password(self, password):
-        """
-        Returns the hash of the given password.
-        """
-        hash_object = hashlib.sha256(password.encode())
-        return hash_object.hexdigest()
+    # def hash_password(self, password):
+    #     """
+    #     Returns the hash of the given password.
+    #     """
+    #     hash_object = hashlib.sha256(password.encode())
+    #     return hash_object.hexdigest()
+

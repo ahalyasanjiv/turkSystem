@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField, ValidationError
+from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField, ValidationError, FloatField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 from models import Applicant
 
@@ -24,7 +24,7 @@ class SignupForm(FlaskForm):
 	confirm_password = PasswordField(label='Confirm Password', id ='confirm_password', validators=[DataRequired('Please confirm your password.')])
 	credit_card = StringField(label='Credit Card Number', id='credit_card', validators=[DataRequired('Please enter the credit card number.')])
 	credit_card_name = StringField(label='Name of Credit Card Holder', id='credit_card_number', validators=[DataRequired('Please enter the name of the credit card holder.')])
-	exp_date = DateField(label='Expiration Date', id='credit_card_exp_date', validators=[DataRequired('Please enter the credit card expiration date.')], format='%Y-%m-%d')
+	exp_date = DateField(label='Expiration Date', id='credit_card_exp_date', validators=[DataRequired('Please enter the credit card expiration date.')], format='%m/%Y')
 	security_code = StringField(label='Security Code', id='security_code', validators=[DataRequired('Please enter the security code.')])
 	billing_address = StringField(label='Billing Address', id='billing_address', validators=[DataRequired('Please enter the billing address.')])
 	role = SelectField(label='Role', id='role', validators=[DataRequired('Please choose a role.')], choices = [('client','Client'),('developer','Developer')],)
@@ -35,7 +35,7 @@ class LoginForm(FlaskForm):
 	Form for the page where the user signs in. 
 	"""
 	username = StringField(label='Username', id='username', validators=[DataRequired('Please enter your username.')])
-	password = StringField(label='Password', id='password', validators=[DataRequired('Please enter your password.')])
+	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter your password.')])
 	submit = SubmitField('Sign in')
 
 class ProtestForm(FlaskForm):
@@ -60,7 +60,11 @@ class DemandForm(FlaskForm):
 					 validators=[DataRequired('Please provide a deadline for bidding.')])
 	submission_deadline = DateField(label='Deadline for Submitting the System', id='submission_deadline',
 					 validators=[DataRequired('Please provide a deadline for submitting the final system.')])
-	submit = SubmitField('Create Demand')
+	submit = SubmitField('Post Demand')
 
-
-
+class BidForm(FlaskForm):
+	"""
+	Form for developers to make bids for a demand.
+	"""
+	bid_amount = FloatField(label='Bid Amount', id='bid_amount', validators=[DataRequired('Please enter an amount to bid.')])
+	submit = SubmitField('Make a Bid')
