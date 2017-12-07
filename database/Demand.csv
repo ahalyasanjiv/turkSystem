@@ -1,9 +1,10 @@
 client_username,date_posted,title,tags,specifications,bidding_deadline,chosen_developer_username,submission_deadline,is_completed
-testuser1,12/7/2017 1:01,testing,testing again,dfnglk,1/1/2018 0:00,test,1/2/2018 0:00,FALSE
-testuser1,12/7/2017 1:16,testing,testing again,dfnglk,1/1/2018 0:00,,1/2/2018 0:00,FALSE
-testuser1,12/7/2017 1:16,testing,testing again,dfnglk,1/1/2018 0:00,,1/2/2018 0:00,FALSE
-testuser1,12/7/2017 1:16,testing,testing again,dfnglk,1/1/2018 0:00,,1/2/2018 0:00,FALSE
-testuser5,12/7/2017 1:18,testing,testing again,dfnglk,1/1/2018 0:00,,1/2/2018 0:00,FALSE
-testuser4,12/7/2017 1:18,testing,testing again,dfnglk,1/1/2018 0:00,,1/2/2018 0:00,FALSE
-testuser2,12/7/2017 1:19,test,test,test,1/1/2018 0:00,,2/2/2018 0:00,FALSE
-testuser3,12/7/2017 1:20,Real test,demand test,description stuff,1/1/2018 0:00,,3/1/2018 0:00,FALSE
+testuser1,12-07-2017 01:01 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,testuser0,01-02-2018 12:00 AM,False
+testuser1,12-07-2017 01:16 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,testuser0,01-02-2018 12:00 AM,False
+testuser1,12-07-2017 01:16 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,dev1,01-02-2018 12:00 AM,False
+testuser1,12-07-2017 01:16 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,dev2,01-02-2018 12:00 AM,False
+testuser1,12-07-2017 01:18 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,dev2,01-02-2018 12:00 AM,False
+tks,12-07-2017 01:18 AM,testing,demand,dfnglk,01-01-2018 12:00 AM,dev3,01-02-2018 12:00 AM,False
+testuser1,12-07-2017 01:19 AM,test,test,test,01-01-2018 12:00 AM,cat,02-02-2018 12:00 AM,False
+testuser1,12-07-2017 01:20 AM,Real test,demand test,description stuff,01-01-2018 12:00 AM,testuser0,03-01-2018 12:00 AM,False
+testuser0,12-07-2017 04:08 PM,test,test,test,01-01-2018 12:00 AM,dog,01-02-2018 12:00 AM,False
