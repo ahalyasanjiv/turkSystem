@@ -37,16 +37,6 @@ class User:
 
         return not tmp.empty
 
-<<<<<<< HEAD
-=======
-    def validate_password(self, password):
-        """
-        Validates the password, which should be longer than 8 characters.
-        Returns True if the password is valid. Returns False otherwise.
-        """
-        return len(password) > 8
-
->>>>>>> ac8b87d4c4f8519c13c0cd3394076739033c940e
     @staticmethod
     def check_password(username, password):
         """
@@ -97,7 +87,6 @@ class User:
         """
         df = pd.read_csv('database/User.csv')
         return df['username'].count() # does not count NaNs
-
 
 class Client:
     """
@@ -243,16 +232,6 @@ class Applicant:
 
         return not tmp.empty
 
-<<<<<<< HEAD
-=======
-    def validate_password(self, password):
-        """
-        Validates the password, which should be longer than 8 characters.
-        Returns True if the password is valid. Returns False otherwise.
-        """
-        return len(password) > 8
-
->>>>>>> ac8b87d4c4f8519c13c0cd3394076739033c940e
     @staticmethod
     def get_applicant_info(user_id):
         """
