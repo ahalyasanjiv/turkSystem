@@ -45,7 +45,15 @@ def dashboard():
         return render_template("dashboard.html", first_name=first_name, notifications=notifications,
                                 new_user=new_user)
     else:
-        return redirect(url_for('index'))
+        return redirect(url_for('login'))
+
+@app.route("/dashboard/notifications")
+def view_notifications():
+    if 'username' in session:
+        notifications = Notification.get_all_notif_to_recipient(session['username'])
+        return render_template('notifications.html', notifications=notifications)
+    else:
+        return redirect(url_for('login'))
 
 @app.route("/dashboard_applicant")
 def dashboard_applicant():

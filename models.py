@@ -556,7 +556,7 @@ class SuperUser:
         if not user.empty:
             pwhash = user['password'][0]
             return pwhash == hash_password(password) 
-            
+
 class Notification:
     """
     Notifications that show up on dashboard.
@@ -587,6 +587,24 @@ class Notification:
         for index, row in msgs_sorted.iterrows():
             if len(notifs) == number :
                 break
+            temp = { 'sender': row['sender'],
+                    'message': row['message'],
+                    'date_sent': row['date_sent'],
+                    'read_status': row['read_status']}
+            notifs.append(temp)
+        return notifs
+
+    @staticmethod
+    def get_all_notif_to_recipient(recipient):
+        """
+        Get all notifications to a user
+        """
+        df = pd.read_csv('database/Notification.csv')
+        msgs = df.loc[df['recipient'] == recipient]
+        msgs_sorted = msgs.sort_values(by="message_id", ascending=False) # latest notif first
+
+        notifs = []
+        for index, row in msgs_sorted.iterrows():
             temp = { 'sender': row['sender'],
                     'message': row['message'],
                     'date_sent': row['date_sent'],
