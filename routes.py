@@ -51,10 +51,15 @@ def dashboard():
 def dashboard_applicant():
     if session['username']:
         info = Applicant.get_applicant_info(session['username'])
-        if (info == None):
-            return render_template("dashboard_applicant.html", first_name=" ")
-        first_name = info['first_name']
-        return render_template("dashboard_applicant.html", first_name=first_name)
+        return render_template("dashboard_applicant.html", info=info)
+    else:
+        return render_template("index.html")
+
+@app.route("/dashboard_superuser")
+def dashboard_superuser():
+    if session['username']:
+        info = SuperUser.get_superuser_info(session['username'])
+        return render_template("dashboard_superuser.html", info=info)
     else:
         return render_template("index.html")
 
@@ -148,6 +153,10 @@ def login():
         if Applicant.check_password(username, password):
             session['username'] = username
             return redirect(url_for('dashboard_applicant'))
+        if SuperUser.check_password(username, password):
+            session['username'] = username
+            return redirect(url_for('dashboard_superuser'))
+
         # If username or password is invalid, notify user
         else:
             flash('Invalid username or password.')
