@@ -61,10 +61,6 @@ class User:
         df = pd.read_csv('database/User.csv')
         user = df.loc[df['username'] == username]
         if not user.empty:
-<<<<<<< HEAD
-            print(user)
-=======
->>>>>>> c5a0bacecb273dc4dc439b378fd477b8cbed5e8c
             pwhash = user['password'].item()
             return pwhash == hash_password(password)        
 

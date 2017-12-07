@@ -77,14 +77,14 @@ def dashboard_applicant():
             info = Applicant.get_applicant_info(session['username'])
             if form.use_prev_credentials.data == 'yes':
                 User.use_old_credentials(info['user_id'],info['email'])
-                session['type_of_user'] == 'user'
-                session['role'] == info['type_of_user']
+                session['type_of_user'] = 'user'
+                session['role'] = info['type_of_user']
                 return redirect(url_for('dashboard'))
             elif form.validate():
                 User.set_credentials(form.username.data,form.password.data,info['email'])
-                session['username'] == form.username.data
-                session['type_of_user'] == 'user'
-                session['role'] == info['type_of_user']
+                session['username'] = form.username.data
+                session['type_of_user'] = 'user'
+                session['role'] = info['type_of_user']
                 return redirect(url_for('dashboard'))
             else:
                 flash('Login credentials are invalid. Please check that all fields are filled correctly.')
