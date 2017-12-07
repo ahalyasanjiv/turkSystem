@@ -154,6 +154,32 @@ class Client:
 
         return usernames
 
+    @staticmethod
+    def get_clients_with_most_projects():
+        """
+        Returns the top 3 clients with the most projects, completed or not.
+        This is used on the index page.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.groupby(['client_username']).size()
+        projects = projects.sort_values(ascending=False)
+        print(projects)
+        usernames = []
+        for index, value in projects.iteritems():
+            if len(usernames) == 3:
+                break;
+            usernames.append(index)
+
+        return usernames
+
+    @staticmethod
+    def get_similiar_clients(username):
+        """
+        Returns three clients with similar interests as the specified user, based
+        on tags of the user's most recent completed projects.
+        """
+        return 1
+
 class Developer:
     """
     Developer class. Has methods that inserts to and reads from the Developer table.

@@ -14,7 +14,7 @@ def index():
     number_of_clients = Client.get_number_of_clients()
     number_of_developers = Developer.get_number_of_developers()
     # clients with the most projects
-    top_clients = Client.get_most_active_clients()
+    top_clients = Client.get_clients_with_most_projects()
     # developers making the most money
     top_devs =[]
     return render_template("index.html",number_of_clients=number_of_clients, 
