@@ -35,7 +35,10 @@ def dashboard():
 
         # If the user has no projects in history, they are a new user.
         user_type = User.get_user_info(session['username'])['type_of_user']
-        recs = {}
+        recs = {"client_rec_des": "Most Active Clients", 
+                "dev_rec_des": "Most Active Developers",
+                "client_rec": Client.get_most_active_clients(), 
+                "dev_rec": Developer.get_most_active_developers()}
 
         if user_type == 'client':
             if Client.get_info(session['username'])['num_of_completed_projects'] > 0:
@@ -45,12 +48,10 @@ def dashboard():
                     "dev_rec": Developer.get_most_active_developers()}
         elif user_type == 'developer':
             if Developer.get_info(session['username'])['num_of_completed_projects'] > 0:
-                recs={}
-        else: # new user
-            recs = {"client_rec_des": "Most Active Clients", 
-                "dev_rec_des": "Most Active Developers",
-                "client_rec": Client.get_most_active_clients(), 
-                "dev_rec": Developer.get_most_active_developers()}
+                recs = {"client_rec_des": "Clients with Similar Interests", 
+                    "dev_rec_des": "Developers with Similar Interests",
+                    "client_rec": Client.get_similar_clients(session['username']), 
+                    "dev_rec": Developer.get_most_active_developers()}
         return render_template("dashboard.html", first_name=first_name, notifications=notifications,
                                 recs=recs)
     else:

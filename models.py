@@ -54,7 +54,8 @@ class User:
         df = pd.read_csv('database/User.csv')
         user = df.loc[df['username'] == username]
         if not user.empty:
-            pwhash = user['password'][0]
+            print(user)
+            pwhash = user['password'].item()
             return pwhash == hash_password(password)        
 
     @staticmethod
@@ -635,7 +636,7 @@ class SuperUser:
         df = pd.read_csv('database/SuperUser.csv')
         user = df.loc[df['username'] == username]
         if not user.empty:
-            pwhash = user['password'][0]
+            pwhash = user['password'].item()
             return pwhash == hash_password(password) 
 
 class Notification:

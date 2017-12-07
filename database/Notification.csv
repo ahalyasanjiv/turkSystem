@@ -1,4 +1,4 @@
 message_id,recipient,sender,date_sent,message,read_status
-0,testuser1,testuser1,12-07-2017 01:16 AM,hi,False
-1,testuser1,testuser1,12-07-2017 01:16 AM,hi,False
-2,testuser1,testuser1,12-07-2017 01:16 AM,hi,False
+0,testuser0,testuser1,12/7/2017 1:16,hi,FALSE
+1,testuser1,testuser1,12/7/2017 1:16,"<a href=""/"">click</a>",FALSE
+2,testuser1,testuser1,12/7/2017 1:16,hi,FALSE
