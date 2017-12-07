@@ -19,9 +19,6 @@ def validate_bid_amount(form, field):
 	"""
 	# bids = Bid.get_bids_for_demand(demand_id)
 
-	if field.data <= 0:
-		raise ValidationError('The amount you tried to bid is invalid. Please enter a positive bid amount.')
-
 	# if len(bids) > 0:
 	# 	lowest_bid_amount = Bid.get_info(bids[0]).bid_amount
 
