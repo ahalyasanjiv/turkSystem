@@ -132,7 +132,7 @@ class Client:
         return df['username'].count() # does not count NaNs
 
     @staticmethod
-    def get_top_clients():
+    def get_most_active_clients():
         """
         Returns the top 3 clients with the most projects completed.
         """
@@ -145,6 +145,54 @@ class Client:
             usernames.append(row['username'])
 
         return usernames
+
+    @staticmethod
+    def get_clients_with_most_projects():
+        """
+        Returns the top 3 clients with the most projects, completed or not.
+        This is used on the index page.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.groupby(['client_username']).size()
+        projects = projects.sort_values(ascending=False)
+
+        usernames = []
+        for index, value in projects.iteritems():
+            if len(usernames) == 3:
+                break;
+            usernames.append(index)
+
+        return usernames
+
+    @staticmethod
+    def get_similar_clients(username):
+        """
+        Returns three clients with similar interests as the specified user, based
+        on tags of the user's most recent completed projects.
+        """
+        projects = []
+        user_type = User.get_user_info(username)['type_of_user']
+        if user_type == 'client':
+            projects = Client.get_projects_posted(username)
+        else: #is developer
+            projects = Developer.get_past_projects(username)
+        
+        tags = ""
+        for index in projects:
+            demand = Demand.get_info(index)
+            tags += demand['tags']
+        print("tag", tags)
+        similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
+        similar_clients = []
+
+        for index in similar_projects:
+            if len(similar_clients) == 3:
+                break
+            demand = Demand.get_info(index)
+            if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
+                similar_clients.append(p['client_username'])
+
+        return similar_clients
 
 class Developer:
     """
@@ -189,6 +237,21 @@ class Developer:
         """
         df = pd.read_csv('database/Developer.csv')
         return df['username'].count() # does not count NaNs
+
+    @staticmethod
+    def get_most_active_developers():
+        """
+        Returns the top 3 developers with the most projects completed.
+        """
+        df = pd.read_csv('database/Developer.csv')
+        sorted_df = df.sort_values(by='num_of_completed_projects', ascending=False)
+        sorted_df = sorted_df.iloc[:3]
+
+        usernames = []
+        for index, row in sorted_df.iterrows():
+            usernames.append(row['username'])
+
+        return usernames
 
 class Applicant:
     """
