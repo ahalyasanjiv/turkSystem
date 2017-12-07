@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField, ValidationError
+from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField, ValidationError, DecimalField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
-from models import Applicant
+from models import Applicant, Bid
 
 def validate_user_id(form,field):
 	"""
@@ -11,6 +11,23 @@ def validate_user_id(form,field):
 	if not Applicant.is_unique_user_id(field.data) or field.data == ' ':
 		raise ValidationError('User ID is taken. Please enter another User ID.')
 
+def validate_bid_amount(form, field):
+	"""
+	Custom validator for BidForm.
+	Validates if bid_amount is less than the lowest bid, if there is any.
+	Also validates that bid_amount is a positive number.
+	"""
+	# bids = Bid.get_bids_for_demand(demand_id)
+
+	if field.data <= 0:
+		raise ValidationError('The amount you tried to bid is invalid. Please enter a positive bid amount.')
+
+	# if len(bids) > 0:
+	# 	lowest_bid_amount = Bid.get_info(bids[0]).bid_amount
+
+	# 	if float(field.data) >= float(lowest_bid_amount):
+	# 		raise ValidationError('The current bid is lower than what you tried to bid. Please enter another bid amount.')
+
 def validate_email(form,field):
 	"""
 	Custom validator for username
@@ -18,8 +35,6 @@ def validate_email(form,field):
 	"""
 	if not Applicant.is_unique_email(field.data):
 		raise ValidationError('There already exists an account with this email.')
-
-
 
 class SignupForm(FlaskForm):
 	""" 
@@ -62,6 +77,29 @@ class ProtestForm(FlaskForm):
 	warning = SelectField(label='Warning to Protest', choices = [('warning1','Warning#1'),('warning2','Warning#2')])
 	reason = TextAreaField(label='Reason for Protest', id='reason', validators=[DataRequired('Please enter a reason for protesting this complaint.')])
 	submit = SubmitField('Submit Protest')
+
+class DemandForm(FlaskForm):
+	"""
+	Form for clients to create and post a demand.
+	"""
+	title = StringField(label='System Title', id='title',
+						validators=[DataRequired('Please enter a title for your demand.')])
+	tags = StringField(label='Tags')
+	specifications = TextAreaField(label='System description',
+					 id='specifications',
+					 validators=[DataRequired('Please enter specifications for the demand.')])
+	bidding_deadline = DateField(label='Deadline for Bidding', id='bidding_deadline',
+					 validators=[DataRequired('Please provide a deadline for bidding.')])
+	submission_deadline = DateField(label='Deadline for Submitting the System', id='submission_deadline',
+					 validators=[DataRequired('Please provide a deadline for submitting the final system.')])
+	submit = SubmitField('Post Demand')
+
+class BidForm(FlaskForm):
+	"""
+	Form for developers to make bids for a demand.
+	"""
+	bid_amount = DecimalField(label='Bid Amount', id='bid_amount', validators=[DataRequired('Please enter an amount to bid.'), validate_bid_amount])
+	submit = SubmitField('Make a Bid')
 
 class BecomeUserForm(FlaskForm):
 	"""

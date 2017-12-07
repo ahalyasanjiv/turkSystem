@@ -37,13 +37,6 @@ class User:
 
         return not tmp.empty
 
-    def validate_password(self, password):
-        """
-        Validates the password, which should be longer than 8 characters.
-        Returns True if the password is valid. Returns False otherwise.
-        """
-        return len(password) > 8
-
     @staticmethod
     def check_password(username, password):
         """
@@ -54,7 +47,10 @@ class User:
         df = pd.read_csv('database/User.csv')
         user = df.loc[df['username'] == username]
         if not user.empty:
+<<<<<<< HEAD
             print(user)
+=======
+>>>>>>> c5a0bacecb273dc4dc439b378fd477b8cbed5e8c
             pwhash = user['password'].item()
             return pwhash == hash_password(password)        
 
@@ -95,7 +91,6 @@ class User:
         """
         df = pd.read_csv('database/User.csv')
         return df['username'].count() # does not count NaNs
-
 
 class Client:
     """
@@ -304,13 +299,6 @@ class Applicant:
 
         return not tmp.empty
 
-    def validate_password(self, password):
-        """
-        Validates the password, which should be longer than 8 characters.
-        Returns True if the password is valid. Returns False otherwise.
-        """
-        return len(password) > 8
-
     @staticmethod
     def get_applicant_info(user_id):
         """
@@ -420,16 +408,25 @@ class Demand:
     Demand class. Has methods that inserts to, reads from, and modifies Demand table.
     """
     def __init__(self, client_username, title, tags, specifications, bidding_deadline, submission_deadline):
+        """
+        Create a new demand by adding a row with the information to the Demand table.
+        Returns the demand_id, which is the index of the row that was just added.
+        """
         df = pd.read_csv('database/Demand.csv')
 
         now = datetime.datetime.now()
         format = '%m-%d-%Y %I:%M %p'
         date_posted = now.strftime(format)
-        
+
         df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False],
             index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed'])
 
         df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def get_most_recent_demand_id():
+        df = pd.read_csv('database/Demand.csv')
+        return df.index.values.tolist()[-1]
 
     @staticmethod
     def get_info(demand_id):

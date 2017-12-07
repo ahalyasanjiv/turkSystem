@@ -2,8 +2,9 @@ from flask import Flask, flash, render_template, request, session, redirect, url
 import pandas as pd
 from csv import reader
 import datetime
+from dateutil import parser
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, Notification
-from forms import SignupForm, LoginForm, ApplicantApprovalForm
 
 app = Flask(__name__)
 app.secret_key = 'development-key'
@@ -170,6 +171,7 @@ def login():
         # Check if username exists and if password matches
         if User.check_password(username, password):
             session['username'] = username
+            session['role'] = User.get_user_info(username)['type_of_user']
             session['type_of_user'] = 'user'
             return redirect(url_for('dashboard'))
         if Applicant.check_password(username, password):
@@ -197,14 +199,19 @@ def logout():
     The '/logout' route will remove the user from the current session if there is one.
     """
     session.pop('username', None)
+    session.pop('role', None)
     return redirect(url_for('index'))
 
 @app.route("/warning/protest")
 def protestWarning():
     return render_template("protestWarning.html")
 
-@app.route("/bid/<demand_id>")
+@app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
+    """
+    The '/bid/<demand_id>' route directs a user to the page with complete
+    specifications for the demand.
+    """
     demand_info = Demand.get_info(demand_id)
     client_info = User.get_user_info(demand_info['client_username'])
     bids = Bid.get_bids_for_demand(demand_id)
@@ -222,12 +229,44 @@ def bidInfo(demand_id):
 
         if info['developer_username'] not in bidders_info:
             bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
+    
+    form = BidForm()
 
-    return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid)
+    if request.method == 'POST':
+        if form.validate():
+            Bid(demand_id, session['username'], form.bid_amount.data)
+            return redirect(url_for('bidInfo', demand_id=demand_id))
+        else:
+            # bid amount was not valid
+            print('was not valid')
+            return redirect(url_for('bidInfo', demand_id=demand_id))
 
-@app.route("/createDemand")
+    elif request.method == 'GET':
+        return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid, form=form, demand_id=demand_id)
+
+@app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
-    return render_template("createDemand.html")
+    """
+    The '/createDemand' route directs a client to the form where he/she can
+    create and post a demand on the Turk System.
+    """
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    form = DemandForm()
+    if session['role'] != 'client':
+        return render_template('access_denied.html')
+    elif request.method == 'POST' and form.validate():
+        format = '%m-%d-%Y %I:%M %p'
+        dt_bid = form.bidding_deadline.data.strftime(format)
+        dt_submit = form.submission_deadline.data.strftime(format)
+
+        Demand(session['username'], form.title.data, form.tags.data,
+                            form.specifications.data, dt_bid, dt_submit)
+        new_demand_id = Demand.get_most_recent_demand_id()
+
+        return redirect(url_for('bidInfo', demand_id=new_demand_id))
+    elif request.method == 'GET':
+        return render_template('createDemand.html', form=form)
 
 @app.route("/applicant_approval/<applicant_id>", methods=["GET", "POST"])
 def applicant_approval(applicant_id):
