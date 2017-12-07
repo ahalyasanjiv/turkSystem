@@ -3,7 +3,7 @@ import pandas as pd
 from csv import reader
 import datetime
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, Notification
-from forms import SignupForm, LoginForm
+from forms import SignupForm, LoginForm, ApplicantApprovalForm
 
 app = Flask(__name__)
 app.secret_key = 'development-key'
@@ -169,12 +169,15 @@ def login():
         # Check if username exists and if password matches
         if User.check_password(username, password):
             session['username'] = username
+            session['type_of_user'] = 'user'
             return redirect(url_for('dashboard'))
         if Applicant.check_password(username, password):
             session['username'] = username
+            session['type_of_user'] = 'applicant'
             return redirect(url_for('dashboard_applicant'))
         if SuperUser.check_password(username, password):
             session['username'] = username
+            session['type_of_user'] = 'superuser'
             return redirect(url_for('dashboard_superuser'))
 
         # If username or password is invalid, notify user
@@ -225,10 +228,26 @@ def bidInfo(demand_id):
 def createDemand():
     return render_template("createDemand.html")
 
-@app.route("/applicant_approval/<applicant_id>")
+@app.route("/applicant_approval/<applicant_id>", methods=["GET", "POST"])
 def applicant_approval(applicant_id):
-    info = Applicant.get_applicant_info(applicant_id)
-    return render_template("applicant_approval.html", info=info)
+    if session['type_of_user'] == 'user':
+        return redirect(url_for('dashboard'))
+    # if session['type_of_user'] == 'applicant':
+        # return redirect(url_for('dashboard_applicant'))
+
+    form = ApplicantApprovalForm()
+
+    if request.method == 'GET':
+        info = Applicant.get_applicant_info(applicant_id)
+        return render_template("applicant_approval.html", applicant_id=applicant_id, info=info, form=form)
+
+    if request.method == 'POST':
+        if form.accept.data == True:
+            Applicant.approve(applicant_id)
+        else:
+            Applicant.reject(applicant_id)
+
+        return redirect(url_for('dashboard_superuser'))
 
 if __name__ == "__main__":
     app.run(debug=True)
