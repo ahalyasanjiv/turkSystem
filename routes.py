@@ -1,4 +1,5 @@
 from flask import Flask, flash, render_template, request, session, redirect, url_for
+import pandas as pd
 from csv import reader
 import datetime
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser
@@ -41,7 +42,10 @@ def dashboard_applicant():
 def dashboard_superuser():
     if session['username']:
         info = SuperUser.get_superuser_info(session['username'])
-        return render_template("dashboard_superuser.html", info=info)
+        df = pd.read_csv('database/Applicant.csv')
+        get_apps = df.loc[df['status'] == 'pending']
+        pending_applicants = get_apps['user_id'].values.tolist()
+        return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants)
     else:
         return render_template("index.html")
 
@@ -186,6 +190,11 @@ def bidInfo(demand_id):
 @app.route("/createDemand")
 def createDemand():
     return render_template("createDemand.html")
+
+@app.route("/applicant_approval/<applicant_id>")
+def applicant_approval(applicant_id):
+    info = Applicant.get_applicant_info(applicant_id)
+    return render_template("applicant_approval.html", info=info)
 
 if __name__ == "__main__":
     app.run(debug=True)

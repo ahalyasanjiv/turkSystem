@@ -261,6 +261,7 @@ class Applicant:
                     'last_name': user['last_name'].item(),
                     'email': user['email'].item(),
                     'phone': user['phone'].item(),
+                    'credit_card': int(user['credit_card'].item()),
                     'type_of_user': user['type_of_user'].item(),
                     'status': user['status'].item()}
 

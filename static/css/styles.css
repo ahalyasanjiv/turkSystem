@@ -6,3 +6,8 @@
 	color:green;
 	font-weight: bold;
 }
+
+div.applicant a {
+	clear:both;
+	margin-bottom: 20px;
+}
