@@ -38,6 +38,13 @@ class LoginForm(FlaskForm):
 	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter your password.')])
 	submit = SubmitField('Sign in')
 
+class ApplicantApprovalForm(FlaskForm):
+	"""
+	Form for the page where the superuser 
+	"""
+	accept = SubmitField(label='Accept')
+	reject = SubmitField(label='Reject')
+	
 class ProtestForm(FlaskForm):
 	""" 
 	Form for when user wants to protest a warning. 
