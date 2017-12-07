@@ -37,6 +37,16 @@ class User:
 
         return not tmp.empty
 
+<<<<<<< HEAD
+=======
+    def validate_password(self, password):
+        """
+        Validates the password, which should be longer than 8 characters.
+        Returns True if the password is valid. Returns False otherwise.
+        """
+        return len(password) > 8
+
+>>>>>>> ac8b87d4c4f8519c13c0cd3394076739033c940e
     @staticmethod
     def check_password(username, password):
         """
@@ -233,6 +243,16 @@ class Applicant:
 
         return not tmp.empty
 
+<<<<<<< HEAD
+=======
+    def validate_password(self, password):
+        """
+        Validates the password, which should be longer than 8 characters.
+        Returns True if the password is valid. Returns False otherwise.
+        """
+        return len(password) > 8
+
+>>>>>>> ac8b87d4c4f8519c13c0cd3394076739033c940e
     @staticmethod
     def get_applicant_info(user_id):
         """
@@ -247,6 +267,7 @@ class Applicant:
                     'last_name': user['last_name'].item(),
                     'email': user['email'].item(),
                     'phone': user['phone'].item(),
+                    'credit_card': int(user['credit_card'].item()),
                     'type_of_user': user['type_of_user'].item(),
                     'status': user['status'].item()}
 
@@ -256,10 +277,16 @@ class Applicant:
         Checks whether user_id is unique.
         Returns True if user_id is unique and False if user_id is not unique.
         """
-        df = pd.read_csv('database/Applicant.csv')
-        tmp = df.loc[df['user_id'] == user_id]
+        df0 = pd.read_csv('database/Applicant.csv')
+        tmp0 = df0.loc[df0['user_id'] == user_id]
 
-        return tmp.empty
+        df1 = pd.read_csv('database/User.csv')
+        tmp1 = df1.loc[df1['username'] == user_id]
+
+        df2 = pd.read_csv('database/SuperUser.csv')
+        tmp2 = df2.loc[df2['username'] == user_id]
+
+        return tmp0.empty and tmp1.empty and tmp2.empty
 
     @staticmethod
     def check_password(user_id, password):
@@ -504,13 +531,13 @@ class SuperUser:
     """
     SuperUser class.
     """
-    def __init__(self, username, password):
+    def __init__(self, username, password, first_name, last_name):
         df = pd.read_csv('database/SuperUser.csv')
 
         hashed = hash_password(password)
         df.loc[len(df)] = pdf.Series(data=[username, hashed],
             index=['username', 'password'])
-
+    
     # def hash_password(self, password):
     #     """
     #     Returns the hash of the given password.
@@ -518,3 +545,85 @@ class SuperUser:
     #     hash_object = hashlib.sha256(password.encode())
     #     return hash_object.hexdigest()
 
+    @staticmethod
+    def get_superuser_info(username):
+        """
+        Returns a dictionary of the superuser's information.
+        """
+        df = pd.read_csv('database/SuperUser.csv')
+        user = df.loc[df['username'] == username]
+
+        if not user.empty:
+            return {'id': user['id'],
+                    'username': username,
+                    'first_name': user['first_name'].item(),
+                    'last_name': user['last_name'].item(),
+                    'email': user['email'].item()}
+    
+    @staticmethod
+    def check_password(username, password):
+        """
+        Checks if the password of a user_id match. 
+        Returns true if password given matches the password for user_id 
+        given and false if the password does not match.
+        """
+        df = pd.read_csv('database/SuperUser.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            pwhash = user['password'][0]
+            return pwhash == hash_password(password) 
+
+class Notification:
+    """
+    Notifications that show up on dashboard.
+    """
+    def __init__(self,recipient,sender,message):
+        df = pd.read_csv('database/Notification.csv')
+
+        now = datetime.datetime.now()
+        format = '%m-%d-%Y %I:%M %p'
+        date_sent = now.strftime(format)
+        
+        df.loc[len(df)] = pd.Series(data=[len(df), recipient, sender, date_sent, message, False],
+            index=['message_id','recipient', 'sender','date_sent', 'message', 'read_status'])
+
+        df.to_csv('database/Notification.csv', index=False)
+
+    @staticmethod
+    def get_notif_to_recipient(recipient, number):
+        """
+        Get messages to a certain recipient. The amount that is returned is number.
+        The most recent notifications are returned.
+        """
+        df = pd.read_csv('database/Notification.csv')
+        msgs = df.loc[df['recipient'] == recipient]
+        msgs_sorted = msgs.sort_values(by="message_id", ascending=False) # latest notif first
+
+        notifs = []
+        for index, row in msgs_sorted.iterrows():
+            if len(notifs) == number :
+                break
+            temp = { 'sender': row['sender'],
+                    'message': row['message'],
+                    'date_sent': row['date_sent'],
+                    'read_status': row['read_status']}
+            notifs.append(temp)
+        return notifs
+
+    @staticmethod
+    def get_all_notif_to_recipient(recipient):
+        """
+        Get all notifications to a user
+        """
+        df = pd.read_csv('database/Notification.csv')
+        msgs = df.loc[df['recipient'] == recipient]
+        msgs_sorted = msgs.sort_values(by="message_id", ascending=False) # latest notif first
+
+        notifs = []
+        for index, row in msgs_sorted.iterrows():
+            temp = { 'sender': row['sender'],
+                    'message': row['message'],
+                    'date_sent': row['date_sent'],
+                    'read_status': row['read_status']}
+            notifs.append(temp)
+        return notifs

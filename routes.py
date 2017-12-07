@@ -1,9 +1,10 @@
 from flask import Flask, flash, render_template, request, session, redirect, url_for
+import pandas as pd
 from csv import reader
 import datetime
 from dateutil import parser
-from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser
 from forms import SignupForm, LoginForm, DemandForm, BidForm
+from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, Notification
 
 app = Flask(__name__)
 app.secret_key = 'development-key'
@@ -24,23 +25,54 @@ def index():
 
 @app.route("/dashboard")
 def dashboard():
-    if session['username']:
+    if 'username' in session:
         info = User.get_user_info(session['username'])
         if (info == None):
             return render_template("dashboard.html", first_name=" ")
         first_name = info['first_name']
-        return render_template("dashboard.html", first_name=first_name)
+
+        # Get notifications for this user.
+        notifications = Notification.get_notif_to_recipient(session['username'], 5)
+
+        # If the user has no projects in history, they are a new user.
+        new_user = True
+        user_type = User.get_user_info(session['username'])['type_of_user']
+
+        if user_type == 'client':
+            if Client.get_info(session['username'])['num_of_completed_projects'] > 0:
+                new_user = False
+        else:
+            if Developer.get_info(session['username'])['num_of_completed_projects'] > 0:
+                new_user = False
+        return render_template("dashboard.html", first_name=first_name, notifications=notifications,
+                                new_user=new_user)
     else:
-        return render_template("index.html")
+        return redirect(url_for('login'))
+
+@app.route("/dashboard/notifications")
+def view_notifications():
+    if 'username' in session:
+        notifications = Notification.get_all_notif_to_recipient(session['username'])
+        return render_template('notifications.html', notifications=notifications)
+    else:
+        return redirect(url_for('login'))
 
 @app.route("/dashboard_applicant")
 def dashboard_applicant():
     if session['username']:
         info = Applicant.get_applicant_info(session['username'])
-        if (info == None):
-            return render_template("dashboard_applicant.html", first_name=" ")
-        first_name = info['first_name']
-        return render_template("dashboard_applicant.html", first_name=first_name)
+        return render_template("dashboard_applicant.html", info=info)
+    else:
+        return render_template("index.html")
+
+@app.route("/dashboard_superuser")
+def dashboard_superuser():
+    if session['username']:
+        info = SuperUser.get_superuser_info(session['username'])
+        df = pd.read_csv('database/Applicant.csv')
+        get_apps = df.loc[df['status'] == 'pending']
+        pending_applicants = get_apps['user_id'].values.tolist()
+        return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants)
     else:
         return render_template("index.html")
 
@@ -135,6 +167,10 @@ def login():
         if Applicant.check_password(username, password):
             session['username'] = username
             return redirect(url_for('dashboard_applicant'))
+        if SuperUser.check_password(username, password):
+            session['username'] = username
+            return redirect(url_for('dashboard_superuser'))
+
         # If username or password is invalid, notify user
         else:
             flash('Invalid username or password.')
@@ -219,6 +255,11 @@ def createDemand():
         return redirect(url_for('bidInfo', demand_id=new_demand_id))
     elif request.method == 'GET':
         return render_template('createDemand.html', form=form)
+
+@app.route("/applicant_approval/<applicant_id>")
+def applicant_approval(applicant_id):
+    info = Applicant.get_applicant_info(applicant_id)
+    return render_template("applicant_approval.html", info=info)
 
 if __name__ == "__main__":
     app.run(debug=True)

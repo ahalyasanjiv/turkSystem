@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.6.1/css/bulma.min.css">
+  <link rel="stylesheet" href="{{  url_for('static', filename='css/styles.css') }}">
+
 </head>
 <body>
 	<nav class="navbar" role="navigation" aria-label="main navigation">
@@ -17,17 +19,19 @@
         {% endif %}
       </div>
       <div class="navbar-menu">
-      <div class="navbar-start">
-      <!-- navbar items -->
-        <a class="navbar-item" href="/browse">Browse</a>
-        <!-- <a class="navbar-item" href="/apply">Apply</a> -->
-        {% if session.username %}
-          <a class="navbar-item" href="/logout">Logout</a>
-        {% else %} 
-          <a class="navbar-item" href="/apply">Apply</a>
-          <a class="navbar-item" href="/login">Login</a>
-        {% endif %}
-      </div>
+        <div class="navbar-start">
+          <!-- navbar start items -->
+          <a class="navbar-item" href="/browse">Browse</a>          
+        </div>
+        <div class="navbar-end">
+          <!-- navbar end items -->
+          {% if session.username %}
+            <a class="navbar-item" href="/logout">Logout</a>
+          {% else %} 
+            <a class="navbar-item" href="/apply">Apply</a>
+            <a class="navbar-item" href="/login">Login</a>
+          {% endif %}
+        </div>
      </div>
     </nav>
 {% block content %}

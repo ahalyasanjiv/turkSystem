@@ -1,1 +1,2 @@
-id,username,password_hash
+id,username,password,first_name,last_name,email
+1,superuser0,c66acaf76576bbd63132c365323d357956e96c9bba80db099df28efb4dfd40a9,John,Smith,johnsmith@example.com
