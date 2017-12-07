@@ -13,7 +13,17 @@
 	<nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
         {% if session.username %}
-          <a class="navbar-item" href="/dashboard">JAJ Turk</a>
+          {% if session.type_of_user == 'applicant' %}
+            <a class="navbar-item" href="/dashboard_applicant">JAJ Turk</a>
+          
+          {% elif session.type_of_user == 'user' %}
+            <a class="navbar-item" href="/dashboard">JAJ Turk</a>
+          
+          {% elif session.type_of_user == 'superuser' %}
+            <a class="navbar-item" href="/dashboard_superuser">JAJ Turk</a>
+          {% endif %}
+
+
         {% else %}
           <a class="navbar-item" href="/">JAJ Turk</a>
         {% endif %}
