@@ -27,13 +27,6 @@ class User:
 
         return not tmp.empty
 
-    def validate_password(self, password):
-        """
-        Validates the password, which should be longer than 8 characters.
-        Returns True if the password is valid. Returns False otherwise.
-        """
-        return len(password) > 8
-
     @staticmethod
     def set_credentials(username, password, email):
         """
@@ -68,7 +61,11 @@ class User:
         df = pd.read_csv('database/User.csv')
         user = df.loc[df['username'] == username]
         if not user.empty:
-            pwhash = user['password'][0]
+<<<<<<< HEAD
+            print(user)
+=======
+>>>>>>> c5a0bacecb273dc4dc439b378fd477b8cbed5e8c
+            pwhash = user['password'].item()
             return pwhash == hash_password(password)        
 
     @staticmethod
@@ -108,7 +105,6 @@ class User:
         """
         df = pd.read_csv('database/User.csv')
         return df['username'].count() # does not count NaNs
-
 
 class Client:
     """
@@ -154,7 +150,7 @@ class Client:
         return df['username'].count() # does not count NaNs
 
     @staticmethod
-    def get_top_clients():
+    def get_most_active_clients():
         """
         Returns the top 3 clients with the most projects completed.
         """
@@ -167,6 +163,54 @@ class Client:
             usernames.append(row['username'])
 
         return usernames
+
+    @staticmethod
+    def get_clients_with_most_projects():
+        """
+        Returns the top 3 clients with the most projects, completed or not.
+        This is used on the index page.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.groupby(['client_username']).size()
+        projects = projects.sort_values(ascending=False)
+
+        usernames = []
+        for index, value in projects.iteritems():
+            if len(usernames) == 3:
+                break;
+            usernames.append(index)
+
+        return usernames
+
+    @staticmethod
+    def get_similar_clients(username):
+        """
+        Returns three clients with similar interests as the specified user, based
+        on tags of the user's most recent completed projects.
+        """
+        projects = []
+        user_type = User.get_user_info(username)['type_of_user']
+        if user_type == 'client':
+            projects = Client.get_projects_posted(username)
+        else: #is developer
+            projects = Developer.get_past_projects(username)
+        
+        tags = ""
+        for index in projects:
+            demand = Demand.get_info(index)
+            tags += demand['tags']
+        print("tag", tags)
+        similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
+        similar_clients = []
+
+        for index in similar_projects:
+            if len(similar_clients) == 3:
+                break
+            demand = Demand.get_info(index)
+            if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
+                similar_clients.append(p['client_username'])
+
+        return similar_clients
 
 class Developer:
     """
@@ -212,6 +256,21 @@ class Developer:
         df = pd.read_csv('database/Developer.csv')
         return df['username'].count() # does not count NaNs
 
+    @staticmethod
+    def get_most_active_developers():
+        """
+        Returns the top 3 developers with the most projects completed.
+        """
+        df = pd.read_csv('database/Developer.csv')
+        sorted_df = df.sort_values(by='num_of_completed_projects', ascending=False)
+        sorted_df = sorted_df.iloc[:3]
+
+        usernames = []
+        for index, row in sorted_df.iterrows():
+            usernames.append(row['username'])
+
+        return usernames
+
 class Applicant:
     """
     Applicant class. Has methods that inserts to and reads from the Applicant table.
@@ -253,13 +312,6 @@ class Applicant:
         tmp = df.loc[df['temp_user_id'] == user_id]
 
         return not tmp.empty
-
-    def validate_password(self, password):
-        """
-        Validates the password, which should be longer than 8 characters.
-        Returns True if the password is valid. Returns False otherwise.
-        """
-        return len(password) > 8
 
     @staticmethod
     def get_applicant_info(user_id):
@@ -370,16 +422,25 @@ class Demand:
     Demand class. Has methods that inserts to, reads from, and modifies Demand table.
     """
     def __init__(self, client_username, title, tags, specifications, bidding_deadline, submission_deadline):
+        """
+        Create a new demand by adding a row with the information to the Demand table.
+        Returns the demand_id, which is the index of the row that was just added.
+        """
         df = pd.read_csv('database/Demand.csv')
 
         now = datetime.datetime.now()
         format = '%m-%d-%Y %I:%M %p'
         date_posted = now.strftime(format)
-        
+
         df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False],
             index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed'])
 
         df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def get_most_recent_demand_id():
+        df = pd.read_csv('database/Demand.csv')
+        return df.index.values.tolist()[-1]
 
     @staticmethod
     def get_info(demand_id):
@@ -586,7 +647,7 @@ class SuperUser:
         df = pd.read_csv('database/SuperUser.csv')
         user = df.loc[df['username'] == username]
         if not user.empty:
-            pwhash = user['password'][0]
+            pwhash = user['password'].item()
             return pwhash == hash_password(password) 
 
 class Notification:

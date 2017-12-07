@@ -2,8 +2,9 @@ from flask import Flask, flash, render_template, request, session, redirect, url
 import pandas as pd
 from csv import reader
 import datetime
+from dateutil import parser
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, Notification
-from forms import SignupForm, LoginForm, ApplicantApprovalForm, BecomeUserForm
 
 app = Flask(__name__)
 app.secret_key = 'development-key'
@@ -14,7 +15,7 @@ def index():
     number_of_clients = Client.get_number_of_clients()
     number_of_developers = Developer.get_number_of_developers()
     # clients with the most projects
-    top_clients = Client.get_top_clients()
+    top_clients = Client.get_clients_with_most_projects()
     # developers making the most money
     top_devs =[]
     return render_template("index.html",number_of_clients=number_of_clients, 
@@ -34,17 +35,26 @@ def dashboard():
         notifications = Notification.get_notif_to_recipient(session['username'], 5)
 
         # If the user has no projects in history, they are a new user.
-        new_user = True
         user_type = User.get_user_info(session['username'])['type_of_user']
+        recs = {"client_rec_des": "Most Active Clients", 
+                "dev_rec_des": "Most Active Developers",
+                "client_rec": Client.get_most_active_clients(), 
+                "dev_rec": Developer.get_most_active_developers()}
 
         if user_type == 'client':
             if Client.get_info(session['username'])['num_of_completed_projects'] > 0:
-                new_user = False
-        else:
+                recs = {"client_rec_des": "Clients with Similar Interests", 
+                    "dev_rec_des": "Developers with Similar Interests",
+                    "client_rec": Client.get_similar_clients(session['username']), 
+                    "dev_rec": Developer.get_most_active_developers()}
+        elif user_type == 'developer':
             if Developer.get_info(session['username'])['num_of_completed_projects'] > 0:
-                new_user = False
+                recs = {"client_rec_des": "Clients with Similar Interests", 
+                    "dev_rec_des": "Developers with Similar Interests",
+                    "client_rec": Client.get_similar_clients(session['username']), 
+                    "dev_rec": Developer.get_most_active_developers()}
         return render_template("dashboard.html", first_name=first_name, notifications=notifications,
-                                new_user=new_user)
+                                recs=recs)
     else:
         return redirect(url_for('login'))
 
@@ -188,6 +198,7 @@ def login():
         # Check if username exists and if password matches
         if User.check_password(username, password):
             session['username'] = username
+            session['role'] = User.get_user_info(username)['type_of_user']
             session['type_of_user'] = 'user'
             return redirect(url_for('dashboard'))
         if Applicant.check_password(username, password):
@@ -215,14 +226,19 @@ def logout():
     The '/logout' route will remove the user from the current session if there is one.
     """
     session.pop('username', None)
+    session.pop('role', None)
     return redirect(url_for('index'))
 
 @app.route("/warning/protest")
 def protestWarning():
     return render_template("protestWarning.html")
 
-@app.route("/bid/<demand_id>")
+@app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
+    """
+    The '/bid/<demand_id>' route directs a user to the page with complete
+    specifications for the demand.
+    """
     demand_info = Demand.get_info(demand_id)
     client_info = User.get_user_info(demand_info['client_username'])
     bids = Bid.get_bids_for_demand(demand_id)
@@ -240,12 +256,44 @@ def bidInfo(demand_id):
 
         if info['developer_username'] not in bidders_info:
             bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
+    
+    form = BidForm()
 
-    return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid)
+    if request.method == 'POST':
+        if form.validate():
+            Bid(demand_id, session['username'], form.bid_amount.data)
+            return redirect(url_for('bidInfo', demand_id=demand_id))
+        else:
+            # bid amount was not valid
+            print('was not valid')
+            return redirect(url_for('bidInfo', demand_id=demand_id))
 
-@app.route("/createDemand")
+    elif request.method == 'GET':
+        return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid, form=form, demand_id=demand_id)
+
+@app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
-    return render_template("createDemand.html")
+    """
+    The '/createDemand' route directs a client to the form where he/she can
+    create and post a demand on the Turk System.
+    """
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    form = DemandForm()
+    if session['role'] != 'client':
+        return render_template('access_denied.html')
+    elif request.method == 'POST' and form.validate():
+        format = '%m-%d-%Y %I:%M %p'
+        dt_bid = form.bidding_deadline.data.strftime(format)
+        dt_submit = form.submission_deadline.data.strftime(format)
+
+        Demand(session['username'], form.title.data, form.tags.data,
+                            form.specifications.data, dt_bid, dt_submit)
+        new_demand_id = Demand.get_most_recent_demand_id()
+
+        return redirect(url_for('bidInfo', demand_id=new_demand_id))
+    elif request.method == 'GET':
+        return render_template('createDemand.html', form=form)
 
 @app.route("/applicant_approval/<applicant_id>", methods=["GET", "POST"])
 def applicant_approval(applicant_id):
