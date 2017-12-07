@@ -3,7 +3,7 @@ import pandas as pd
 from csv import reader
 import datetime
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, Notification
-from forms import SignupForm, LoginForm, ApplicantApprovalForm
+from forms import SignupForm, LoginForm, ApplicantApprovalForm, BecomeUserForm
 
 app = Flask(__name__)
 app.secret_key = 'development-key'
@@ -56,13 +56,40 @@ def view_notifications():
     else:
         return redirect(url_for('login'))
 
-@app.route("/dashboard_applicant")
+@app.route("/dashboard_applicant", methods=["GET", "POST"])
 def dashboard_applicant():
     if session['username']:
-        info = Applicant.get_applicant_info(session['username'])
-        return render_template("dashboard_applicant.html", info=info)
+        form = BecomeUserForm()
+        if session['type_of_user'] == 'applicant' and request.method == 'GET':
+            info = Applicant.get_applicant_info(session['username'])
+            return render_template("dashboard_applicant.html", info=info, form=form)
+        if session['type_of_user'] == 'applicant' and request.method == 'POST':
+            info = Applicant.get_applicant_info(session['username'])
+            if form.use_prev_credentials.data == 'yes':
+                User.use_old_credentials(info['user_id'],info['email'])
+                session['type_of_user'] == 'user'
+                session['role'] == info['type_of_user']
+                return redirect(url_for('dashboard'))
+            elif form.validate():
+                User.set_credentials(form.username.data,form.password.data,info['email'])
+                session['username'] == form.username.data
+                session['type_of_user'] == 'user'
+                session['role'] == info['type_of_user']
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Login credentials are invalid. Please check that all fields are filled correctly.')
+                return render_template("dashboard_applicant.html", info=info, form=form)
+        elif session['type_of_user'] == 'user':
+            return render_template("dashboard", info=info)
+        elif session['type_of_user'] == 'superuser':
+            return render_template("dashboard_superuser", info=info)
+
     else:
         return render_template("index.html")
+
+
+
+
 
 @app.route("/dashboard_superuser")
 def dashboard_superuser():

@@ -17,16 +17,6 @@ class User:
                            index=['username', 'password', 'first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user'])
         df.to_csv('database/User.csv', index=False)
 
-    def set_credentials(self, username, password, email):
-        """
-        After a user is approved, the user can set his/her official username and password.
-        This method stores this information in the User table.
-        """
-        df = pd.read_csv('database/User.csv')
-        df.loc[df.email == email, 'username'] = username
-        df.loc[df.email == email, 'password'] = hash_password(password)
-        df.to_csv('database/User.csv', index=False)
-
     def has_user_id(self, username):
         """
         Returns True if the username exists in the User table.
@@ -43,6 +33,30 @@ class User:
         Returns True if the password is valid. Returns False otherwise.
         """
         return len(password) > 8
+
+    @staticmethod
+    def set_credentials(username, password, email):
+        """
+        After a user is approved, the user can set his/her official username and password.
+        This method stores this information in the User table.
+        """
+        df = pd.read_csv('database/User.csv')
+        df.loc[df.email == email, 'username'] = username
+        df.loc[df.email == email, 'password'] = hash_password(password)
+        df.to_csv('database/User.csv', index=False)
+    
+    @staticmethod
+    def use_old_credentials(username, email):
+        """
+        After a user is approved, the user can keep their old username and password.
+        This method stores this information in the User table.
+        """
+        df = pd.read_csv('database/Applicant.csv')
+        password = df.loc[df.user_id == username, 'password']
+        df = pd.read_csv('database/User.csv')
+        df.loc[df.email == email, 'username'] = username
+        df.loc[df.email == email, 'password'] = password
+        df.to_csv('database/User.csv', index=False)
 
     @staticmethod
     def check_password(username, password):
