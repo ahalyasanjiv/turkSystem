@@ -102,7 +102,7 @@
           {% for notif in notifications %}
           <div class="notification">
             <p class="content">
-            {{ notif.message }}
+            {{ notif.message|safe }}
             <br>
             <small>{{ notif.date_sent }}</small>
             </p>

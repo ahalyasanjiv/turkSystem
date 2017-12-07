@@ -163,7 +163,7 @@ class Client:
         df = pd.read_csv('database/Demand.csv')
         projects = df.groupby(['client_username']).size()
         projects = projects.sort_values(ascending=False)
-        print(projects)
+
         usernames = []
         for index, value in projects.iteritems():
             if len(usernames) == 3:
@@ -173,12 +173,34 @@ class Client:
         return usernames
 
     @staticmethod
-    def get_similiar_clients(username):
+    def get_similar_clients(username):
         """
         Returns three clients with similar interests as the specified user, based
         on tags of the user's most recent completed projects.
         """
-        return 1
+        projects = []
+        user_type = User.get_user_info(username)['type_of_user']
+        if user_type == 'client':
+            projects = Client.get_projects_posted(username)
+        else: #is developer
+            projects = Developer.get_past_projects(username)
+        
+        tags = ""
+        for index in projects:
+            demand = Demand.get_info(index)
+            tags += demand['tags']
+        print("tag", tags)
+        similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
+        similar_clients = []
+
+        for index in similar_projects:
+            if len(similar_clients) == 3:
+                break
+            demand = Demand.get_info(index)
+            if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
+                similar_clients.append(p['client_username'])
+
+        return similar_clients
 
 class Developer:
     """
