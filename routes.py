@@ -3,7 +3,7 @@ from csv import reader
 import datetime
 from dateutil import parser
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser
-from forms import SignupForm, LoginForm, DemandForm
+from forms import SignupForm, LoginForm, DemandForm, BidForm
 
 app = Flask(__name__)
 app.secret_key = 'development-key'
@@ -151,16 +151,17 @@ def logout():
     The '/logout' route will remove the user from the current session if there is one.
     """
     session.pop('username', None)
+    session.pop('role', None)
     return redirect(url_for('index'))
 
 @app.route("/warning/protest")
 def protestWarning():
     return render_template("protestWarning.html")
 
-@app.route("/bid/<demand_id>")
+@app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
     """
-    The '/bid/<demand_id>' route directs a client to the page with complete
+    The '/bid/<demand_id>' route directs a user to the page with complete
     specifications for the demand.
     """
     demand_info = Demand.get_info(demand_id)
@@ -180,8 +181,20 @@ def bidInfo(demand_id):
 
         if info['developer_username'] not in bidders_info:
             bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
+    
+    form = BidForm()
 
-    return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid)
+    if request.method == 'POST':
+        if form.validate():
+            Bid(demand_id, session['username'], form.bid_amount.data)
+            return redirect(url_for('bidInfo', demand_id=demand_id))
+        else:
+            # bid amount was not valid
+            print('was not valid')
+            return redirect(url_for('bidInfo', demand_id=demand_id))
+
+    elif request.method == 'GET':
+        return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid, form=form, demand_id=demand_id)
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():

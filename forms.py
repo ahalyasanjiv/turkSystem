@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField, ValidationError, FloatField
+from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField, ValidationError, DecimalField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
-from models import Applicant
+from models import Applicant, Bid
 
 def validate_user_id(form,field):
 	"""
@@ -10,6 +10,23 @@ def validate_user_id(form,field):
 	"""
 	if not Applicant.is_unique_user_id(field.data):
 		raise ValidationError('User ID is taken. Please enter another User ID.')
+
+def validate_bid_amount(form, field):
+	"""
+	Custom validator for BidForm.
+	Validates if bid_amount is less than the lowest bid, if there is any.
+	Also validates that bid_amount is a positive number.
+	"""
+	# bids = Bid.get_bids_for_demand(demand_id)
+
+	if field.data <= 0:
+		raise ValidationError('The amount you tried to bid is invalid. Please enter a positive bid amount.')
+
+	# if len(bids) > 0:
+	# 	lowest_bid_amount = Bid.get_info(bids[0]).bid_amount
+
+	# 	if float(field.data) >= float(lowest_bid_amount):
+	# 		raise ValidationError('The current bid is lower than what you tried to bid. Please enter another bid amount.')
 
 class SignupForm(FlaskForm):
 	""" 
@@ -66,5 +83,5 @@ class BidForm(FlaskForm):
 	"""
 	Form for developers to make bids for a demand.
 	"""
-	bid_amount = FloatField(label='Bid Amount', id='bid_amount', validators=[DataRequired('Please enter an amount to bid.')])
+	bid_amount = DecimalField(label='Bid Amount', id='bid_amount', validators=[DataRequired('Please enter an amount to bid.'), validate_bid_amount])
 	submit = SubmitField('Make a Bid')
