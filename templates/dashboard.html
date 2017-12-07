@@ -153,39 +153,25 @@
           </article>
           </div>
           
-        {% if new_user %}
           <div class="level">
             <div class="level-item has-text-centered">
               <div>
-                <p class="heading">Most Active Clients</p>
-                <p class="title">Rainbow, Dragon, Salmon</p>
+                <p class="heading">{{ recs.client_rec_des }}</p>
+                {% for name in recs.client_rec %}
+                  <p class="title">{{ name }}</p>
+                {% endfor %}
               </div>
             </div>
 
              <div class="level-item has-text-centered">
               <div>
-                <p class="heading">Most Active Developers</p>
-                <p class="title">Mocha, Latte, Frappe</p>
+                <p class="heading">{{ recs.dev_rec_des }}</p>
+                {% for name in recs.dev_rec %}
+                  <p class="title">{{ name }}</p>
+                {% endfor %}
               </div>
             </div>
-          </div>
-        {% else %}
-        <div class="level">
-            <div class="level-item has-text-centered">
-              <div>
-                <p class="heading">Clients with Similar Interests</p>
-                <p class="title">Rainbow, Dragon, Salmon</p>
-              </div>
-            </div>
-
-             <div class="level-item has-text-centered">
-              <div>
-                <p class="heading">Developers with Interests</p>
-                <p class="title">Mocha, Latte, Frappe</p>
-              </div>
-            </div>
-          </div>
-        {% endif %}
+          </div> <!-- level -->
         </div>
       </div>
 

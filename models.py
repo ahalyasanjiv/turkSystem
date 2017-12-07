@@ -140,7 +140,7 @@ class Client:
         return df['username'].count() # does not count NaNs
 
     @staticmethod
-    def get_top_clients():
+    def get_most_active_clients():
         """
         Returns the top 3 clients with the most projects completed.
         """
@@ -197,6 +197,21 @@ class Developer:
         """
         df = pd.read_csv('database/Developer.csv')
         return df['username'].count() # does not count NaNs
+
+    @staticmethod
+    def get_most_active_developers():
+        """
+        Returns the top 3 developers with the most projects completed.
+        """
+        df = pd.read_csv('database/Developer.csv')
+        sorted_df = df.sort_values(by='num_of_completed_projects', ascending=False)
+        sorted_df = sorted_df.iloc[:3]
+
+        usernames = []
+        for index, row in sorted_df.iterrows():
+            usernames.append(row['username'])
+
+        return usernames
 
 class Applicant:
     """
