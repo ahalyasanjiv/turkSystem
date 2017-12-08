@@ -627,7 +627,6 @@ class Demand:
         who created the demand. Only one notification will be sent.
         """
         df = pd.read_csv('database/Demand.csv')
-        # df['bidding_deadline'] = pd.to_datetime(df['bidding_deadline'], format='%m-%d-%Y %I:%M %p')
         now = datetime.datetime.now()
 
         for index, row in df.iterrows():
@@ -637,6 +636,31 @@ class Demand:
                 message = 'The deadline for your {} demand is approaching.'.format(row['title'])
                 Notification(row['client_username'], 'superuser0', message)
                 df.loc[index, 'bidding_deadline_approaching_notif_sent'] = True
+
+        df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def check_expired_demands():
+        """
+        Checks for any demands that are passed their bidding deadlines
+        and have no bidders. These systems are marked as expired, and
+        the client who posted the demand pays a $10 fee.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        now = datetime.datetime.now()
+
+        for index, row in df.iterrows():
+            dt = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p')
+            # time_diff = now - dt
+            num_bids = len(Bid.get_bids_for_demand(index))
+
+            # if the bidding deadline passed and there are no bids for this demand,
+            # make it expired
+            if (now > dt) and (num_bids == 0):
+                df.loc[index, 'is_expired'] = True
+                message = 'Your {} demand expired at {}. $10 is taken off of your balance.'.format(row['title'], row['bidding_deadline'])
+                Notification(row['client_username'], 'superuser0', message)
+                Transaction('superuser0', row['client_username'], 10)
 
         df.to_csv('database/Demand.csv', index=False)
 
@@ -891,4 +915,6 @@ class Transaction:
             index=['transaction_id', 'recipient','sender','amount','status', 'optional_message'])
         df.to_csv('database/Transaction.csv', index=False)
 
+# run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()
+Demand.check_expired_demands()

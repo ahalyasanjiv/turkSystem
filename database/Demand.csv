@@ -1,11 +1,11 @@
-client_username,date_posted,title,tags,specifications,bidding_deadline,chosen_developer_username,submission_deadline,is_completed,bidding_deadline_approaching_notif_sent
-testuser1,12-07-2017 01:01 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,testuser0,01-02-2018 12:00 AM,False,False
-testuser1,12-07-2017 01:16 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,testuser0,01-02-2018 12:00 AM,False,False
-testuser1,12-07-2017 01:16 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,dev1,01-02-2018 12:00 AM,False,False
-testuser1,12-07-2017 01:16 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,dev2,01-02-2018 12:00 AM,False,False
-testuser1,12-07-2017 01:18 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,dev2,01-02-2018 12:00 AM,False,False
-tks,12-07-2017 01:18 AM,testing,demand,dfnglk,01-01-2018 12:00 AM,dev3,01-02-2018 12:00 AM,False,False
-testuser1,12-07-2017 01:19 AM,test,test,test,01-01-2018 12:00 AM,cat,02-02-2018 12:00 AM,False,False
-testuser1,12-07-2017 01:20 AM,Real test,demand test,description stuff,01-01-2018 12:00 AM,testuser0,03-01-2018 12:00 AM,False,False
-testuser0,12-07-2017 04:08 PM,test,test,test,12-07-2017 12:00 AM,testuser0,01-02-2018 12:00 AM,False,True
-testuser0,12-07-2017 09:10 PM,ldfg,,sdofji,12-01-2017 12:00 AM,,01-01-2018 12:00 AM,False,True
+client_username,date_posted,title,tags,specifications,bidding_deadline,chosen_developer_username,submission_deadline,is_completed,bidding_deadline_approaching_notif_sent,is_expired
+testuser1,12-07-2017 01:01 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,testuser0,01-02-2018 12:00 AM,False,False,False
+testuser1,12-07-2017 01:16 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,testuser0,01-02-2018 12:00 AM,False,False,False
+testuser1,12-07-2017 01:16 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,dev1,01-02-2018 12:00 AM,False,False,False
+testuser1,12-07-2017 01:16 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,dev2,01-02-2018 12:00 AM,False,False,False
+testuser1,12-07-2017 01:18 AM,testing,testing again,dfnglk,01-01-2018 12:00 AM,dev2,01-02-2018 12:00 AM,False,False,False
+tks,12-07-2017 01:18 AM,testing,demand,dfnglk,01-01-2018 12:00 AM,dev3,01-02-2018 12:00 AM,False,False,False
+testuser1,12-07-2017 01:19 AM,test,test,test,01-01-2018 12:00 AM,cat,02-02-2018 12:00 AM,False,False,False
+testuser1,12-07-2017 01:20 AM,Real test,demand test,description stuff,01-01-2018 12:00 AM,testuser0,03-01-2018 12:00 AM,False,False,False
+testuser0,12-07-2017 04:08 PM,test,test,test,12-07-2017 12:00 AM,testuser0,01-02-2018 12:00 AM,False,True,False
+testuser0,12-07-2017 09:10 PM,ldfg,,sdofji,12-01-2017 12:00 AM,,01-01-2018 12:00 AM,False,True,True
