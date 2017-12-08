@@ -65,8 +65,9 @@ class ApplicantApprovalForm(FlaskForm):
 	"""
 	Form for the page where the superuser 
 	"""
-	accept = SubmitField(label='Accept')
-	reject = SubmitField(label='Reject')
+	decision = SelectField(label='Decision', id='decision', validators=[DataRequired('Please select a decision.')], choices = [('approve','Approve'),('reject','Reject')],)
+	reason = TextAreaField(label='Reason for Decision', validators=[DataRequired('Please provide a reason.')])
+	submit = SubmitField('Submit')
 
 class ProtestForm(FlaskForm):
 	""" 

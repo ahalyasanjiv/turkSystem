@@ -21,8 +21,7 @@
 			     	Applicant Information
 			    </h2>
 			  	<ul>
-			  	<li><strong>First Name:</strong> {{ info['first_name'] }}</li>
-			  	<li><strong>Last Name:</strong> {{ info['last_name'] }}</li>
+			  	<li><strong>Full Name:</strong> {{ info['first_name'] }} {{ info['last_name'] }}</li>
 			  	<li><strong>Email:</strong> {{ info['email'] }}</li>
 			  	<li><strong>Phone Number:</strong> {{ info['phone'] }}</li>
 			  	<li><strong>Credit Card Number:</strong> {{ info['credit_card'] }}</li>
@@ -31,12 +30,39 @@
 			  	<div class="columns">
 			  		<div class="column is-2"></div>
 	      			<div class="column is-8 has-text-centered">
-						<div style="display: inline-block;">
-							{{ form.accept(class="button is-success") }}
-						</div>
-						<div style="display: inline-block;">
-							{{ form.reject(class="button is-danger") }}
-						</div>
+	      				{{ form.hidden_tag() }}
+			            {% with messages = get_flashed_messages() %}
+			              {% if messages %}
+			                  <div class=flashes>
+			                    {% for message in messages %}
+			                        {{ message }}
+			                    {% endfor %}
+			                  </div>
+			              {% endif %}
+			            {% endwith %}
+						<div class="field">
+							<div class="label">{{ form.decision.label }}</div>
+					        <div class="control has-text-centered">
+					        	<div class="select">{{ form.decision(placeholder="Select a decision", class="is-medium") }}</div>
+					        </div>
+					        {% if form.decision.errors %}
+					          {% for error in form.decision.errors %}
+					            <p class="is-danger">{{ error }}</p>
+					          {% endfor %}
+					        {% endif %}
+				      	</div>
+				      	<div class="field">
+					        <div class="label">{{ form.reason.label }}</div>
+					        <div class="control">
+					        	{{ form.reason(class_="textarea") }}
+					        </div>
+					        {% if form.reason.errors %}
+					            {% for error in form.reason.errors %}
+					              <p class="is-danger">{{ error }}</p>
+					            {% endfor %}
+					        {% endif %}
+				      	</div>
+				      	{{ form.submit(class="button is-link") }}
 					</div>
 				</div>
 			</form>

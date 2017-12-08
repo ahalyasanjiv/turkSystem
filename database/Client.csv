@@ -1,4 +1,6 @@
 username,avg_rating,avg_given_rating,num_of_completed_projects,num_of_warnings
-testuser1,,,1,
+testuser1,0,0,1,0
 testuser0,0.0,0.0,0,0.0
 samjohnson,0.0,0.0,0,0.0
+jessicafields,0.0,0.0,0,0.0
+carmenreed,0.0,0.0,0,0.0

@@ -16,9 +16,14 @@
 
   <section class="section">
     <div class="container">
+      {% if session['role'] == 'client' %}
+      <a href="/createDemand" class="button is-primary">Create a New Demand</a>
+      <br><br>
+      {% endif %}
+
       <div class="columns">
         <div class="column is-7">
-          {% for demand in demands_info%}
+          {% for demand in demands_info %}
             <article class="media">
               <div class="media-content">
                 <div class="content">
@@ -26,11 +31,23 @@
                     <strong>
                       <a href="{{ demand.link_to_demand }}">{{ demand.title }}</a>
                     </strong>
+                    <!-- Posted by information -->
                     <small>Posted by <a href="{{ demand.link_to_client }}">@{{ demand.client_username }}</a> on {{ demand.date_posted }}</small>
                     <br>
+
+                    <!-- specifications/description of demand -->
                     {{ demand.specifications }}
                     <br>
-                    <small><em>Lowest bid: {{ demand.min_bid }}</em></small><br>
+
+                    <!-- current lowest bid, if there is one -->
+                    {% if demand.min_bid is not none %}
+                      <small><em>Lowest bid: {{ demand.min_bid }}</em></small>
+                    {% else %}
+                      <small><em>No bids were made yet!</em></small>
+                    {% endif %}
+                    <br>
+
+                    <!-- bidding deadline information -->
                     {% if demand.bidding_deadline_passed %}
                       <small><em>Closed on {{ demand.bidding_deadline }}</em></small>
                     {% else %}
