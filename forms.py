@@ -11,20 +11,6 @@ def validate_user_id(form,field):
 	if not Applicant.is_unique_user_id(field.data) or field.data == ' ':
 		raise ValidationError('User ID is taken. Please enter another User ID.')
 
-def validate_bid_amount(form, field):
-	"""
-	Custom validator for BidForm.
-	Validates if bid_amount is less than the lowest bid, if there is any.
-	Also validates that bid_amount is a positive number.
-	"""
-	# bids = Bid.get_bids_for_demand(demand_id)
-
-	# if len(bids) > 0:
-	# 	lowest_bid_amount = Bid.get_info(bids[0]).bid_amount
-
-	# 	if float(field.data) >= float(lowest_bid_amount):
-	# 		raise ValidationError('The current bid is lower than what you tried to bid. Please enter another bid amount.')
-
 def validate_email(form,field):
 	"""
 	Custom validator for username
@@ -32,6 +18,21 @@ def validate_email(form,field):
 	"""
 	if not Applicant.is_unique_email(field.data):
 		raise ValidationError('There already exists an account with this email.')
+
+def validate_bid_amount(form, field, demand_id):
+	"""
+	Custom validator for BidForm.
+	Validates if bid_amount is less than the lowest bid, if there is any.
+	Also validates that bid_amount is a positive number.
+	"""
+	bids = Bid.get_bids_for_demand(demand_id)
+
+	if len(bids) > 0:
+		lowest_bid_amount = Bid.get_info(bids[0]).bid_amount
+
+		if float(field.data) >= float(lowest_bid_amount):
+			print(field.data)
+			raise ValidationError('Bid must be lower than the currently lowest bid.')
 
 class SignupForm(FlaskForm):
 	""" 
@@ -95,7 +96,8 @@ class BidForm(FlaskForm):
 	"""
 	Form for developers to make bids for a demand.
 	"""
-	bid_amount = DecimalField(label='Bid Amount', id='bid_amount', validators=[DataRequired('Please enter an amount to bid.'), validate_bid_amount])
+	bid_amount = DecimalField(label='Bid Amount', id='bid_amount', validators=[DataRequired('Please enter an amount to bid.')])
+	# , validate_bid_amount])
 	submit = SubmitField('Make a Bid')
 
 class BecomeUserForm(FlaskForm):
@@ -105,5 +107,5 @@ class BecomeUserForm(FlaskForm):
 	use_prev_credentials = SelectField(label='Use previous login credentials', id='use_prev_credentials', validators=[DataRequired('Please choose a role.')], choices = [('yes','yes'),('no','no')],)
 	username = StringField(label='User ID', id='user_id', validators=[DataRequired('Please enter a user ID.'), validate_user_id])
 	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter a password.'), Length(min=8, message='Your password must have at least 8 characters.')])
-	confirm_password = PasswordField(label='Confirm Password', id ='confirm_password', validators=[DataRequired('Please confirm your password.')])
+	confirm_password = PasswordField(label='Confirm Password', id='confirm_password', validators=[DataRequired('Please confirm your password.')])
 	submit = SubmitField('Submit')

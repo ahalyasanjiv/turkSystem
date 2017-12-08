@@ -258,14 +258,14 @@ def bidInfo(demand_id):
             bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
     
     form = BidForm()
+    # form = BidForm(demand_id)
 
     if request.method == 'POST':
         if form.validate():
             Bid(demand_id, session['username'], form.bid_amount.data)
             return redirect(url_for('bidInfo', demand_id=demand_id))
         else:
-            # bid amount was not valid
-            print('was not valid')
+            print(form.bid_amount.data)
             return redirect(url_for('bidInfo', demand_id=demand_id))
 
     elif request.method == 'GET':
