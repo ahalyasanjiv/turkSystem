@@ -46,13 +46,13 @@ def dashboard():
                 recs = {"client_rec_des": "Clients with Similar Interests", 
                     "dev_rec_des": "Developers with Similar Interests",
                     "client_rec": Client.get_similar_clients(session['username']), 
-                    "dev_rec": Developer.get_most_active_developers()}
+                    "dev_rec": Developer.get_similar_developers(session['username'])}
         elif user_type == 'developer':
             if Developer.get_info(session['username'])['num_of_completed_projects'] > 0:
                 recs = {"client_rec_des": "Clients with Similar Interests", 
                     "dev_rec_des": "Developers with Similar Interests",
                     "client_rec": Client.get_similar_clients(session['username']), 
-                    "dev_rec": Developer.get_most_active_developers()}
+                    "dev_rec": Developer.get_similar_developers(session['username'])}
         return render_template("dashboard.html", first_name=first_name, notifications=notifications,
                                 recs=recs)
     else:
