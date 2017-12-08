@@ -37,7 +37,7 @@
                       <a class="button is-static">$</a>
                     </p>
                     <div class="control">
-                      {{ form.bid_amount(placeholder="Bid amount", class="form-control input", type="number") }}
+                      {{ form.bid_amount(placeholder="Bid amount", class="form-control input", type="number", step="0.01", value="0.00", min="0.00") }}
                       {% if form.bid_amount.errors %}
                         {% for error in form.bid_amount.errors %}
                           <p class="is-danger">{{ error }}</p>

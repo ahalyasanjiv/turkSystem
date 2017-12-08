@@ -62,7 +62,7 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             pwhash = user['password'].item()
-            return pwhash == hash_password(password)        
+            return pwhash == hash_password(password)  
 
     @staticmethod
     def get_user_info(username):
