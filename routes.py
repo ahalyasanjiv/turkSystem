@@ -32,6 +32,7 @@ def dashboard():
         first_name = info['first_name']
 
         # Get notifications for this user.
+        unread = Notification.get_number_of_unread(session['username'])
         notifications = Notification.get_notif_to_recipient(session['username'], 5)
 
         # If the user has no projects in history, they are a new user.
@@ -54,15 +55,16 @@ def dashboard():
                     "client_rec": Client.get_similar_clients(session['username']), 
                     "dev_rec": Developer.get_similar_developers(session['username'])}
         return render_template("dashboard.html", first_name=first_name, notifications=notifications,
-                                recs=recs)
+                                recs=recs, unread=unread)
     else:
         return redirect(url_for('login'))
 
 @app.route("/dashboard/notifications")
 def view_notifications():
     if 'username' in session:
+        unread = Notification.get_number_of_unread(session['username'])
         notifications = Notification.get_all_notif_to_recipient(session['username'])
-        return render_template('notifications.html', notifications=notifications)
+        return render_template('notifications.html', notifications=notifications, unread=unread)
     else:
         return redirect(url_for('login'))
 
@@ -261,7 +263,6 @@ def bidInfo(demand_id):
             Bid(demand_id, session['username'], form.bid_amount.data)
             return redirect(url_for('bidInfo', demand_id=demand_id))
         else:
-            print(form.bid_amount.data)
             return redirect(url_for('bidInfo', demand_id=demand_id))
 
     elif request.method == 'GET':

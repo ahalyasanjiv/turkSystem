@@ -205,7 +205,7 @@ class Client:
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
                 if demand['client_username'] not in similar_clients:
-                    similar_clients.append(demand['client_username'])
+                    similar_clients.append(User.get_user_info(demand['client_username']))
 
         return similar_clients
 
@@ -295,7 +295,7 @@ class Developer:
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
                 if demand['chosen_developer_username'] not in similar_developers:
-                    similar_developers.append(demand['chosen_developer_username'])
+                    similar_developers.append(User.get_user_info(demand['chosen_developer_username']))
 
         return similar_developers
 
@@ -483,6 +483,12 @@ class Demand:
         now = datetime.datetime.now()
         deadline_passed = datetime.datetime.strptime(demand['bidding_deadline'], '%m-%d-%Y %I:%M %p') < now
 
+        bids = Bid.get_bids_for_demand(demand_id)
+        if len(bids) > 0:
+            lowest_bid = Bid.get_info(bids[0])['bid_amount']
+        else:
+            lowest_bid = None
+
         if not demand.empty:
             return {'client_username': demand['client_username'],
                     'date_posted': demand['date_posted'],
@@ -494,6 +500,7 @@ class Demand:
                     'is_completed': demand['is_completed'],
                     'bidding_deadline_passed': deadline_passed,
                     'chosen_developer_username' : demand['chosen_developer_username'],
+                    'min_bid': lowest_bid,
                     'link_to_client': '/user/' + demand['client_username'],
                     'link_to_demand': '/bid/' + str(demand_id)}
 
@@ -574,10 +581,18 @@ class Bid:
         now = datetime.datetime.now()
         format = '%m-%d-%Y %I:%M %p'
         date_bidded = now.strftime(format)
+        bid_amount = round(bid_amount, 2)
 
         df.loc[len(df)] = pd.Series(data=[demand_id, developer_username, bid_amount, date_bidded],
             index=['demand_id', 'developer_username', 'bid_amount', 'date_bidded'])
         df.to_csv('database/Bid.csv', index=False)
+
+        # send notification to client who made the demand stating that a bid was made
+        demand_info = Demand.get_info(demand_id)
+        client_username = demand_info['client_username']
+        demand_title = demand_info['title']
+        message = '{} made a bid of ${} on your {} demand'.format(developer_username, bid_amount, demand_title) 
+        Notification(client_username, developer_username, message)
 
     @staticmethod
     def get_info(bid_id):
@@ -698,6 +713,16 @@ class Notification:
         df.to_csv('database/Notification.csv', index=False)
 
     @staticmethod
+    def get_number_of_unread(recipient):
+        """
+        Gets the number of unread messages the recipient username has.
+        """
+        df = pd.read_csv('database/Notification.csv')
+        msgs = df.loc[(df['recipient'] == recipient) & (df.read_status == False)]
+
+        return len(msgs)
+
+    @staticmethod
     def get_notif_to_recipient(recipient, number):
         """
         Get messages to a certain recipient. The amount that is returned is number.
@@ -727,9 +752,12 @@ class Notification:
         msgs = df.loc[df['recipient'] == recipient]
         msgs_sorted = msgs.sort_values(by="message_id", ascending=False) # latest notif first
 
+        df.loc[df['recipient'] == recipient, ['read_status']] = True
+        df.to_csv('database/Notification.csv', index=False)
+
         notifs = []
         for index, row in msgs_sorted.iterrows():
-            temp = { 'sender': row['sender'],
+            temp = {'sender': row['sender'],
                     'message': row['message'],
                     'date_sent': row['date_sent'],
                     'read_status': row['read_status']}
