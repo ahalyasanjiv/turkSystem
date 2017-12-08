@@ -61,8 +61,6 @@ def dashboard():
     else:
         return redirect(url_for('login'))
 
-<<<<<<< HEAD
-=======
 @app.route("/dashboard/projects")
 def my_projects():
     user_type = User.get_user_info(session['username'])['type_of_user']
@@ -88,7 +86,6 @@ def my_projects():
         completed = (Demand.get_info(x) for x in Client.get_past_projects(session['username']))
     return render_template("myProjects.html", user_type = user_type, current=current, mid=mid, completed=completed)
 
->>>>>>> 6195e054388cc858239546603a8d951bc148c5b7
 @app.route("/dashboard/notifications")
 def view_notifications():
     if 'username' in session:
@@ -287,7 +284,6 @@ def protestWarning(warning_id):
     
     form = ProtestForm()
     if request.method == 'GET':
-<<<<<<< HEAD
         return render_template("protestWarning.html", form=form, warning_id=warning_id)
     else:
         if form.validate():
@@ -295,11 +291,7 @@ def protestWarning(warning_id):
             return redirect(url_for('dashboard'))
         else:
             return render_template('protestWarning.html', form=form, warning_id=warning_id)
-=======
-        return render_template("protestWarning.html",form=form, warning_id=warning_id)
-    elif request.method == 'POST':
-        pass
->>>>>>> 6195e054388cc858239546603a8d951bc148c5b7
+    
 
 @app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
@@ -337,8 +329,7 @@ def bidInfo(demand_id):
     elif request.method == 'GET':
         return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid, form=form, demand_id=demand_id)
 
-<<<<<<< HEAD
-=======
+
 @app.route('/bid/<demand_id>/choose-developer', methods=['GET', 'POST'])
 def choose_developer(demand_id):
     """
@@ -415,7 +406,6 @@ def justify_developer_choice(demand_id):
     if request.method == 'GET':
         return render_template("justify_developer_choice.html", demand_id=demand_id, form=form)
 
->>>>>>> 6195e054388cc858239546603a8d951bc148c5b7
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
     """
@@ -496,8 +486,10 @@ def protest_approval(warning_id):
         if form.validate():
             if form.decision.data == 'remove':
                 SystemWarning.remove_warning(warning_id)
+                Notification(username,session['username'],'Your protest for warning#'+ str(warning_id) +' was approved. Your warning has been deleted.')
             else:
                 SystemWarning.keep_warning(warning_id)
+                Notification(username,session['username'],'Your protest for warning#'+ str(warning_id) +' was not approved. Your warning remains.')
             return redirect(url_for('dashboard_superuser'))
         else:
             return render_template("protestApproval.html", warning_id=warning_id, info=info, form=form, avg_rating=avg_rating)
