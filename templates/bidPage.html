@@ -44,19 +44,20 @@
                       <div class="message-body">
                         Congrats! You are chosen to develop this system.
                         <div class="has-text-centered">
-                          <a href="{{ url_for('choose_developer', demand_id=demand_id) }}" class="button">See All Developers</a>
+                          <a href="{{ url_for('upload_system', demand_id=demand_id) }}" class="button">Upload System</a>
                         </div>
                       </div>
                     </article>
+                  {% else %}
+                    <article class="message is-danger">
+                      <div class="message-header">
+                        <p>Deadline for Bidding Passed</p>
+                      </div>
+                      <div class="message-body">
+                        You can no longer make bids on this system demand.
+                      </div>
+                    </article>
                   {% endif %}
-                  <article class="message is-danger">
-                    <div class="message-header">
-                      <p>Deadline for Bidding Passed</p>
-                    </div>
-                    <div class="message-body">
-                      You can no longer make bids on this system demand.
-                    </div>
-                  </article>
                 {% else %}
                   <div class="has-text-centered">
                     <form method="POST" action="{{ url_for('bidInfo', demand_id=demand_id) }}">
