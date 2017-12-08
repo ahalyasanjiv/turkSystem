@@ -86,25 +86,8 @@
               {% if session.role == 'client' %}
                 {% if session.username == client_info.username %}
                   {% if demand_info.bidding_deadline_passed %}
-                    <!-- client is able to choose a developer from those who made bids -->
-                    {% if demand_info.chosen_developer_username is not none %}
-                      {% if demand_info.is_completed %}
-                        <article class="message is-success">
-                          <div class="message-header">
-                            <p>This system demand is completed.</p>
-                          </div>
-                        </article>
-                      {% else %}
-                        <article class="message is-info">
-                          <div class="message-header">
-                            <p>Developer is chosen.</p>
-                          </div>
-                          <div class="message-body">
-                            You chose {{ demand_info.chosen_developer_username }} to implement this system demand.
-                          </div>
-                        </article>
-                      {% endif %}
-                    {% elif bidders_info|length > 0 %}
+                    
+                    {% if bidders_info|length > 0 %}
                       <article class="message is-success">
                         <div class="message-header">
                           <p>Deadline for Bidding Passed</p>

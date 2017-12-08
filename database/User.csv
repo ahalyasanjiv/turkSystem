@@ -1,9 +1,10 @@
 username,password,first_name,last_name,email,phone,credit_card,type_of_user,about
 samjohnson,bb9b8ee199288f2253d580352235f227e6281109619d1bfa229b21d2a7f02023,Sam,Johnson,samjohn97@example.com,1234567890,1230000000000000.0,client,
-testuser0,07295b249f87e4540867d07f18a3919b3e458205a502fe63af547304157a0842,test,user,test@user.com,2342342344,2342342344.0,developer,
+testuser0,07295b249f87e4540867d07f18a3919b3e458205a502fe63af547304157a0842,test,user,test@user.com,2342342344,2342342344.0,client,
 jessicafields,ad55a489edd85736ab58430272a169062bb2d81f5b1e3beaca5d2e6069fe7a02,Jessica,Fields,jessicafields@example.com,43218765098,1234570000000000.0,client,
 carmenreed1,1fa977e2598680fbb6d258b3b998874481aabe1572bcea8ca0bc299bd6b8b906,Carmen,Reed,carmenreed@example.com,1234567890,1234567812345678.0,client,
 testuser1,07295b249f87e4540867d07f18a3919b3e458205a502fe63af547304157a0842,test,user,test@user.com,2342342344,2342342344.0,developer,
 feliciadunn4,3788af9ae08dcd21ff59193e82d12bdfcd00f46dca9f25b9614e115d99e726da,Felicia,Dunn,feliciadunn@example.com,1234567890,1234567812345678.0,developer,
 jonhamilton0,94ffd2d79b9adba4eda251a48aa4aa073159b5cc4637c0a1a2434bd0a8ee2088,Jon,Hamilton,jonhamilton@example.com,1234567890,1234567812345678.0,client,
 joepeters1,86faa85edaa39dc2d0a7e279928de6c33361b1706a862a05c3e1bb9c35bc0ee1,Joe,Peters,joepeters@example.com,1234567890,1234567812345678.0,client,
+ , ,jane,chen,test@email.com,2342342344,234234000000.0,developer,

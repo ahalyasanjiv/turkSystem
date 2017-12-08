@@ -34,3 +34,6 @@ message_id,recipient,sender,date_sent,message,read_status
 32,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#3) was approved.,False
 33,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#4) was denied.,False
 34,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#6) was denied.,False
+35,testuser0,superuser0,12-08-2017 01:59 PM,Your transaction (Transaction#0) was approved.,False
+36,testuser1,testuser0,12-08-2017 02:56 PM,testuser0 made a bid of $3.00 on your Real test demand,False
+37,testuser0,testuser1,12-08-2017 02:58 PM,testuser1 made a bid of $5.00 on your new demand demand,False

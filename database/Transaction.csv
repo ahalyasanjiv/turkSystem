@@ -1,5 +1,5 @@
 transaction_id,recipient,sender,amount,status,optional_message
-0,testuser1,testuser0,0.45,pending,
+0,testuser1,testuser0,0.45,approved,
 1,testuser0,testuser0,2.5,pending,sdfl
 2,superuser0,testuser0,10.0,pending,
 3,superuser0,testuser0,10.0,approved,
