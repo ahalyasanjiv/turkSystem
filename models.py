@@ -211,7 +211,7 @@ class Client:
         tags = ""
         for index in projects:
             demand = Demand.get_info(index)
-            tags += demand['tags'] + " "
+            tags += str(demand['tags']) + " "
         print("tag", tags)
         similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
         print(similar_projects)
@@ -304,7 +304,7 @@ class Developer:
         tags = ""
         for index in projects:
             demand = Demand.get_info(index)
-            tags += demand['tags'] + " "
+            tags += str(demand['tags']) + " "
         print("tag", tags)
         similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
         similar_developers = []
@@ -320,6 +320,21 @@ class Developer:
                     similar_developers.append(User.get_user_info(demand['chosen_developer_username']))
 
         return similar_developers
+
+    @staticmethod
+    def submit_system(demand_id, developer_username):
+        """
+        Updates the Demand table so that the project is complete.
+        Also notifies the client that the project is complete.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        df.loc[int(demand_id), 'is_completed'] = True
+
+        demand_info = Demand.get_info(demand_id)
+
+        message = 'The system for the {} demand has been uploaded. Please rate {} <a href="/bid/{}/rating/{}">here</a>.'.format(demand_info['title'], developer_username, demand_id, developer_username)
+        Notification(demand_info['client_username'], developer_username, message)
+        df.to_csv('database/Demand.csv', index=False)
 
 class Applicant:
     """
@@ -711,6 +726,10 @@ class Demand:
                     Transaction(chosen_developer, row['client_username'], fee)
 
                     # automatically give this developer a rating of 1
+                    df2 = pd.read_csv('database/Rating.csv')
+                    df2.loc[len(df)] = pd.Series(data=[index, chosen_developer, row['client_username'], 1, 'System demand overdue.'],
+                        index=['demand_id', 'recipient', 'rater', 'rating', 'message'])
+                    df2.to_csv('database/Rating.csv')
 
         df.to_csv('database/Demand.csv', index=False)
 
@@ -1022,6 +1041,7 @@ class Transaction:
             index=['transaction_id', 'recipient','sender','amount','status', 'optional_message'])
         df.to_csv('database/Transaction.csv', index=False)
 
+<<<<<<< HEAD
     @staticmethod
     def get_transaction_info(transaction_id):
         """
@@ -1059,6 +1079,51 @@ class Transaction:
         # Issues a warning to the sender
         sender = transaction['sender'].item()
         SystemWarning(sender,'active')
+=======
+class Rating:
+    """
+    Ratings between developers and clients.
+    """
+    def __init__(self, demand_id, recipient, rater, rating, message=None):
+        df = pd.read_csv('database/Rating.csv')
+        df.loc[len(df)] = pd.Series(data=[demand_id, recipient, rater, rating, message],
+            index=['demand_id', 'recipient', 'rater', 'rating', 'message'])
+        df.to_csv('database/Rating.csv', index=False)
+
+    @staticmethod
+    def get_avg_rating(username):
+        df = pd.read_csv('database/Rating.csv')
+        ratings = df.loc[df.recipient == username]
+        average = ratings["rating"].mean()
+
+        return average
+
+    @staticmethod
+    def get_ratings_by_demand_id(demand_id):
+        """
+        Returns dataframe of ratings corresponding to a demand_id.
+        """
+        df = pd.read_csv('database/Rating.csv')
+        ratings = df.loc[df.demand_id == demand_id]
+
+        return ratings
+
+    @staticmethod
+    def check_if_valid_rating_form(demand_id, recipient, rater):
+        """
+        Checks if the URL for a rating is legitimate.
+        """
+        demand = Demand.get_info(demand_id)
+        if (demand['client_username'] == recipient and demand['chosen_developer_username'] == rater) or (demand['client_username'] == rater and demand['chosen_developer_username'] == recipient):
+        # exists a demand where recipient/rater is a dev/client
+            if demand['is_completed']:
+            # if the demand has finished and can have ratings
+                ratings = Rating.get_ratings_by_demand_id(demand_id)
+                if len(ratings.loc[ratings.recipient == recipient]) == 0:
+                    # there has not yet been a rating for this recipient
+                    return True
+        return False
+>>>>>>> 6f847c79b1ca835aeb77834f09a5deeab0e041fe
 
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()

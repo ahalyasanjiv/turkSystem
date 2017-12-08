@@ -4,7 +4,7 @@
 <section class="section">
 	<div class="container">
 		<h1 class="title">Leave feedback for {{ recipient }}. </h1>
-		<form method="POST" action="/bid/{{ demand_id }}/rating/{{ recipient }}">
+		<form method="POST" action="{{ url_for('rating', demand_id=demand_id, recipient=recipient) }}">
 			<div class="field">
 			<h2 class="title is-4">{{form.rating.label}}</h2>
 			{% for subfield in form.rating %}
@@ -22,8 +22,6 @@
 	            {% endfor %}
 			{% endif %}
 	    	</div>
-	    	<hr>
-
 	    	{{ form.submit(class="button is-link") }}
 
 		</form>
