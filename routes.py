@@ -4,7 +4,7 @@ import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification
 import helpers
 
@@ -61,8 +61,6 @@ def dashboard():
     else:
         return redirect(url_for('login'))
 
-<<<<<<< HEAD
-=======
 @app.route("/dashboard/projects")
 def my_projects():
     user_type = User.get_user_info(session['username'])['type_of_user']
@@ -88,7 +86,6 @@ def my_projects():
         completed = (Demand.get_info(x) for x in Client.get_past_projects(session['username']))
     return render_template("myProjects.html", user_type = user_type, current=current, mid=mid, completed=completed)
 
->>>>>>> 6195e054388cc858239546603a8d951bc148c5b7
 @app.route("/dashboard/notifications")
 def view_notifications():
     if 'username' in session:
@@ -287,7 +284,6 @@ def protestWarning(warning_id):
     
     form = ProtestForm()
     if request.method == 'GET':
-<<<<<<< HEAD
         return render_template("protestWarning.html", form=form, warning_id=warning_id)
     else:
         if form.validate():
@@ -295,11 +291,6 @@ def protestWarning(warning_id):
             return redirect(url_for('dashboard'))
         else:
             return render_template('protestWarning.html', form=form, warning_id=warning_id)
-=======
-        return render_template("protestWarning.html",form=form, warning_id=warning_id)
-    elif request.method == 'POST':
-        pass
->>>>>>> 6195e054388cc858239546603a8d951bc148c5b7
 
 @app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
@@ -337,8 +328,6 @@ def bidInfo(demand_id):
     elif request.method == 'GET':
         return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid, form=form, demand_id=demand_id)
 
-<<<<<<< HEAD
-=======
 @app.route('/bid/<demand_id>/choose-developer', methods=['GET', 'POST'])
 def choose_developer(demand_id):
     """
@@ -415,7 +404,20 @@ def justify_developer_choice(demand_id):
     if request.method == 'GET':
         return render_template("justify_developer_choice.html", demand_id=demand_id, form=form)
 
->>>>>>> 6195e054388cc858239546603a8d951bc148c5b7
+@app.route("/bid/<demand_id>/upload-system", methods=['GET', 'POST'])
+def upload_system(demand_id):
+    form = SubmitSystemForm()
+
+    if request.method == 'POST':
+        if form.validate():
+            # will not actually store the file
+            return render_template("system_uploaded.html")
+        else:
+            return render_template("upload_system.html", demand_id=demand_id, form=form)
+
+    if request.method == 'GET':
+        return render_template("upload_system.html", demand_id=demand_id, form=form)
+
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
     """

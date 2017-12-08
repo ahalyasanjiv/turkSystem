@@ -479,8 +479,8 @@ class Demand:
         format = '%m-%d-%Y %I:%M %p'
         date_posted = now.strftime(format)
 
-        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False, False],
-            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed', 'bidding_deadline_approaching_notif_sent'])
+        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False, False, False, False],
+            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed', 'bidding_deadline_approaching_notif_sent', 'is_expired', 'submission_deadline_approaching_notif_sent'])
 
         df.to_csv('database/Demand.csv', index=False)
 
@@ -638,6 +638,27 @@ class Demand:
                 message = 'The deadline for your {} demand is approaching.'.format(row['title'])
                 Notification(row['client_username'], 'superuser0', message)
                 df.loc[index, 'bidding_deadline_approaching_notif_sent'] = True
+
+        df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def check_approaching_submission_deadlines():
+        """
+        Checks for any approaching submission deadlines for all of the demands.
+        if the deadline is within 24 hours, a notification will be sent to the
+        developer who is assigned the demand. Only one notification will be sent.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        now = datetime.datetime.now()
+
+        for index, row in df.iterrows():
+            if (not row['is_expired']) and (row['chosen_developer_username'] is not None):
+                dt = datetime.datetime.strptime(row['submission_deadline'], '%m-%d-%Y %I:%M %p')
+                time_diff = (dt - now).days
+                if time_diff <= 1 and (not row['submission_deadline_approaching_notif_sent']):
+                    message = 'The deadline for submitting your system for the {} demand is approaching.'.format(row['title'])
+                    Notification(row['chosen_developer_username'], 'superuser0', message)
+                    df.loc[index, 'submission_deadline_approaching_notif_sent'] = True
 
         df.to_csv('database/Demand.csv', index=False)
 
@@ -991,5 +1012,6 @@ class Transaction:
 
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()
+Demand.check_approaching_submission_deadlines()
 Demand.check_expired_demands()
 Demand.check_overdue_demands()
