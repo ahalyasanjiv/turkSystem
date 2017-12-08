@@ -4,7 +4,7 @@ import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, Notification
 
 app = Flask(__name__)
@@ -263,9 +263,13 @@ def logout():
     session.pop('role', None)
     return redirect(url_for('index'))
 
-@app.route("/warning/protest")
+@app.route("/warnings/<warning_id>/protest", methods=['GET', 'POST'])
 def protestWarning():
-    return render_template("protestWarning.html")
+    form = ProtestForm()
+    if request.method == 'GET':
+        return render_template("protestWarning.html",form=form, warning_id=warning_id)
+    elif request.method == 'POST':
+        pass
 
 @app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
@@ -334,20 +338,51 @@ def choose_developer(demand_id):
 
     if request.method == 'POST':
         chosen_developer = request.form['developer']
+        session['chosen_developer'] = request.form['developer']
 
         # if the chosen developer had the lowest bid,
         # update the demand's chosen developer
         if chosen_developer == bids_info[0]['developer_username']:
             # updates the table, notifies the developer, and also starts the transaction request
-            Demand.choose_developer(demand_id, chosen_developer, demand_info['client_username'], bids_info[0]['bid_amount'])
+            Demand.choose_developer(demand_id, chosen_developer, session['username'], bids_info[0]['bid_amount'])
+            return render_template("developer_chosen.html")
 
         # if the chosen developer did not have the lowest bid,
         # the client must provide a reason for choosing this developer
         else:
-            pass
-        return render_template("developer_chosen.html", demand_id=demand_id, bidders_info=bidders_info)
+            return redirect(url_for('justify_developer_choice', demand_id=demand_id))
     if request.method == 'GET':
         return render_template("choose_developer.html", demand_id=demand_id, bidders_info=bidders_info)
+
+@app.route("/bid/<demand_id>/justify-developer", methods=['GET', 'POST'])
+def justify_developer_choice(demand_id):
+    """
+    The '/bid/<demand_id>/justify-developer' route is where the client fills out a form
+    to explain his/her reason for choosing a developer who did not offer the lowest bid.
+    """
+    bids = Bid.get_bids_for_demand(demand_id)
+    bids_info = []
+    bidders_info = {}
+
+    for bid in bids:
+        info = Bid.get_info(bid)
+        bids_info.append(info)
+
+        if info['developer_username'] not in bidders_info:
+            username = info['developer_username']
+            bidders_info[username] = User.get_user_info(username)
+            bidders_info[username]['lowest_bid'] = info['bid_amount']
+
+    form = JustifyDeveloperChoiceForm()
+
+    if request.method == 'POST':
+        if form.validate():
+            Demand.choose_developer(demand_id, session['chosen_developer'], session['username'], bidders_info[session['chosen_developer']]['lowest_bid'], form.reason.data)
+            return render_template("developer_chosen.html")
+        else:
+            return render_template("justify_developer_choice.html", demand_id=demand_id, form=form)
+    if request.method == 'GET':
+        return render_template("justify_developer_choice.html", demand_id=demand_id, form=form)
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():

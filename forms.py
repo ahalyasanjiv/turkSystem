@@ -73,8 +73,7 @@ class ProtestForm(FlaskForm):
 	""" 
 	Form for when user wants to protest a warning. 
 	"""
-	warning = SelectField(label='Warning to Protest', choices = [('warning1','Warning#1'),('warning2','Warning#2')])
-	reason = TextAreaField(label='Reason for Protest', id='reason', validators=[DataRequired('Please enter a reason for protesting this complaint.')])
+	reason = TextAreaField(label='Reason for Protesting Warning', id='reason', validators=[DataRequired('Please enter a reason for protesting this warning.')])
 	submit = SubmitField('Submit Protest')
 
 class DemandForm(FlaskForm):
@@ -100,6 +99,15 @@ class BidForm(FlaskForm):
 	bid_amount = DecimalField(label='Bid Amount', id='bid_amount', validators=[DataRequired('Please enter an amount to bid.')])
 	# , validate_bid_amount])
 	submit = SubmitField('Make a Bid')
+
+class JustifyDeveloperChoiceForm(FlaskForm):
+	"""
+	Form for clients to justify their reason for choosing a developer who did
+	not submit the lowest bid for their system demand.
+	"""
+	reason = TextAreaField(label='Reason for not choosing the developer with the lowest bid.',
+						   validators=[DataRequired('Please provide a reason for not choosing the developer with the lowest bid.')])
+	submit = SubmitField('Submit Reason')
 
 class BecomeUserForm(FlaskForm):
 	"""
