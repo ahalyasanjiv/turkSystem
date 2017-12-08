@@ -896,7 +896,7 @@ class Notification:
             notifs.append(temp)
         return notifs
 
-class Warning:
+class SystemWarning:
     """
     A warning that is issued to a user
 
@@ -912,9 +912,20 @@ class Warning:
             index=['warning_id','warned_user','status'])
         df.to_csv('database/Warning.csv', index=False)
 
+    @staticmethod
+    def protest_warning(warning_id,reason):
+        """
+        Allow user to protest a warning
+        """
+        df = pd.read_csv('database/Warning.csv')
+        # Set warning back to active and give reason
+        df.loc[df.warning_id == warning_id, 'status'] = 'pending'
+        df.loc[df.warning_id == warning_id, 'reason'] = reason
+
+        df.to_csv('database/Warning.csv', index=False)
 
     @staticmethod
-    def removeWarning(warning_id):
+    def remove_warning(warning_id):
         """
         Remove warning that user has protested
         """
@@ -924,15 +935,49 @@ class Warning:
         df.to_csv('database/Warning.csv', index=False)
 
     @staticmethod
-    def keepWarning(warning_id, reason):
+    def keep_warning(warning_id):
         """
         Keep the warning that user has protested and provide reason for doing so
         """
         df = pd.read_csv('database/Warning.csv')
         # Set warning back to active and give reason
-        df.loc[df.warning_id == warning_id, 'status'] = 'active'
-        df.loc[df.warning_id == warning_id, 'reason'] = reason
+        df.loc[df.warning_id == warning_id, 'status'] = 'active_and_denied'
         df.to_csv('database/Warning.csv', index=False)
+
+    @staticmethod
+    def get_warned_user(warning_id):
+        """
+        Get tbe recipient of a particular warning's username
+        """
+        df = pd.read_csv('database/Warning.csv')
+        if len(df.loc[df.warning_id == warning_id]) > 0:
+            df = pd.read_csv('database/Warning.csv')
+            return df.loc[df.warning_id == warning_id, 'warned_user'][warning_id]
+
+    @staticmethod
+    def get_warning_status(warning_id):
+        """
+        Get tbe recipient of a particular warning's username
+        """
+        df = pd.read_csv('database/Warning.csv')
+        if len(df.loc[df.warning_id == warning_id]) > 0:
+            df = pd.read_csv('database/Warning.csv')
+            return df.loc[df.warning_id == warning_id, 'status'][warning_id]
+
+    @staticmethod
+    def get_warning_info(warning_id):
+        """
+        Returns a dictionary of the warning's information.
+        """
+        df = pd.read_csv('database/Warning.csv')
+        warning = df.loc[df['warning_id'] == warning_id]
+
+        if not warning.empty:
+            return {'warning_id': warning['warning_id'].item(),
+                    'warned_user': warning['warned_user'].item(),
+                    'status': warning['status'].item(),
+                    'reason': warning['reason'].item()}
+
 
 class Transaction:
     """

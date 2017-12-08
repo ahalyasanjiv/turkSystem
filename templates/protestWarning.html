@@ -19,6 +19,17 @@
   					<h1 class="title is-2">
 						File a protest against a warning with a reason
 				    </h1>
+				    <form method="POST" action={{  url_for('protestWarning', warning_id=warning_id)  }}>
+					{{ form.hidden_tag() }}
+		            {% with messages = get_flashed_messages() %}
+		              {% if messages %}
+		                  <div class=flashes>
+		                    {% for message in messages %}
+		                        {{ message }}
+		                    {% endfor %}
+		                  </div>
+		              {% endif %}
+		            {% endwith %}
 					<div class="field">
 				        <div class="control">
 				        	{{ form.reason(class_="textarea") }}
@@ -30,6 +41,7 @@
 				        {% endif %}
 			      	</div>
 				    {{ form.submit(class="button is-link") }}
+					</form>
 
 				</div>
 			</div>
