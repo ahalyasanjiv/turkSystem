@@ -4,16 +4,20 @@
 <section class='section'>
 	<div class="container">
 		<a href="/dashboard" class="button" style="margin-bottom:10px">Back</a>
-	  <h2 class="title">Notifications</h2>
-	  {% for notif in notifications %}
-      <div class="notification">
-        <p class="content">
-          {{ notif.message }}
-          <br>
-          <small>{{ notif.date_sent }}</small>
-        </p>
-      </div>
-    {% endfor %}
+		<h2 class="title">Notifications ({{ unread }} unread messages) </h2>
+	{% for notif in notifications %}
+          {% if notif.read_status == True %}
+            <div class="notification is-light">
+          {% else %}
+            <div class="notification is-success">
+          {% endif %}
+            <p class="content">
+            {{ notif.message|safe }}
+            <br>
+            <small>{{ notif.date_sent }}</small>
+            </p>
+          </div>
+   {% endfor %}
 	</div>
 </section>
 {% endblock %}

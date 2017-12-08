@@ -33,10 +33,17 @@ class User:
         After a user is approved, the user can set his/her official username and password.
         This method stores this information in the User table.
         """
+        # Change the login credentials in Applicant database
+        df = pd.read_csv('database/Applicant.csv')
+        df.loc[df.email == email, 'username'] = username
+        df.loc[df.email == email, 'password'] = hash_password(password)
+        df.to_csv('database/Applicant.csv', index=False)
+        # Change the login credentials in User database
         df = pd.read_csv('database/User.csv')
         df.loc[df.email == email, 'username'] = username
         df.loc[df.email == email, 'password'] = hash_password(password)
         df.to_csv('database/User.csv', index=False)
+
     
     @staticmethod
     def use_old_credentials(username, email):
@@ -205,7 +212,7 @@ class Client:
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
                 if demand['client_username'] not in similar_clients:
-                    similar_clients.append(demand['client_username'])
+                    similar_clients.append(User.get_user_info(demand['client_username']))
 
         return similar_clients
 
@@ -295,7 +302,7 @@ class Developer:
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
                 if demand['chosen_developer_username'] not in similar_developers:
-                    similar_developers.append(demand['chosen_developer_username'])
+                    similar_developers.append(User.get_user_info(demand['chosen_developer_username']))
 
         return similar_developers
 
@@ -427,11 +434,6 @@ class Applicant:
                 df.loc[df.user_id == user_id, 'status'] = 'approved'
                 df.to_csv('database/Applicant.csv', index=False)
 
-                # add the user to the corresponding table
-                if user['type_of_user'].item() == 'client':
-                    Client(user_id)
-                elif user['type_of_user'].item() == 'developer':
-                    Developer(user_id)
 
     @staticmethod
     def reject(user_id, reason):
@@ -711,6 +713,16 @@ class Notification:
             index=['message_id','recipient', 'sender','date_sent', 'message', 'read_status'])
 
         df.to_csv('database/Notification.csv', index=False)
+
+    @staticmethod
+    def get_number_of_unread(recipient):
+        """
+        Gets the number of unread messages the recipient username has.
+        """
+        df = pd.read_csv('database/Notification.csv')
+        msgs = df.loc[(df['recipient'] == recipient) & (df.read_status == False)]
+
+        return len(msgs)
 
     @staticmethod
     def get_notif_to_recipient(recipient, number):
