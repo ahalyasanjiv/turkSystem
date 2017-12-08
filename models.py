@@ -726,6 +726,10 @@ class Demand:
                     Transaction(chosen_developer, row['client_username'], fee)
 
                     # automatically give this developer a rating of 1
+                    df2 = pd.read_csv('database/Rating.csv')
+                    df2.loc[len(df)] = pd.Series(data=[index, chosen_developer, row['client_username'], 1, 'System demand overdue.'],
+                        index=['demand_id', 'recipient', 'rater', 'rating', 'message'])
+                    df2.to_csv('database/Rating.csv')
 
         df.to_csv('database/Demand.csv', index=False)
 
@@ -1085,8 +1089,6 @@ class Rating:
                 if len(ratings.loc[ratings.recipient == recipient]) == 0:
                     # there has not yet been a rating for this recipient
                     return True
-
-
         return False
 
 # run these checks here (not as good as real triggers, but good enough)
