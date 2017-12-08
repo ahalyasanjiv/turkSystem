@@ -307,9 +307,21 @@ def choose_developer(demand_id):
             bidders_info[username]['has_half_star'] = rating % 1 == .5
 
     if request.method == 'POST':
-        return render_template("")
+        chosen_developer = request.form['developer']
+
+        # if the chosen developer had the lowest bid,
+        # update the demand's chosen developer
+        if chosen_developer == bids_info[0]['developer_username']:
+            # updates the table, notifies the developer, and also starts the transaction request
+            Demand.choose_developer(demand_id, chosen_developer, demand_info['client_username'], bids_info[0]['bid_amount'])
+
+        # if the chosen developer did not have the lowest bid,
+        # the client must provide a reason for choosing this developer
+        else:
+            pass
+        return render_template("developer_chosen.html", demand_id=demand_id, bidders_info=bidders_info)
     if request.method == 'GET':
-        return render_template("choose_developer.html", bidders_info=bidders_info)
+        return render_template("choose_developer.html", demand_id=demand_id, bidders_info=bidders_info)
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():

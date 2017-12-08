@@ -56,13 +56,13 @@
           </div>
 
           <!-- choose developer button -->
-          <form method="POST" action="{{ url_for('choose_developer', demand_id=demand_id) }}">
-            
+          <form action="{{ url_for('choose_developer', demand_id=demand_id) }}" method="POST">
+            <div class="media-right">
+              <input type="hidden" name="developer" value="{{ username }}">
+              <input type="submit" name="choose" value="Choose Developer" class="button is-success">
+              
+            </div>
           </form>
-
-          <div class="media-right">
-            <a href="{{ url_for('choose_developer', demand_id=demand_id, developer_username=username) }}" class="button is-success">Choose Developer</a>
-          </div>
         </article>
       {% endfor %}
     </div>

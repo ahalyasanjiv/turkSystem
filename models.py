@@ -574,6 +574,24 @@ class Demand:
 
         return filtered.sort_values(['date_posted'], ascending=[True]).index.tolist()[::-1]
 
+    @staticmethod
+    def choose_developer(demand_id, developer_username, client_username, bid_amount):
+        """
+        Update the Demand table when a client chooses a developer for a certain demand.
+        Also half of the bid amount is transferred from the client to the developer.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        df.loc[int(demand_id), 'chosen_developer_username'] = developer_username
+        df.to_csv('database/Demand.csv', index=False)
+
+        # notify the developer that he/she was chosen to implement the system
+        demand_title = Demand.get_info(demand_id)['title']
+        message = 'Congratulations! You were chosen by {} for the {} demand.'.format(client_username, demand_title)
+        Notification(developer_username, client_username, message)
+
+        # transfer money from client to developer
+        Transaction(developer_username, client_username, float(bid_amount) / 2)
+
 class Bid:
     """
     Bid class. Has methods that inserts to Bid table.
@@ -765,3 +783,13 @@ class Notification:
                     'read_status': row['read_status']}
             notifs.append(temp)
         return notifs
+
+class Transaction:
+    """
+    Transactions between users (sender and recipient).
+    """
+    def __init__(self, recipient, sender, amount):
+        df = pd.read_csv('database/Transaction.csv')
+        df.loc[len(df)] = pd.Series(data=[len(df), recipient, sender, amount, 'pending'],
+            index=['transaction_id', 'recipient','sender','amount','status'])
+        df.to_csv('database/Transaction.csv', index=False)
