@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero is-warning">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">Justify Your Choice</h1>
+      <h2 class="subtitle">Provide a reason for choosing a developer who did not offer the lowest bid.</h2>
+    </div>
+  </div>
+</section>
+<br>
+
+<div class="container">
+  <div class="columns">
+    <div class="column is-offset-3 is-half">
+      <form action="{{ url_for('justify_developer_choice', demand_id=demand_id) }}" method="POST">
+        {{ form.hidden_tag() }}
+
+        <!-- reason -->
+        <div class="field">
+          <div class="control">
+            {{ form.reason(placeholder="Reason", class="form-control textarea is-medium", rows="10") }}
+          </div>
+          {% if form.reason.errors %}
+            {% for error in form.reason.errors %}
+              <p class="is-danger">{{ error }}</p>
+            {% endfor %}
+          {% endif %}
+        </div>
+
+        <div class="has-text-centered">
+          {{ form.submit(class="button is-info is-medium") }}
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

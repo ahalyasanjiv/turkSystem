@@ -1,2 +1,3 @@
 recipient,sender,amount,status,optional_message
 testuser1,testuser0,0.45,pending,
+testuser0,testuser0,2.5,pending,sdfl

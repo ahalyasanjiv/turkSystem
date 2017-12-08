@@ -109,6 +109,15 @@ class BidForm(FlaskForm):
 	# , validate_bid_amount])
 	submit = SubmitField('Make a Bid')
 
+class JustifyDeveloperChoiceForm(FlaskForm):
+	"""
+	Form for clients to justify their reason for choosing a developer who did
+	not submit the lowest bid for their system demand.
+	"""
+	reason = TextAreaField(label='Reason for not choosing the developer with the lowest bid.',
+						   validators=[DataRequired('Please provide a reason for not choosing the developer with the lowest bid.')])
+	submit = SubmitField('Submit Reason')
+
 class BecomeUserForm(FlaskForm):
 	"""
 	Form for when applicant wants to become user

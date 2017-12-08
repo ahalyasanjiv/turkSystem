@@ -143,6 +143,16 @@ class Client:
         projects = df.loc[df.client_username == username]
 
         return projects.index.tolist()
+    
+    @staticmethod
+    def get_past_projects(username):
+        """
+        Returns a list of all demands that the client posted.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[(df.client_username == username) & (df.is_completed)]
+
+        return projects.index.tolist()
 
     @staticmethod
     def get_number_of_clients():
@@ -469,8 +479,8 @@ class Demand:
         format = '%m-%d-%Y %I:%M %p'
         date_posted = now.strftime(format)
 
-        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False],
-            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed'])
+        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False, False],
+            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed', 'bidding_deadline_approaching_notif_sent'])
 
         df.to_csv('database/Demand.csv', index=False)
 
@@ -531,7 +541,7 @@ class Demand:
         filtered['date_posted'] = pd.to_datetime(filtered['date_posted'])
         filtered['bidding_deadline'] = pd.to_datetime(filtered['bidding_deadline'])
 
-        # filter by date
+        # filter by date posted
         if start_date is not None and start_date != '':
             filtered = filtered.loc[filtered.date_posted >= start_date]
 
@@ -580,7 +590,19 @@ class Demand:
         return filtered.sort_values(['date_posted'], ascending=[True]).index.tolist()[::-1]
 
     @staticmethod
-    def choose_developer(demand_id, developer_username, client_username, bid_amount):
+    def get_current_projects(username):
+        """
+        Returns index of projects related to username.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[((df.chosen_developer_username == username) | (df.client_username == username)) 
+                    & (df.is_completed == False) & (df.chosen_developer_username.notnull())]
+        
+        return projects.index.tolist()
+
+    
+    @staticmethod
+    def choose_developer(demand_id, developer_username, client_username, bid_amount, reason=None):
         """
         Update the Demand table when a client chooses a developer for a certain demand.
         Also half of the bid amount is transferred from the client to the developer.
@@ -595,7 +617,52 @@ class Demand:
         Notification(developer_username, client_username, message)
 
         # transfer money from client to developer
-        Transaction(developer_username, client_username, float(bid_amount) / 2)
+        Transaction(developer_username, client_username, float(bid_amount) / 2, reason)
+
+    @staticmethod
+    def check_approaching_bidding_deadlines():
+        """
+        Checks for any approaching bidding deadlines for all of the demands.
+        If the deadline is within 24 hours, a notification will be sent to the client
+        who created the demand. Only one notification will be sent.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        now = datetime.datetime.now()
+
+        for index, row in df.iterrows():
+            dt = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p')
+            time_diff = (dt - now).days
+            if time_diff <= 1 and (not row['bidding_deadline_approaching_notif_sent']):
+                message = 'The deadline for your {} demand is approaching.'.format(row['title'])
+                Notification(row['client_username'], 'superuser0', message)
+                df.loc[index, 'bidding_deadline_approaching_notif_sent'] = True
+
+        df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def check_expired_demands():
+        """
+        Checks for any demands that are passed their bidding deadlines
+        and have no bidders. These systems are marked as expired, and
+        the client who posted the demand pays a $10 fee.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        now = datetime.datetime.now()
+
+        for index, row in df.iterrows():
+            dt = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p')
+            # time_diff = now - dt
+            num_bids = len(Bid.get_bids_for_demand(index))
+
+            # if the bidding deadline passed and there are no bids for this demand,
+            # make it expired
+            if (now > dt) and (num_bids == 0):
+                df.loc[index, 'is_expired'] = True
+                message = 'Your {} demand expired at {}. $10 is taken off of your balance.'.format(row['title'], row['bidding_deadline'])
+                Notification(row['client_username'], 'superuser0', message)
+                Transaction('superuser0', row['client_username'], 10)
+
+        df.to_csv('database/Demand.csv', index=False)
 
 class Bid:
     """
@@ -658,6 +725,17 @@ class Bid:
         bids = df.loc[df['demand_id'] == int(demand_id)].sort_values(['bid_amount'], ascending=[True])
 
         return bids.index.tolist()
+
+    @staticmethod
+    def get_bids_by_username(username):
+        """
+        Returns bid index by username, ordered in latest to oldest.
+        """
+        df = pd.read_csv('database/Bid.csv')
+        bids = df.loc[df.developer_username == username]
+        bids_sorted = bids.sort_values(['date_bidded'], ascending=[False])
+
+        return bids_sorted.index.tolist()
 
 class BlacklistedUser:
     """
@@ -882,3 +960,6 @@ class Transaction:
             index=['transaction_id', 'recipient','sender','amount','status', 'optional_message'])
         df.to_csv('database/Transaction.csv', index=False)
 
+# run these checks here (not as good as real triggers, but good enough)
+Demand.check_approaching_bidding_deadlines()
+Demand.check_expired_demands()

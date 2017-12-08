@@ -22,26 +22,26 @@
             <h2 class="title is-4">My Projects</h2>
             <div class="columns">
               <div class="column has-text-centered">
-                <a href="/dashboard/projects" style="text-decoration:none">
+                <a href="/dashboard/projects#current" style="text-decoration:none">
                   <span class="icon is-large"><i class="fa fa-exchange fa-4x" aria-hidden="true"></i></span>
                   <p class="subtitle">Current Projects</p>
                 </a>
               </div>
               <div class="column has-text-centered">
                 {% if user_type == 'client' %}
-                  <a href="" style="text-decoration:none">
+                  <a href="/dashboard/projects#mid" style="text-decoration:none">
                     <span class="icon is-large"><i class="fa fa-certificate fa-4x" aria-hidden="true"></i></span>
                     <p class="subtitle">Opened Demands</p>
                   </a>
                 {% else %}
-                  <a href="" style="text-decoration:none">
+                  <a href="/dashboard/projects#mid" style="text-decoration:none">
                     <span class="icon is-large"><i class="fa fa-certificate fa-4x" aria-hidden="true"></i></span>
                     <p class="subtitle">Bidding Demands</p>
                   </a>
                 {% endif %}
               </div>
               <div class="column has-text-centered">
-                <a href="" style="text-decoration:none">
+                <a href="/dashboard/projects#completed" style="text-decoration:none">
                   <span class="icon is-large"><i class="fa fa-check fa-4x" aria-hidden="true"></i></span>
                   <p class="subtitle">Completed Projects</p>
                 </a>
