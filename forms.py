@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField, ValidationError, DecimalField
+from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField, ValidationError, DecimalField, FileField
 from wtforms.validators import DataRequired, Email, Length, EqualTo
 from models import Applicant, Bid
 
@@ -126,4 +126,11 @@ class BecomeUserForm(FlaskForm):
 	username = StringField(label='User ID', id='user_id', validators=[DataRequired('Please enter a user ID.'), validate_user_id])
 	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter a password.'), Length(min=8, message='Your password must have at least 8 characters.')])
 	confirm_password = PasswordField(label='Confirm Password', id='confirm_password', validators=[DataRequired('Please confirm your password.')])
+	submit = SubmitField('Submit')
+
+class SubmitSystemForm(FlaskForm):
+	"""
+	Form for a developer to submit a system for a client's demand.
+	"""
+	system = FileField('System file', validators=[DataRequired('Please submit a file containing the system.')])
 	submit = SubmitField('Submit')

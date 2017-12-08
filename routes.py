@@ -4,7 +4,7 @@ import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification
 import helpers
 
@@ -291,7 +291,6 @@ def protestWarning(warning_id):
             return redirect(url_for('dashboard'))
         else:
             return render_template('protestWarning.html', form=form, warning_id=warning_id)
-    
 
 @app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
@@ -328,7 +327,6 @@ def bidInfo(demand_id):
 
     elif request.method == 'GET':
         return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid, form=form, demand_id=demand_id)
-
 
 @app.route('/bid/<demand_id>/choose-developer', methods=['GET', 'POST'])
 def choose_developer(demand_id):
@@ -405,6 +403,20 @@ def justify_developer_choice(demand_id):
             return render_template("justify_developer_choice.html", demand_id=demand_id, form=form)
     if request.method == 'GET':
         return render_template("justify_developer_choice.html", demand_id=demand_id, form=form)
+
+@app.route("/bid/<demand_id>/upload-system", methods=['GET', 'POST'])
+def upload_system(demand_id):
+    form = SubmitSystemForm()
+
+    if request.method == 'POST':
+        if form.validate():
+            # will not actually store the file
+            return render_template("system_uploaded.html")
+        else:
+            return render_template("upload_system.html", demand_id=demand_id, form=form)
+
+    if request.method == 'GET':
+        return render_template("upload_system.html", demand_id=demand_id, form=form)
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():

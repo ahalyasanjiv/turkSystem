@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero is-primary">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        Submit the System
+      </h1>
+    </div>
+  </div>
+</section>
+
+<div class="hero-body">
+  <div class="container">
+    <div class="columns">
+      <div class="column is-offset-3 is-half">
+        <h2 class="subtitle">
+          Please submit a file containing the system demand.
+        </h2>
+        <form method="POST" action="{{ url_for('upload_system', demand_id=demand_id) }}">
+          {{ form.hidden_tag() }}
+
+          <div class="field">
+            <div class="file is-medium is-boxed has-name is-primary">
+              <label class="file-label">
+                {{ form.system(class_="file-input") }}
+                <span class="file-cta">
+                  <span class="file-label">
+                    System file...
+                  </span>
+                </span>
+                <span class="file-name">
+                  {{ form.system.name }}
+                </span>
+              </label>
+            </div>
+
+            {% if form.system.errors %}
+              {% for error in form.system.errors %}
+              <p class="is-danger">{{ error }}</p>
+              {% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="has-text-centered">
+            {{ form.submit(class="button is-info is-medium") }}
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
