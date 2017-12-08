@@ -62,7 +62,7 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             pwhash = user['password'].item()
-            return pwhash == hash_password(password)        
+            return pwhash == hash_password(password)  
 
     @staticmethod
     def get_user_info(username):
@@ -267,6 +267,37 @@ class Developer:
             usernames.append(row['username'])
 
         return usernames
+
+    @staticmethod
+    def get_similar_developers(username):
+        """
+        Returns three developers with similar interests as the specified user, based
+        on tags of the user's most recent completed projects.
+        """
+        projects = []
+        user_type = User.get_user_info(username)['type_of_user']
+        if user_type == 'client':
+            projects = Client.get_projects_posted(username)
+        else: #is developer
+            projects = Developer.get_past_projects(username)
+        
+        tags = ""
+        for index in projects:
+            demand = Demand.get_info(index)
+            tags += demand['tags']
+        print("tag", tags)
+        similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
+        similar_developers = []
+
+        for index in similar_projects:
+            if len(similar_developers) == 3:
+                break
+            demand = Demand.get_info(index)
+            if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
+                if demand['chosen_developer_username'] not in similar_developers:
+                    similar_developers.append(demand['chosen_developer_username'])
+
+        return similar_developers
 
 class Applicant:
     """

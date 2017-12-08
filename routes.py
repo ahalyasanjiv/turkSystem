@@ -46,14 +46,15 @@ def dashboard():
                 recs = {"client_rec_des": "Clients with Similar Interests", 
                     "dev_rec_des": "Developers with Similar Interests",
                     "client_rec": Client.get_similar_clients(session['username']), 
-                    "dev_rec": Developer.get_most_active_developers()}
+                    "dev_rec": Developer.get_similar_developers(session['username'])}
         elif user_type == 'developer':
             if Developer.get_info(session['username'])['num_of_completed_projects'] > 0:
                 recs = {"client_rec_des": "Clients with Similar Interests", 
                     "dev_rec_des": "Developers with Similar Interests",
                     "client_rec": Client.get_similar_clients(session['username']), 
-                    "dev_rec": Developer.get_most_active_developers()}
-        return render_template("dashboard.html", first_name=first_name, notifications=notifications, recs=recs)
+                    "dev_rec": Developer.get_similar_developers(session['username'])}
+        return render_template("dashboard.html", first_name=first_name, notifications=notifications,
+                                recs=recs)
     else:
         return redirect(url_for('login'))
 
@@ -96,10 +97,6 @@ def dashboard_applicant():
 
     else:
         return render_template("index.html")
-
-
-
-
 
 @app.route("/dashboard_superuser")
 def dashboard_superuser():
@@ -183,8 +180,6 @@ def apply():
         else:
             flash('Applicant submission is invalid. Please check that all fields are filled correctly.')
             return render_template('application.html', form=form)
-
-
     elif request.method == 'GET':
         return render_template('application.html', form=form)
 
@@ -259,14 +254,14 @@ def bidInfo(demand_id):
             bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
     
     form = BidForm()
+    # form = BidForm(demand_id)
 
     if request.method == 'POST':
         if form.validate():
             Bid(demand_id, session['username'], form.bid_amount.data)
             return redirect(url_for('bidInfo', demand_id=demand_id))
         else:
-            # bid amount was not valid
-            print('was not valid')
+            print(form.bid_amount.data)
             return redirect(url_for('bidInfo', demand_id=demand_id))
 
     elif request.method == 'GET':
@@ -280,19 +275,25 @@ def createDemand():
     """
     if 'username' not in session:
         return redirect(url_for('login'))
-    form = DemandForm()
+
     if session['role'] != 'client':
         return render_template('access_denied.html')
-    elif request.method == 'POST' and form.validate():
-        format = '%m-%d-%Y %I:%M %p'
-        dt_bid = form.bidding_deadline.data.strftime(format)
-        dt_submit = form.submission_deadline.data.strftime(format)
 
-        Demand(session['username'], form.title.data, form.tags.data,
-                            form.specifications.data, dt_bid, dt_submit)
-        new_demand_id = Demand.get_most_recent_demand_id()
+    form = DemandForm()
 
-        return redirect(url_for('bidInfo', demand_id=new_demand_id))
+    if request.method == 'POST':
+        if form.validate():
+            format = '%m-%d-%Y %I:%M %p'
+            dt_bid = form.bidding_deadline.data.strftime(format)
+            dt_submit = form.submission_deadline.data.strftime(format)
+
+            Demand(session['username'], form.title.data, form.tags.data,
+                                form.specifications.data, dt_bid, dt_submit)
+            new_demand_id = Demand.get_most_recent_demand_id()
+
+            return redirect(url_for('bidInfo', demand_id=new_demand_id))
+        else:
+            return render_template('createDemand.html', form=form)
     elif request.method == 'GET':
         return render_template('createDemand.html', form=form)
 
