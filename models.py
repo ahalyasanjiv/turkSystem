@@ -33,10 +33,17 @@ class User:
         After a user is approved, the user can set his/her official username and password.
         This method stores this information in the User table.
         """
+        # Change the login credentials in Applicant database
+        df = pd.read_csv('database/Applicant.csv')
+        df.loc[df.email == email, 'username'] = username
+        df.loc[df.email == email, 'password'] = hash_password(password)
+        df.to_csv('database/Applicant.csv', index=False)
+        # Change the login credentials in User database
         df = pd.read_csv('database/User.csv')
         df.loc[df.email == email, 'username'] = username
         df.loc[df.email == email, 'password'] = hash_password(password)
         df.to_csv('database/User.csv', index=False)
+
     
     @staticmethod
     def use_old_credentials(username, email):
@@ -427,11 +434,6 @@ class Applicant:
                 df.loc[df.user_id == user_id, 'status'] = 'approved'
                 df.to_csv('database/Applicant.csv', index=False)
 
-                # add the user to the corresponding table
-                if user['type_of_user'].item() == 'client':
-                    Client(user_id)
-                elif user['type_of_user'].item() == 'developer':
-                    Developer(user_id)
 
     @staticmethod
     def reject(user_id, reason):
