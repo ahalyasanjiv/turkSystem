@@ -73,8 +73,7 @@ class ProtestForm(FlaskForm):
 	""" 
 	Form for when user wants to protest a warning. 
 	"""
-	warning = SelectField(label='Warning to Protest', choices = [('warning1','Warning#1'),('warning2','Warning#2')])
-	reason = TextAreaField(label='Reason for Protest', id='reason', validators=[DataRequired('Please enter a reason for protesting this complaint.')])
+	reason = TextAreaField(label='Reason for Protesting Warning', id='reason', validators=[DataRequired('Please enter a reason for protesting this warning.')])
 	submit = SubmitField('Submit Protest')
 
 class DemandForm(FlaskForm):

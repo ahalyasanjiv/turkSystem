@@ -765,3 +765,41 @@ class Notification:
                     'read_status': row['read_status']}
             notifs.append(temp)
         return notifs
+
+class Warning:
+    """
+    A warning that is issued to a user
+
+    The status of a warning may be:
+        active
+        protested
+        inactive
+    """
+    def __init__(self,recipient,status):
+        df = pd.read_csv('database/Warning.csv')
+        # Create a new row in table for warning
+        df.loc[len(df)] = pd.Series(data=[len(df), recipient, status],
+            index=['warning_id','warned_user','status'])
+        df.to_csv('database/Warning.csv', index=False)
+
+
+    @staticmethod
+    def removeWarning(warning_id):
+        """
+        Remove warning that user has protested
+        """
+        df = pd.read_csv('database/Warning.csv')
+        # Set warning back to active and give reason
+        df.loc[df.warning_id == warning_id, 'status'] = 'inactive'
+        df.to_csv('database/Warning.csv', index=False)
+
+    @staticmethod
+    def keepWarning(warning_id, reason):
+        """
+        Keep the warning that user has protested and provide reason for doing so
+        """
+        df = pd.read_csv('database/Warning.csv')
+        # Set warning back to active and give reason
+        df.loc[df.warning_id == warning_id, 'status'] = 'active'
+        df.loc[df.warning_id == warning_id, 'reason'] = reason
+        df.to_csv('database/Warning.csv', index=False)

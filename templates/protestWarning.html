@@ -5,7 +5,7 @@
 	<div class="hero-body">
 	  <div class="container">
 	    <h1 class="title">
-	      Protest a warning
+	      Protest Warning#{{ warning_id }}
 	    </h1>
 	  </div>
 	</div>
@@ -17,27 +17,19 @@
   				</div>
   				<div class="column is-half">
   					<h1 class="title is-2">
-						File protest against warning
+						File a protest against a warning with a reason
 				    </h1>
 					<div class="field">
-					  <label class="label">Select warning to protest</label>
-					  <div class="control">
-					    <span class="select">
-					      <select>
-					        <option>Warning 1</option>
-					        <option>Warning 2</option>
-					      </select>
-					    </span>
-					  </div>
-					</div>
-
-					<div class="field">
-						<textarea class="textarea" placeholder="Give reason for protesting warning" rows="10"></textarea>
-					</div>
-					
-					<div class="has-text-centered">
-					<a class="button is-info has-text-centered">Submit</a>
-					</div>
+				        <div class="control">
+				        	{{ form.reason(class_="textarea") }}
+				        </div>
+				        {% if form.reason.errors %}
+				            {% for error in form.reason.errors %}
+				              <p class="is-danger">{{ error }}</p>
+				            {% endfor %}
+				        {% endif %}
+			      	</div>
+				    {{ form.submit(class="button is-link") }}
 
 				</div>
 			</div>
