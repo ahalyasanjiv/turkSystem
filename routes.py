@@ -66,12 +66,19 @@ def my_projects():
     mid = []
     completed = []
     if user_type == "developer":
-        mid = (Bid.get_info(x) for x in Bid.get_bids_by_username(session['username']))
+        bids_by_username = Bid.get_bids_by_username(session['username'])
+        temp = []
+
+        for i in bids_by_username:
+            info = Bid.get_info(i)['demand_id']
+            if info not in temp:
+                temp.append(info)
+
+        mid = (Demand.get_info(y) for y in temp)
         completed = (Demand.get_info(x) for x in Developer.get_past_projects(session['username']))
     else:
         temp = (Demand.get_info(x) for x in Demand.get_filtered_demands(None, None, session['username'], None, None, None, True))
         for demand in temp:
-            print(demand['chosen_developer_username'])
             if demand['chosen_developer_username'] is np.nan:
                 mid.append(demand)
         completed = (Demand.get_info(x) for x in Client.get_past_projects(session['username']))
