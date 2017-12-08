@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+	<div class="container">
+		<h1 class="title">Leave feedback for {{ recipient }}. </h1>
+		<form method="POST" action="">
+		 <div class="field notification">
+			<h2 class="title is-4">{{form.message.label}}</h2>
+			<p class="subtitle is-6">You must write a reason for a rating of 2 or lower.</p>
+			{% if form.message.errors %}
+			            {% for error in form.message.errors %}
+			              <p class="is-danger">{{ error }}</p>
+			            {% endfor %}
+			{% endif %}
+			<div class="control">
+			    {{ form.message(class_="textarea") }}
+			</div>
+		</div>
+		{{ form.submit(class="button is-link") }}
+	</form>
+	</div>
+</section>
+{% endblock %}

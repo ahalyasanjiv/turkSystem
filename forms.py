@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, RadioField, SubmitField, SelectField, TextAreaField, DateField, ValidationError, DecimalField, FileField
-from wtforms.validators import DataRequired, Email, Length, EqualTo
+from wtforms.validators import DataRequired, Email, Length, EqualTo, InputRequired
 from models import Applicant, Bid
 
 def validate_user_id(form,field):
@@ -139,19 +139,19 @@ class RatingForm(FlaskForm):
 	"""
 	Form for rating after a project is finished.
 	"""
-	rating = RadioField(label='Rating', id="rating", 
+	rating = RadioField(label='Rating', 
 		choices=[
 		(1,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
 		(2,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
 		(3,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
 		(4, '<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
 		(5,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i>')], 
-		validators=[DataRequired('Please give a rating.')], coerce=int)
+		coerce=int)
 	submit = SubmitField('Submit')
 
 class RatingMessageForm(FlaskForm):
 	"""
 	Form for sending message after a low rating.
 	"""
-	message = TextAreaField(label='Send Feedback', id="message", validators=[DataRequired('Please give a rating.')] )
+	message = TextAreaField(label='Send Feedback',validators=[InputRequired('Please enter a message.')] )
 	submit = SubmitField('Submit')

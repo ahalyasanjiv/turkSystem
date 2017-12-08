@@ -1010,6 +1010,13 @@ class Transaction:
             index=['transaction_id', 'recipient','sender','amount','status', 'optional_message'])
         df.to_csv('database/Transaction.csv', index=False)
 
+class Rating:
+    def __init__(self, demand_id, recipient, rater, rating, message=None):
+        df = pd.read_csv('database/Rating.csv')
+        df.loc[len(df)] = pd.Series(data=[demand_id, recipient, rater, rating, message],
+            index=['demand_id', 'recipient', 'rater', 'rating', 'message'])
+        df.to_csv('database/Rating.csv', index=False)
+
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()
 Demand.check_approaching_submission_deadlines()

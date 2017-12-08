@@ -4,8 +4,8 @@ import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm
-from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm, RatingMessageForm
+from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating
 import helpers
 
 app = Flask(__name__)
@@ -429,11 +429,32 @@ def rating(demand_id, recipient):
         if request.method == "GET":
             return render_template("rating.html", form=form, recipient=recipient, demand_id = demand_id)
         elif request.method == "POST":
-            if form.validate():
-                return render_template('rating.html')
-            else:
-                flash('fjefoei')
+            if form.rating.data <=2: #low rating
+                session['rating'] = form.rating.data
+                return redirect(url_for('ratingMessage', demand_id=demand_id, recipient=recipient))
+            elif form.rating.data == None:
                 return render_template('rating.html', form=form, recipient=recipient, demand_id=demand_id)
+            else:
+                #add to form data
+                Rating(demand_id, recipient, session['username'], form.rating.data)
+                return render_template('ratingFinished.html', recipient=recipient)
+
+@app.route("/bid/<demand_id>/rating/<recipient>/message", methods=["GET", "POST"])
+def ratingMessage(demand_id, recipient):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if 'username' in session:
+        form = RatingMessageForm()
+        if request.method == "GET":
+            return render_template("ratingMessage.html", form=form, demand_id=demand_id, recipient=recipient)
+        elif request.method == "POST":
+            if form.message.validate(form):
+                Rating(demand_id, recipient, session['username'], session['rating'],form.message.data)
+                del session['rating']
+                return render_template('ratingFinished.html', recipient=recipient)
+            else:
+                return render_template("ratingMessage.html", form=form, demand_id=demand_id, recipient=recipient)
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
