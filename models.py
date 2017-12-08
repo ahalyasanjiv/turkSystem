@@ -211,7 +211,7 @@ class Client:
         tags = ""
         for index in projects:
             demand = Demand.get_info(index)
-            tags += demand['tags'] + " "
+            tags += str(demand['tags']) + " "
         print("tag", tags)
         similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
         print(similar_projects)
@@ -304,7 +304,7 @@ class Developer:
         tags = ""
         for index in projects:
             demand = Demand.get_info(index)
-            tags += demand['tags'] + " "
+            tags += str(demand['tags']) + " "
         print("tag", tags)
         similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
         similar_developers = []
