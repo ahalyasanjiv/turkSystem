@@ -1,5 +1,6 @@
 from flask import Flask, flash, render_template, request, session, redirect, url_for
 import pandas as pd
+import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
@@ -60,7 +61,28 @@ def dashboard():
 
 @app.route("/dashboard/projects")
 def my_projects():
-    return render_template("myProjects.html")
+    user_type = User.get_user_info(session['username'])['type_of_user']
+    current = (Demand.get_info(x) for x in Demand.get_current_projects(session['username']))
+    mid = []
+    completed = []
+    if user_type == "developer":
+        bids_by_username = Bid.get_bids_by_username(session['username'])
+        temp = []
+
+        for i in bids_by_username:
+            info = Bid.get_info(i)['demand_id']
+            if info not in temp:
+                temp.append(info)
+
+        mid = (Demand.get_info(y) for y in temp)
+        completed = (Demand.get_info(x) for x in Developer.get_past_projects(session['username']))
+    else:
+        temp = (Demand.get_info(x) for x in Demand.get_filtered_demands(None, None, session['username'], None, None, None, True))
+        for demand in temp:
+            if demand['chosen_developer_username'] is np.nan:
+                mid.append(demand)
+        completed = (Demand.get_info(x) for x in Client.get_past_projects(session['username']))
+    return render_template("myProjects.html", user_type = user_type, current=current, mid=mid, completed=completed)
 
 @app.route("/dashboard/notifications")
 def view_notifications():

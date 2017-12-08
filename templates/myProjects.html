@@ -2,21 +2,63 @@
 
 {% block content %}
 <section class="section">
-	<article class="media">
-	  <figure class="media-left">
-	   <p class="image is-64x64">
-	    <img src="https://bulma.io/images/placeholders/128x128.png">
-	  </p>
-	  </figure>
-	  <div class="media-content">
-	    <div class="content">
-	      <p>
-	        <strong>Project Name</strong> <small>Posted by Client</small>
-	        <br>
-	        <small>Closes: 1/1/2018 12:00 AM</small>
-	      </p>
-	    </div>
-	  </div>
-	</article>
+	<div class="container">
+		<a href="/dashboard" class="button" style="margin-bottom:10px">Back</a>
+		<h2 class="title" id="current">Current Projects</h2>
+		{% for demand in current%}
+		<article class="media notification">
+		  <div class="media-content">
+		    <div class="content">
+		      <p>
+		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by {{ demand.client_username }} on {{ demand.date_posted }}</small>
+		        <br>
+		        <br>
+		        <small>Deadline: {{ demand.submission_deadline}}</small>
+		      </p>
+		    </div>
+		  </div>
+		</article>
+		{% endfor %}
+		<hr>
+		{% if user_type == "client" %}
+			<h2 class="title" id="mid">Opened Demands</h2>
+		{% else %}
+			<h2 class="title" id="mid">Bidding Demands</h2>
+		{% endif %}
+
+		{% for demand in mid %}
+		<article class="media notification">
+		  <div class="media-content">
+		    <div class="content">
+		      <p>
+		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by {{ demand.client_username }} on {{ demand.date_posted }}</small>
+		        <br>
+		        <br>
+		        <small>Lowest Bid Price: {{ demand.min_bid }}</small>
+		        <br>
+		        <small>Bidding Deadline: {{ demand.bidding_deadline }}</small>
+		      </p>
+		    </div>
+		  </div>
+		</article>
+		{% endfor %}
+
+		<hr>
+
+		<h2 class="title" id="completed">Completed Projects</h2>
+		{% for demand in completed %}
+		<article class="media notification">
+		  <div class="media-content">
+		    <div class="content">
+		      <p>
+		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by {{ demand.client_username }} on {{ demand.date_posted }}</small>
+		      </p>
+		    </div>
+		  </div>
+		</article>
+		{% endfor %}
+
+
+	</div> <!-- container -->
 </section>
 {% endblock %}

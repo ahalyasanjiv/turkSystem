@@ -143,6 +143,16 @@ class Client:
         projects = df.loc[df.client_username == username]
 
         return projects.index.tolist()
+    
+    @staticmethod
+    def get_past_projects(username):
+        """
+        Returns a list of all demands that the client posted.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[(df.client_username == username) & (df.is_completed)]
+
+        return projects.index.tolist()
 
     @staticmethod
     def get_number_of_clients():
@@ -580,6 +590,18 @@ class Demand:
         return filtered.sort_values(['date_posted'], ascending=[True]).index.tolist()[::-1]
 
     @staticmethod
+    def get_current_projects(username):
+        """
+        Returns index of projects related to username.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        projects = df.loc[((df.chosen_developer_username == username) | (df.client_username == username)) 
+                    & (df.is_completed == False) & (df.chosen_developer_username.notnull())]
+        
+        return projects.index.tolist()
+
+    
+    @staticmethod
     def choose_developer(demand_id, developer_username, client_username, bid_amount, reason=None):
         """
         Update the Demand table when a client chooses a developer for a certain demand.
@@ -679,6 +701,17 @@ class Bid:
         bids = df.loc[df['demand_id'] == int(demand_id)].sort_values(['bid_amount'], ascending=[True])
 
         return bids.index.tolist()
+
+    @staticmethod
+    def get_bids_by_username(username):
+        """
+        Returns bid index by username, ordered in latest to oldest.
+        """
+        df = pd.read_csv('database/Bid.csv')
+        bids = df.loc[df.developer_username == username]
+        bids_sorted = bids.sort_values(['date_bidded'], ascending=[False])
+
+        return bids_sorted.index.tolist()
 
 class BlacklistedUser:
     """
