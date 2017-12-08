@@ -1062,8 +1062,7 @@ class Rating:
         Checks if the URL for a rating is legitimate.
         """
         demand = Demand.get_info(demand_id)
-        if (demand['client_username'] == recipient and demand['chosen_developer_username'] == rater) or
-        (demand['client_username'] == rater and demand['chosen_developer_username'] == recipient):
+        if (demand['client_username'] == recipient and demand['chosen_developer_username'] == rater) or (demand['client_username'] == rater and demand['chosen_developer_username'] == recipient):
         # exists a demand where recipient/rater is a dev/client
             if demand['is_completed']: 
             # if the demand has finished and can have ratings

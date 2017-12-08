@@ -440,20 +440,22 @@ def rating(demand_id, recipient):
         return redirect(url_for('login'))
 
     if 'username' in session:
-        form = RatingForm()
+        if session['username'] != recipient and Rating.check_if_valid_rating_form(int(demand_id), recipient, session['username']):
+            form = RatingForm()
 
-        if request.method == "GET":
-            return render_template("rating.html", form=form, recipient=recipient, demand_id = demand_id)
-        elif request.method == "POST":
-            if form.rating.data <=2: #low rating
-                session['rating'] = form.rating.data
-                return redirect(url_for('ratingMessage', demand_id=demand_id, recipient=recipient))
-            elif form.rating.data == None:
-                return render_template('rating.html', form=form, recipient=recipient, demand_id=demand_id)
-            else:
-                #add to form data
-                Rating(demand_id, recipient, session['username'], form.rating.data)
-                return render_template('ratingFinished.html', recipient=recipient)
+            if request.method == "GET":
+                return render_template("rating.html", form=form, recipient=recipient, demand_id = demand_id)
+            elif request.method == "POST":
+                if form.rating.data <=2: #low rating
+                    session['rating'] = form.rating.data
+                    return redirect(url_for('ratingMessage', demand_id=demand_id, recipient=recipient))
+                elif form.rating.data == None:
+                    return render_template('rating.html', form=form, recipient=recipient, demand_id=demand_id)
+                else:
+                    #add to form data
+                    Rating(demand_id, recipient, session['username'], form.rating.data)
+                    return render_template('ratingFinished.html', recipient=recipient)
+    return render_template('access_denied.html')
 
 @app.route("/bid/<demand_id>/rating/<recipient>/message", methods=["GET", "POST"])
 def ratingMessage(demand_id, recipient):
@@ -471,6 +473,7 @@ def ratingMessage(demand_id, recipient):
                 return render_template('ratingFinished.html', recipient=recipient)
             else:
                 return render_template("ratingMessage.html", form=form, demand_id=demand_id, recipient=recipient)
+    return render_template('access_denied.html')
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
