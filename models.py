@@ -116,8 +116,8 @@ class Client:
     def __init__(self, username):
         df = pd.read_csv('database/Client.csv')
 
-        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
-            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0, 100],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings', 'balance'])
         df.to_csv('database/Client.csv', index=False)
 
     @staticmethod
@@ -223,8 +223,8 @@ class Developer:
     def __init__(self, username):
         df = pd.read_csv('database/Developer.csv')
 
-        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
-            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0, 0],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings', 'balance'])
         df.to_csv('database/Developer.csv', index=False)
 
     @staticmethod
@@ -788,8 +788,8 @@ class Transaction:
     """
     Transactions between users (sender and recipient).
     """
-    def __init__(self, recipient, sender, amount):
+    def __init__(self, recipient, sender, amount, message=None):
         df = pd.read_csv('database/Transaction.csv')
-        df.loc[len(df)] = pd.Series(data=[len(df), recipient, sender, amount, 'pending'],
-            index=['transaction_id', 'recipient','sender','amount','status'])
+        df.loc[len(df)] = pd.Series(data=[len(df), recipient, sender, amount, 'pending', message],
+            index=['transaction_id', 'recipient','sender','amount','status', 'optional_message'])
         df.to_csv('database/Transaction.csv', index=False)

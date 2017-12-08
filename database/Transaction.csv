@@ -1,2 +1,2 @@
-recipient,sender,amount,status
-testuser1,testuser0,0.45,pending
+recipient,sender,amount,status,optional_message
+testuser1,testuser0,0.45,pending,
