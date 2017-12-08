@@ -93,10 +93,18 @@
                 </article> 
                 <br>
                 <div class="button">See All</div>
-        </div>
+                <hr>
+                <div class="notification is-light">
+                  <h2 class="title is-4">Settings</h2>
+                  <div class="button">Edit Profile</div>
+                  <div class="button">Check Warnings</div>
+                  <div class="button">Close Account</div>
+                </div>
+        </div> <!-- column -->
+
         <div class="column is-8">
           <h2 class="title is-4" style="display:inline-flex">
-            Notifications
+            Notifications ({{ unread }} unread messages)
           </h2> 
           <a class="button" href="/dashboard/notifications" style="margin-left:10px">See All </a>
           {% for notif in notifications %}
@@ -128,7 +136,7 @@
                 <div class="media-content">
                   <div class="content">
                     <p>
-                      <strong>{{ user.username }}</strong>
+                      <a href="user/{{ user.username }}"><strong>{{ user.username }}</strong></a>
                       <br>
                       {{ user.about }}
                     </p>
@@ -150,7 +158,7 @@
                 <div class="media-content">
                   <div class="content">
                     <p>
-                      <strong>{{ user.username }}</strong>
+                      <a href="user/{{ user.username }}"><strong>{{ user.username }}</strong></a>
                       <br>
                       {{ user.about }}
                     </p>

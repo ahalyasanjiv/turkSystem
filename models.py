@@ -713,6 +713,16 @@ class Notification:
         df.to_csv('database/Notification.csv', index=False)
 
     @staticmethod
+    def get_number_of_unread(recipient):
+        """
+        Gets the number of unread messages the recipient username has.
+        """
+        df = pd.read_csv('database/Notification.csv')
+        msgs = df.loc[(df['recipient'] == recipient) & (df.read_status == False)]
+
+        return len(msgs)
+
+    @staticmethod
     def get_notif_to_recipient(recipient, number):
         """
         Get messages to a certain recipient. The amount that is returned is number.

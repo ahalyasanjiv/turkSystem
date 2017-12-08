@@ -33,6 +33,7 @@ def dashboard():
 
         # Get notifications for this user.
         notifications = Notification.get_notif_to_recipient(session['username'], 5)
+        unread = Notification.get_number_of_unread(session['username'])
 
         # If the user has no projects in history, they are a new user.
         user_type = User.get_user_info(session['username'])['type_of_user']
@@ -54,7 +55,7 @@ def dashboard():
                     "client_rec": Client.get_similar_clients(session['username']), 
                     "dev_rec": Developer.get_similar_developers(session['username'])}
         return render_template("dashboard.html", first_name=first_name, notifications=notifications,
-                                recs=recs)
+                                recs=recs, unread=unread)
     else:
         return redirect(url_for('login'))
 
@@ -62,7 +63,8 @@ def dashboard():
 def view_notifications():
     if 'username' in session:
         notifications = Notification.get_all_notif_to_recipient(session['username'])
-        return render_template('notifications.html', notifications=notifications)
+        unread = Notification.get_number_of_unread(session['username'])
+        return render_template('notifications.html', notifications=notifications, unread=unread)
     else:
         return redirect(url_for('login'))
 
