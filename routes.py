@@ -423,11 +423,11 @@ def justify_developer_choice(demand_id):
 @app.route("/bid/<demand_id>/upload-system", methods=['GET', 'POST'])
 def upload_system(demand_id):
     form = SubmitSystemForm()
-
+    client = Demand.get_info(demand_id)['client_username']
     if request.method == 'POST':
         if form.validate():
             # will not actually store the file
-            return render_template("system_uploaded.html")
+            return render_template("system_uploaded.html", demand_id = demand_id, recipient=client)
         else:
             return render_template("upload_system.html", demand_id=demand_id, form=form)
 
