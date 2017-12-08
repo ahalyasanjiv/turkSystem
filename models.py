@@ -450,6 +450,12 @@ class Demand:
         now = datetime.datetime.now()
         deadline_passed = datetime.datetime.strptime(demand['bidding_deadline'], '%m-%d-%Y %I:%M %p') < now
 
+        bids = Bid.get_bids_for_demand(demand_id)
+        if len(bids) > 0:
+            lowest_bid = Bid.get_info(bids[0])['bid_amount']
+        else:
+            lowest_bid = None
+
         if not demand.empty:
             return {'client_username': demand['client_username'],
                     'date_posted': demand['date_posted'],
@@ -461,6 +467,7 @@ class Demand:
                     'is_completed': demand['is_completed'],
                     'bidding_deadline_passed': deadline_passed,
                     'chosen_developer_username' : demand['chosen_developer_username'],
+                    'min_bid': lowest_bid,
                     'link_to_client': '/user/' + demand['client_username'],
                     'link_to_demand': '/bid/' + str(demand_id)}
 

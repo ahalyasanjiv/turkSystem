@@ -21,6 +21,15 @@
           </h2>
           <form method="POST" action="/createDemand">
             {{ form.hidden_tag() }}
+            {% with messages = get_flashed_messages() %}
+              {% if messages %}
+                <div class="flashes">
+                  {% for message in messages %}
+                    {{ messages }}
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
 
             <!-- System Title -->
             <div class="field">
