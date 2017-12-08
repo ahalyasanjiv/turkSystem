@@ -423,11 +423,16 @@ def justify_developer_choice(demand_id):
 @app.route("/bid/<demand_id>/upload-system", methods=['GET', 'POST'])
 def upload_system(demand_id):
     form = SubmitSystemForm()
-    client = Demand.get_info(demand_id)['client_username']
+    demand_info = Demand.get_info(demand_id)
+    client = demand_info['client_username']
+
     if request.method == 'POST':
         if form.validate():
             # will not actually store the file
-            return render_template("system_uploaded.html", demand_id = demand_id, recipient=client)
+            # project is now completed
+            Developer.submit_system(demand_id, session['username'])
+            return redirect(url_for('rating', demand_id=demand_id, recipient=client))
+            # return render_template("system_uploaded.html", demand_id=demand_id, recipient=client)
         else:
             return render_template("upload_system.html", demand_id=demand_id, form=form)
 
@@ -439,22 +444,33 @@ def rating(demand_id, recipient):
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    if 'username' in session:
-        if session['username'] != recipient and Rating.check_if_valid_rating_form(int(demand_id), recipient, session['username']):
-            form = RatingForm()
+    demand_info = Demand.get_info(demand_id)
 
-            if request.method == "GET":
-                return render_template("rating.html", form=form, recipient=recipient, demand_id = demand_id)
-            elif request.method == "POST":
-                if form.rating.data <=2: #low rating
-                    session['rating'+demand_id] = form.rating.data
-                    return redirect(url_for('ratingMessage', demand_id=demand_id, recipient=recipient))
-                elif form.rating.data == None:
-                    return render_template('rating.html', form=form, recipient=recipient, demand_id=demand_id)
-                else:
-                    #add to form data
-                    Rating(demand_id, recipient, session['username'], form.rating.data)
-                    return render_template('ratingFinished.html', recipient=recipient)
+    # make sure the user is authorized to rate the recipient
+    if session['role'] == 'developer':
+        # developer rates the client, so client is recipient
+        if session['username'] != demand_info['chosen_developer_username']:
+            return render_template('access_denied.html')
+    elif session['role'] == 'client':
+        # client rates the developer, so developer is recipient
+        if session['username'] != demand_info['client_username']:
+            return render_template('access_denied.html')
+
+    if Rating.check_if_valid_rating_form(int(demand_id), recipient, session['username']):
+        form = RatingForm()
+
+        if request.method == "GET":
+            return render_template("rating.html", form=form, recipient=recipient, demand_id=demand_id)
+        elif request.method == "POST":
+            if form.rating.data <= 2: #low rating
+                session['rating'+demand_id] = form.rating.data
+                return redirect(url_for('ratingMessage', demand_id=demand_id, recipient=recipient))
+            elif form.rating.data == None:
+                return render_template('rating.html', form=form, recipient=recipient, demand_id=demand_id)
+            else:
+                #add to form data
+                Rating(demand_id, recipient, session['username'], form.rating.data)
+                return render_template('ratingFinished.html', recipient=recipient)
     return render_template('access_denied.html')
 
 @app.route("/bid/<demand_id>/rating/<recipient>/message", methods=["GET", "POST"])

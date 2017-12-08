@@ -321,6 +321,21 @@ class Developer:
 
         return similar_developers
 
+    @staticmethod
+    def submit_system(demand_id, developer_username):
+        """
+        Updates the Demand table so that the project is complete.
+        Also notifies the client that the project is complete.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        df.loc[int(demand_id), 'is_completed'] = True
+
+        demand_info = Demand.get_info(demand_id)
+
+        message = 'The system for the {} demand has been uploaded. Please rate {} <a href="/bid/{}/rating/{}">here</a>.'.format(demand_info['title'], developer_username, demand_id, developer_username)
+        Notification(demand_info['client_username'], developer_username, message)
+        df.to_csv('database/Demand.csv', index=False)
+
 class Applicant:
     """
     Applicant class. Has methods that inserts to and reads from the Applicant table.
@@ -1064,7 +1079,7 @@ class Rating:
         demand = Demand.get_info(demand_id)
         if (demand['client_username'] == recipient and demand['chosen_developer_username'] == rater) or (demand['client_username'] == rater and demand['chosen_developer_username'] == recipient):
         # exists a demand where recipient/rater is a dev/client
-            if demand['is_completed']: 
+            if demand['is_completed']:
             # if the demand has finished and can have ratings
                 ratings = Rating.get_ratings_by_demand_id(demand_id)
                 if len(ratings.loc[ratings.recipient == recipient]) == 0:
