@@ -82,6 +82,19 @@
     </div>
   </div>
 </div>
+{% elif info['status'] == 'rejected' %}
+<div class ="hero-body">
+  <div class="container ">
+    <div class="columns">
+      <div class="column is-one-quarter"></div>
+      <div class="column is-half has-text-centered">
+        <div class="notification is-danger">
+          Reason for rejection: {{ info['reason'] }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {% endif %}
 
 

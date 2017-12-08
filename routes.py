@@ -70,29 +70,30 @@ def view_notifications():
 def dashboard_applicant():
     if session['username']:
         form = BecomeUserForm()
+        info = Applicant.get_applicant_info(session['username'])
+
         if session['type_of_user'] == 'applicant' and request.method == 'GET':
-            info = Applicant.get_applicant_info(session['username'])
             return render_template("dashboard_applicant.html", info=info, form=form)
         if session['type_of_user'] == 'applicant' and request.method == 'POST':
             info = Applicant.get_applicant_info(session['username'])
             if form.use_prev_credentials.data == 'yes':
                 User.use_old_credentials(info['user_id'],info['email'])
-                session['type_of_user'] == 'user'
-                session['role'] == info['type_of_user']
+                session['type_of_user'] = 'user'
+                session['role'] = info['type_of_user']
                 return redirect(url_for('dashboard'))
             elif form.validate():
                 User.set_credentials(form.username.data,form.password.data,info['email'])
-                session['username'] == form.username.data
-                session['type_of_user'] == 'user'
-                session['role'] == info['type_of_user']
+                session['username'] = form.username.data
+                session['type_of_user'] = 'user'
+                session['role'] = info['type_of_user']
                 return redirect(url_for('dashboard'))
             else:
                 flash('Login credentials are invalid. Please check that all fields are filled correctly.')
                 return render_template("dashboard_applicant.html", info=info, form=form)
         elif session['type_of_user'] == 'user':
-            return render_template("dashboard", info=info)
+            return redirect(url_for('dashboard'))
         elif session['type_of_user'] == 'superuser':
-            return render_template("dashboard_superuser", info=info)
+            return redirect(url_for('dashboard_superuser'))
 
     else:
         return render_template("index.html")
@@ -173,6 +174,7 @@ def apply():
             new_user = Applicant(form.role.data, form.first_name.data, form.last_name.data, form.email.data, form.phone.data,
                             form.credit_card.data, form.user_id.data, form.password.data)
             session['username'] = form.user_id.data
+            session['type_of_user'] = 'applicant'
             session['role'] = form.role.data
             return redirect(url_for('dashboard_applicant'))
         else:
@@ -259,7 +261,6 @@ def bidInfo(demand_id):
             Bid(demand_id, session['username'], form.bid_amount.data)
             return redirect(url_for('bidInfo', demand_id=demand_id))
         else:
-            print(form.bid_amount.data)
             return redirect(url_for('bidInfo', demand_id=demand_id))
 
     elif request.method == 'GET':
@@ -299,22 +300,26 @@ def createDemand():
 def applicant_approval(applicant_id):
     if session['type_of_user'] == 'user':
         return redirect(url_for('dashboard'))
-    # if session['type_of_user'] == 'applicant':
-        # return redirect(url_for('dashboard_applicant'))
+    if session['type_of_user'] == 'applicant':
+        return redirect(url_for('dashboard_applicant'))
 
     form = ApplicantApprovalForm()
+    info = Applicant.get_applicant_info(applicant_id)
 
     if request.method == 'GET':
-        info = Applicant.get_applicant_info(applicant_id)
         return render_template("applicant_approval.html", applicant_id=applicant_id, info=info, form=form)
 
     if request.method == 'POST':
-        if form.accept.data == True:
-            Applicant.approve(applicant_id)
+        if form.decision.data == 'approve':
+           Applicant.approve(applicant_id)
+           return redirect(url_for('dashboard_superuser'))
         else:
-            Applicant.reject(applicant_id)
-
-        return redirect(url_for('dashboard_superuser'))
+            if form.validate():
+                Applicant.reject(applicant_id,form.reason.data)
+                return redirect(url_for('dashboard_superuser'))
+            else:
+                flash('Approval form is invalid. Please make sure all fields are completed correctly')
+                return render_template("applicant_approval.html", applicant_id=applicant_id, info=info, form=form)
 
 if __name__ == "__main__":
     app.run(debug=True)
