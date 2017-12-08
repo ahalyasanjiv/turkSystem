@@ -460,7 +460,7 @@ def ratingMessage(demand_id, recipient):
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    if 'username' in session:
+    if 'username' in session and 'rating' in session:
         form = RatingMessageForm()
         if request.method == "GET":
             return render_template("ratingMessage.html", form=form, demand_id=demand_id, recipient=recipient)

@@ -1029,11 +1029,51 @@ class Transaction:
         df.to_csv('database/Transaction.csv', index=False)
 
 class Rating:
+    """
+    Ratings between developers and clients.
+    """
     def __init__(self, demand_id, recipient, rater, rating, message=None):
         df = pd.read_csv('database/Rating.csv')
         df.loc[len(df)] = pd.Series(data=[demand_id, recipient, rater, rating, message],
             index=['demand_id', 'recipient', 'rater', 'rating', 'message'])
         df.to_csv('database/Rating.csv', index=False)
+
+    @staticmethod
+    def get_avg_rating(username):
+        df = pd.read_csv('database/Rating.csv')
+        ratings = df.loc[df.recipient == username]
+        average = ratings["rating"].mean()
+
+        return average
+
+    @staticmethod
+    def get_ratings_by_demand_id(demand_id):
+        """
+        Returns dataframe of ratings corresponding to a demand_id.
+        """
+        df = pd.read_csv('database/Rating.csv')
+        ratings = df.loc[df.demand_id == demand_id]
+
+        return ratings
+
+    @staticmethod
+    def check_if_valid_rating_form(demand_id, recipient, rater):
+        """
+        Checks if the URL for a rating is legitimate.
+        """
+        demand = Demand.get_info(demand_id)
+        if (demand['client_username'] == recipient and demand['chosen_developer_username'] == rater) or
+        (demand['client_username'] == rater and demand['chosen_developer_username'] == recipient):
+        # exists a demand where recipient/rater is a dev/client
+            if demand['is_completed']: 
+            # if the demand has finished and can have ratings
+                ratings = Rating.get_ratings_by_demand_id(demand_id)
+                if len(ratings.loc[ratings.recipient == recipient]) == 0:
+                    # there has not yet been a rating for this recipient
+                    return True
+
+
+        return False
 
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()
