@@ -32,8 +32,8 @@ def dashboard():
         first_name = info['first_name']
 
         # Get notifications for this user.
-        notifications = Notification.get_notif_to_recipient(session['username'], 5)
         unread = Notification.get_number_of_unread(session['username'])
+        notifications = Notification.get_notif_to_recipient(session['username'], 5)
 
         # If the user has no projects in history, they are a new user.
         user_type = User.get_user_info(session['username'])['type_of_user']
@@ -62,8 +62,8 @@ def dashboard():
 @app.route("/dashboard/notifications")
 def view_notifications():
     if 'username' in session:
-        notifications = Notification.get_all_notif_to_recipient(session['username'])
         unread = Notification.get_number_of_unread(session['username'])
+        notifications = Notification.get_all_notif_to_recipient(session['username'])
         return render_template('notifications.html', notifications=notifications, unread=unread)
     else:
         return redirect(url_for('login'))
