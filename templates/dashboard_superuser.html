@@ -24,8 +24,8 @@
 
         {% for applicant in pending_applicants %}
         <div class="applicant">  
-          <a href={{  url_for('applicant_approval', applicant_id=applicant) }} style="margin-bottom:20px; padding: 0 30px 0 30px;" class="button is-info is-medium has-text-centered">
-            {{ applicant }}
+          <a href={{  url_for('applicant_approval', applicant_id=applicant) }} style="margin-right:10px; padding: 0 30px 0 30px;" class="button is-info is-fullwidth has-text-centered">
+            Applicant User ID: {{ applicant }}
           </a>
         </div>
         {% endfor %}
@@ -34,6 +34,26 @@
         <br>
         <div class="button">See All</div>
         <hr>
+        <h1 class="title is-4">
+          Warning Removal Requests
+        </h1>
+        {% if not protests %}
+        <div class="notification is-warning">
+          There are no pending warning protests.
+        </div>
+        {% endif %}
+        {% for protest in protests %}
+        <div class="applicant">  
+          <a href={{  url_for('protest_approval', warning_id=protest) }} style="margin-right:10px; padding: 0 30px 0 30px;" class="button is-warning is-fullwidth has-text-centered">
+            Warning No. {{ protest }}
+          </a>
+        </div>
+        {% endfor %}
+        <br>
+        <div class="button">See All</div>
+      </div>
+      <div class="column is-1"></div>
+      <div class="column is-7">
         <h1 class="title is-4">
           Transactions to Approve
         </h1>
@@ -69,29 +89,9 @@
             </div>
           </div>
         </article> 
-        <br>
-        <div class="button">See All</div>
-      </div>
-      <div class="column is-8">
-        <h1 class="title is-4">
-          Warning Removal Requests
-        </h1>
-        <div class="notification">
-          <p class="content">
-          You were chosen for <strong>Project</strong>! 
-          <br>
-          <small>1/1/2018 11:59 PM</small>
-          </p>
-        </div>
-        <div class="notification">
-          <p class="content">
-          You have received a payment for <strong>Project</strong>!
-          <br>
-          <small>1/1/2018 11:59 PM</small>
-          </p>
-        </div>
-        <div class="notification is-info">
-          <h2 class="title is-4">Account Deletion Requests</h2>
+        
+        <hr>
+        <h1 class="title is-4">Account Deletion Requests</h1>
         <article class="media">
           <figure class="media-left">
            <p class="image is-64x64">

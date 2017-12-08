@@ -3,11 +3,13 @@ import pandas as pd
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm
-from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, Notification
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, ProtestForm, ProtestApprovalForm
+from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification
+import helpers
 
 app = Flask(__name__)
 app.secret_key = 'development-key'
+
 
 @app.route("/")
 def index():
@@ -54,13 +56,9 @@ def dashboard():
                     "client_rec": Client.get_similar_clients(session['username']), 
                     "dev_rec": Developer.get_similar_developers(session['username'])}
         return render_template("dashboard.html", first_name=first_name, notifications=notifications,
-                                recs=recs, unread=unread, user_type=user_type)
+                                recs=recs, unread=unread)
     else:
         return redirect(url_for('login'))
-
-@app.route("/dashboard/projects")
-def my_projects():
-    return render_template("myProjects.html")
 
 @app.route("/dashboard/notifications")
 def view_notifications():
@@ -118,10 +116,9 @@ def dashboard_applicant():
 def dashboard_superuser():
     if session['username']:
         info = SuperUser.get_superuser_info(session['username'])
-        df = pd.read_csv('database/Applicant.csv')
-        get_apps = df.loc[df['status'] == 'pending']
-        pending_applicants = get_apps['user_id'].values.tolist()
-        return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants)
+        pending_applicants = helpers.get_pending_applicants()
+        protests = helpers.get_protests()
+        return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants, protests=protests)
     else:
         return render_template("index.html")
 
@@ -242,11 +239,32 @@ def logout():
     return redirect(url_for('index'))
 
 @app.route("/warnings/<warning_id>/protest", methods=['GET', 'POST'])
-def protestWarning():
+def protestWarning(warning_id):
+    """
+    The /warnings/<warning_id>/protest route directs the user to a page that allows them to protest
+    a warning
+    """
+
+    # Only allow access to protest warning if regular user
+    warning_id = int(warning_id)
+    if session['type_of_user'] == 'superuser':
+        return redirect(url_for('dashboard_superuser'))
+    elif session['type_of_user'] == 'applicant':
+        return redirect(url_for('dashboard_applicant')) 
+
+    # User can only protest warning if they are the recipient of the warning and it is an active warning
+    if session['username'] != SystemWarning.get_warned_user(warning_id) or SystemWarning.get_warning_status(warning_id)!='active':
+        return redirect(url_for('dashboard'))
+    
     form = ProtestForm()
     if request.method == 'GET':
-        return render_template("protestWarning.html",form=form, warning_id=warning_id)
-    elif request.method == 'POST'
+        return render_template("protestWarning.html", form=form, warning_id=warning_id)
+    else:
+        if form.validate():
+            SystemWarning.protest_warning(warning_id,form.reason.data)
+            return redirect(url_for('dashboard'))
+        else:
+            return render_template('protestWarning.html', form=form, warning_id=warning_id)
 
 @app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
@@ -273,7 +291,6 @@ def bidInfo(demand_id):
             bidders_info[info['developer_username']] = User.get_user_info(info['developer_username'])
     
     form = BidForm()
-    # form = BidForm(demand_id)
 
     if request.method == 'POST':
         if form.validate():
@@ -284,51 +301,6 @@ def bidInfo(demand_id):
 
     elif request.method == 'GET':
         return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid, form=form, demand_id=demand_id)
-
-@app.route('/bid/<demand_id>/choose-developer', methods=['GET', 'POST'])
-def choose_developer(demand_id):
-    """
-    The '/bid/<demand_id>/choose-developer' route directs a client to a page
-    where he/she can select the developer he/she wants to hire to implement the
-    system that was demanded.
-    """
-    demand_info = Demand.get_info(demand_id)
-
-    bids = Bid.get_bids_for_demand(demand_id)
-    bids_info = []
-    bidders_info = {}
-
-    for bid in bids:
-        info = Bid.get_info(bid)
-        bids_info.append(info)
-
-        if info['developer_username'] not in bidders_info:
-            username = info['developer_username']
-            bidders_info[username] = User.get_user_info(username)
-            bidders_info[username]['lowest_bid'] = info['bid_amount']
-
-            rating = Developer.get_info(username)['avg_rating']
-            # round rating to the nearest 0.5
-            rating = round(0.5 * round(float(rating) / 0.5), 1)
-            bidders_info[username]['full_stars'] = int(rating)
-            bidders_info[username]['has_half_star'] = rating % 1 == .5
-
-    if request.method == 'POST':
-        chosen_developer = request.form['developer']
-
-        # if the chosen developer had the lowest bid,
-        # update the demand's chosen developer
-        if chosen_developer == bids_info[0]['developer_username']:
-            # updates the table, notifies the developer, and also starts the transaction request
-            Demand.choose_developer(demand_id, chosen_developer, demand_info['client_username'], bids_info[0]['bid_amount'])
-
-        # if the chosen developer did not have the lowest bid,
-        # the client must provide a reason for choosing this developer
-        else:
-            pass
-        return render_template("developer_chosen.html", demand_id=demand_id, bidders_info=bidders_info)
-    if request.method == 'GET':
-        return render_template("choose_developer.html", demand_id=demand_id, bidders_info=bidders_info)
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
@@ -384,6 +356,37 @@ def applicant_approval(applicant_id):
             else:
                 flash('Approval form is invalid. Please make sure all fields are completed correctly')
                 return render_template("applicant_approval.html", applicant_id=applicant_id, info=info, form=form)
+
+@app.route("/protest_approval/<warning_id>", methods=["GET", "POST"])
+def protest_approval(warning_id):
+    if session['type_of_user'] == 'user':
+        return redirect(url_for('dashboard'))
+    if session['type_of_user'] == 'applicant':
+        return redirect(url_for('dashboard_applicant'))
+
+    warning_id = int(warning_id)
+    info = SystemWarning.get_warning_info(warning_id)
+    username = info['warned_user']
+    type_of_user = User.get_user_info(username)['type_of_user']
+    avg_rating = 0
+    if type_of_user == 'client':
+        avg_rating = Client.get_info(username)['avg_rating']
+    elif type_of_user == 'developer':
+        avg_rating = Developer.get_info(username)['avg_rating']
+
+    form = ProtestApprovalForm()
+
+    if request.method == 'GET':
+        return render_template("protestApproval.html", warning_id=warning_id, info=info, form=form, avg_rating=avg_rating)
+    if request.method == 'POST':
+        if form.validate():
+            if form.decision.data == 'remove':
+                SystemWarning.remove_warning(warning_id)
+            else:
+                SystemWarning.keep_warning(warning_id)
+            return redirect(url_for('dashboard_superuser'))
+        else:
+            return render_template("protestApproval.html", warning_id=warning_id, info=info, form=form, avg_rating=avg_rating)
 
 if __name__ == "__main__":
     app.run(debug=True)

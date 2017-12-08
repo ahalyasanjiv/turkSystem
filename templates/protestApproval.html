@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero is-info">
+<div class="hero-body">
+  <div class="container">
+    <h1 class="title">
+      Protest Against Warning
+    </h1>
+  </div>
+</div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      	<div class="column is-4"></div>
+      	<div class="column is-4">
+		<div class="notification">
+			<form method="POST" action={{  url_for('protest_approval', warning_id=warning_id)  }}>
+			  	
+  				<h2 class="title is-4">
+			     	Protest Information
+			    </h2>
+			  	<ul>
+			  	<li><strong>Warning ID:</strong> {{ info['warning_id'] }}</li>
+			  	<li><strong>Warned User:</strong> {{ info['warned_user'] }}</li>
+			  	<li><strong>Average Rating for User:</strong> {{ avg_rating }}</li>
+			  	<li><strong>Reason for Protest:</strong> {{ info['reason'] }}</li>
+			  	</ul><br>
+  				{{ form.hidden_tag() }}
+	            {% with messages = get_flashed_messages() %}
+	              {% if messages %}
+	                  <div class=flashes>
+	                    {% for message in messages %}
+	                        {{ message }}
+	                    {% endfor %}
+	                  </div>
+	              {% endif %}
+	            {% endwith %}
+
+				<div class="field">
+					<div class="label is-medium">{{ form.decision.label }}</div>
+			        <div class="control has-text-centered">
+			        	<div class="select">{{ form.decision(placeholder="Select a decision", class="is-medium") }}</div>
+			        </div>
+			        {% if form.decision.errors %}
+			          {% for error in form.decision.errors %}
+			            <p class="is-danger">{{ error }}</p>
+			          {% endfor %}
+			        {% endif %}
+
+		      	</div>
+		      	
+		      	{{ form.submit(class="button is-link") }}
+					
+			</form>
+		</div>
+	  	</div>
+	</div>
+  </div>
+ </section>
+
+{% endblock %}
+
