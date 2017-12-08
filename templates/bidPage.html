@@ -16,40 +16,65 @@
         <div class="column is-one-third">
           <h1 class="title is-2">System Description</h1>
           <div class="media-content">
-          <div class="content">
-            <p>
-            <strong>{{ client_info.first_name }} {{ client_info.last_name }}</strong> <small><a>@{{ demand_info.client_username }}</a></small>
-            <br>
-            <strong>Posted:</strong> {{ demand_info.date_posted }}
-            <br><strong>Bidding deadline:</strong> {{ demand_info.bidding_deadline }}
-            <br>
-            <strong>Specifications:</strong><br>
-              {{ demand_info.specifications }}
-            </p>
+            <div class="content">
+              <!-- client information -->
+              <p>
+              <strong>{{ client_info.first_name }} {{ client_info.last_name }}</strong> <small><a>@{{ demand_info.client_username }}</a></small>
+              <br>
 
-            {% if session.role == 'developer' %}
-              <div class="has-text-centered">
-                <form method="POST" action="{{ url_for('bidInfo', demand_id=demand_id) }}">
-                  {{ form.hidden_tag() }}
+              <!-- date posted and bidding deadline -->
+              <strong>Posted:</strong> {{ demand_info.date_posted }}
+              <br><strong>Bidding deadline:</strong> {{ demand_info.bidding_deadline }}
+              <br>
 
-                  <div class="field has-addons">
-                    <p class="control">
-                      <a class="button is-static">$</a>
-                    </p>
-                    <div class="control">
-                      {{ form.bid_amount(placeholder="Bid amount", class="form-control input", type="number", step="0.01", value="0.00", min="0.00") }}
-                      {% if form.bid_amount.errors %}
-                        {% for error in form.bid_amount.errors %}
-                          <p class="is-danger">{{ error }}</p>
-                        {% endfor %}
-                      {% endif %}
+              <!-- specifications -->
+              <strong>Specifications:</strong><br>
+                {{ demand_info.specifications }}
+              </p>
+
+              <!-- bidding form for developer -->
+              {% if session.role == 'developer' %}
+                <!-- if deadline did not pass yet, developers can still bid -->
+                {% if demand_info.bidding_deadline_passed %}
+                  <article class="message is-danger">
+                    <div class="message-header">
+                      <p>Deadline for Bidding Passed</p>
                     </div>
-                    {{ form.submit(class="button is-info") }}
+                    <div class="message-body">
+                      You can no longer make bids on this system demand.
+                    </div>
+                  </article>
+                {% else %}
+                  <div class="has-text-centered">
+                    <form method="POST" action="{{ url_for('bidInfo', demand_id=demand_id) }}">
+                      {{ form.hidden_tag() }}
+
+                      <div class="field has-addons">
+                        <p class="control">
+                          <a class="button is-static">$</a>
+                        </p>
+                        <div class="control">
+                          {{ form.bid_amount(placeholder="Bid amount", class="form-control input", type="number", step="0.01", value="0.00", min="0.00") }}
+                          {% if form.bid_amount.errors %}
+                            {% for error in form.bid_amount.errors %}
+                              <p class="is-danger">{{ error }}</p>
+                            {% endfor %}
+                          {% endif %}
+                        </div>
+                        {{ form.submit(class="button is-info") }}
+                      </div>
+                    </form>
                   </div>
-                </form>
-              </div>
-            {% endif %}
-          </div>
+                {% endif %}
+              {% endif %}
+
+              <!-- tools for the client who made the demand -->
+              {% if session.role == 'client' %}
+                {% if session.username == client_info.username %}
+                  hi
+                {% endif %}
+              {% endif %}
+            </div>
           </div>
         </div>
         <div class="column is-one-third">

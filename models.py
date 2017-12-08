@@ -579,10 +579,18 @@ class Bid:
         now = datetime.datetime.now()
         format = '%m-%d-%Y %I:%M %p'
         date_bidded = now.strftime(format)
+        bid_amount = round(bid_amount, 2)
 
         df.loc[len(df)] = pd.Series(data=[demand_id, developer_username, bid_amount, date_bidded],
             index=['demand_id', 'developer_username', 'bid_amount', 'date_bidded'])
         df.to_csv('database/Bid.csv', index=False)
+
+        # send notification to client who made the demand stating that a bid was made
+        demand_info = Demand.get_info(demand_id)
+        client_username = demand_info['client_username']
+        demand_title = demand_info['title']
+        message = '{} made a bid of ${} on your {} demand'.format(developer_username, bid_amount, demand_title) 
+        Notification(client_username, developer_username, message)
 
     @staticmethod
     def get_info(bid_id):
