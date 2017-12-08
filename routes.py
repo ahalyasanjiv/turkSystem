@@ -55,9 +55,13 @@ def dashboard():
                     "client_rec": Client.get_similar_clients(session['username']), 
                     "dev_rec": Developer.get_similar_developers(session['username'])}
         return render_template("dashboard.html", first_name=first_name, notifications=notifications,
-                                recs=recs, unread=unread)
+                                recs=recs, unread=unread, user_type=user_type)
     else:
         return redirect(url_for('login'))
+
+@app.route("/dashboard/projects")
+def my_projects():
+    return render_template("myProjects.html")
 
 @app.route("/dashboard/notifications")
 def view_notifications():

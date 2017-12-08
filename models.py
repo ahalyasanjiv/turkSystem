@@ -194,17 +194,20 @@ class Client:
         tags = ""
         for index in projects:
             demand = Demand.get_info(index)
-            tags += demand['tags']
+            tags += demand['tags'] + " "
         print("tag", tags)
         similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
+        print(similar_projects)
         similar_clients = []
+        similar_clients_usernames=[]
 
         for index in similar_projects:
             if len(similar_clients) == 3:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['client_username'] not in similar_clients:
+                if demand['client_username'] not in similar_clients_usernames:
+                    similar_clients_usernames.append(demand['client_username'])
                     similar_clients.append(User.get_user_info(demand['client_username']))
 
         return similar_clients
@@ -284,17 +287,19 @@ class Developer:
         tags = ""
         for index in projects:
             demand = Demand.get_info(index)
-            tags += demand['tags']
+            tags += demand['tags'] + " "
         print("tag", tags)
         similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
         similar_developers = []
+        similar_developers_usernames = []
 
         for index in similar_projects:
             if len(similar_developers) == 3:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['chosen_developer_username'] not in similar_developers:
+                if demand['chosen_developer_username'] not in similar_developers_usernames:
+                    similar_developers_usernames.append(demand['chosen_developer_username'])
                     similar_developers.append(User.get_user_info(demand['chosen_developer_username']))
 
         return similar_developers
