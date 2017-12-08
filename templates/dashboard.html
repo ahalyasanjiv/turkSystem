@@ -100,7 +100,12 @@
           </h2> 
           <a class="button" href="/dashboard/notifications" style="margin-left:10px">See All </a>
           {% for notif in notifications %}
-          <div class="notification">
+          
+          {% if notif.read_status == True %}
+            <div class="notification is-light">
+          {% else %}
+            <div class="notification is-success">
+          {% endif %}
             <p class="content">
             {{ notif.message|safe }}
             <br>
@@ -109,69 +114,51 @@
           </div>
           {% endfor %}
 
-          <div class="notification is-info">
-            <h2 class="title is-4">Suggested Projects</h2>
-                      <article class="media">
-            <figure class="media-left">
-             <p class="image is-64x64">
-              <img src="https://bulma.io/images/placeholders/128x128.png">
-            </p>
-            </figure>
-            <div class="media-content">
-              <div class="content">
-                <p>
-                  <strong>Project Name</strong> <small>Posted by Client on 1/1/2018 11:59 PM</small>
-                  <br>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                  <br>
-                  <small><strong>Current Lowest Bid: $1500</strong></small>
-                  <br>
-                  <small><em>Closes: 2/1/2018 11:50 PM</em></small>
-                </p>
-              </div>
-            </div>
-          </article>
-                    <article class="media">
-            <figure class="media-left">
-             <p class="image is-64x64">
-              <img src="https://bulma.io/images/placeholders/128x128.png">
-            </p>
-            </figure>
-            <div class="media-content">
-              <div class="content">
-                <p>
-                  <strong>Project Name</strong> <small>Posted by Client on 1/1/2018 11:59 PM</small>
-                  <br>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                  <br>
-                  <small><strong>Current Lowest Bid: $1500</strong></small>
-                  <br>
-                  <small><em>Closes: 2/1/2018 11:50 PM</em></small>
-                </p>
-              </div>
-            </div>
-          </article>
-          </div>
-          
-          <div class="level">
-            <div class="level-item has-text-centered">
-              <div>
-                <p class="heading">{{ recs.client_rec_des }}</p>
-                {% for name in recs.client_rec %}
-                  <p class="title">{{ name }}</p>
-                {% endfor %}
-              </div>
-            </div>
+          <hr>
 
-             <div class="level-item has-text-centered">
-              <div>
-                <p class="heading">{{ recs.dev_rec_des }}</p>
-                {% for name in recs.dev_rec %}
-                  <p class="title">{{ name }}</p>
-                {% endfor %}
-              </div>
-            </div>
-          </div> <!-- level -->
+          <div class="notification is-info">
+            <h2 class="title is-4">{{ recs.client_rec_des }}</h2>
+            {% for name in recs.client_rec %}
+              <article class="media">
+                <figure class="media-left">
+                  <p class="image is-64x64">
+                    <img src="https://bulma.io/images/placeholders/128x128.png">
+                  </p>
+                </figure>
+                <div class="media-content">
+                  <div class="content">
+                    <p>
+                      <strong>{{ name }}</strong>
+                      <br>
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+                    </p>
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          </div> <!-- suggestion box-->
+
+          <div class="notification is-primary">
+            <h2 class="title is-4">{{ recs.dev_rec_des }}</h2>
+            {% for name in recs.dev_rec %}
+              <article class="media">
+                <figure class="media-left">
+                  <p class="image is-64x64">
+                    <img src="https://bulma.io/images/placeholders/128x128.png">
+                  </p>
+                </figure>
+                <div class="media-content">
+                  <div class="content">
+                    <p>
+                      <strong>{{ name }}</strong>
+                      <br>
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+                    </p>
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          </div> <!-- suggestion box-->
         </div>
       </div>
 
