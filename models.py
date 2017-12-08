@@ -326,7 +326,8 @@ class Applicant:
                     'phone': user['phone'].item(),
                     'credit_card': int(user['credit_card'].item()),
                     'type_of_user': user['type_of_user'].item(),
-                    'status': user['status'].item()}
+                    'status': user['status'].item(),
+                    'reason': user['reason'].item()}
 
     @staticmethod
     def is_unique_user_id(user_id):
@@ -402,7 +403,7 @@ class Applicant:
                     Developer(user_id)
 
     @staticmethod
-    def reject(user_id):
+    def reject(user_id, reason):
         """
         Reject the applicant. The applicant's status is changed to rejected.
         """
@@ -412,6 +413,7 @@ class Applicant:
         if user['status'].item() == 'pending':
             # update status
             df.loc[df.user_id == user_id, 'status'] = 'rejected'
+            df.loc[df.user_id == user_id, 'reason'] = reason
             df.to_csv('database/Applicant.csv', index=False)
 
 class Demand:
