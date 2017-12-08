@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+	<div class="container">
+		<h1 class="title">Leave feedback for {{ recipient }}. </h1>
+		<form method="POST" action="/bid/{{ demand_id }}/rating/{{ recipient }}">
+			<div class="field">
+			<h2 class="title is-4">{{form.rating.label}}</h2>
+			{% for subfield in form.rating %}
+		        <div class="control">
+		        	<label class="radio">
+		        		{{ subfield }}
+		        		{{ subfield.label }}
+		        	</label>
+		        </div>
+			{% endfor %}
+
+			{% if form.rating.errors %}
+	            {% for error in form.rating.errors %}
+	              <p class="is-danger">{{ error }}</p>
+	            {% endfor %}
+			{% endif %}
+	    	</div>
+	    	<hr>
+
+	    	{{ form.submit(class="button is-link") }}
+
+		</form>
+	</div>
+</section>
+
+{% endblock %}

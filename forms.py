@@ -134,3 +134,24 @@ class SubmitSystemForm(FlaskForm):
 	"""
 	system = FileField('System file', validators=[DataRequired('Please submit a file containing the system.')])
 	submit = SubmitField('Submit')
+
+class RatingForm(FlaskForm):
+	"""
+	Form for rating after a project is finished.
+	"""
+	rating = RadioField(label='Rating', id="rating", 
+		choices=[
+		(1,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
+		(2,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
+		(3,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
+		(4, '<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
+		(5,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i>')], 
+		validators=[DataRequired('Please give a rating.')], coerce=int)
+	submit = SubmitField('Submit')
+
+class RatingMessageForm(FlaskForm):
+	"""
+	Form for sending message after a low rating.
+	"""
+	message = TextAreaField(label='Send Feedback', id="message", validators=[DataRequired('Please give a rating.')] )
+	submit = SubmitField('Submit')

@@ -4,7 +4,7 @@ import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification
 import helpers
 
@@ -417,6 +417,23 @@ def upload_system(demand_id):
 
     if request.method == 'GET':
         return render_template("upload_system.html", demand_id=demand_id, form=form)
+
+@app.route("/bid/<demand_id>/rating/<recipient>", methods=["GET", "POST"])
+def rating(demand_id, recipient):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    if 'username' in session:
+        form = RatingForm()
+
+        if request.method == "GET":
+            return render_template("rating.html", form=form, recipient=recipient, demand_id = demand_id)
+        elif request.method == "POST":
+            if form.validate():
+                return render_template('rating.html')
+            else:
+                flash('fjefoei')
+                return render_template('rating.html', form=form, recipient=recipient, demand_id=demand_id)
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
