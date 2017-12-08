@@ -5,9 +5,16 @@
   <div class="hero-body">
     <div class="container">
       <h1 class="title">System uploaded Successfully</h1>
-      <h2 class="subtitle">Congratulations! The system has been uploaded successfully. A notification has been sent to the client. Please rate your client.</h2>
+      <h2 class="subtitle">Congratulations! The system has been uploaded successfully. A notification has been sent to the client. Please rate your client below.</h2>
     </div>
   </div>
+</section>
+
+<section class="section">
+	<div class="container has-text-centered">
+
+    <a href="{{ url_for('rating', demand_id=demand_id, recipient=recipient) }}" class="button is-large">Leave Feedback</a>
+	</div>
 </section>
 
 {% endblock %}
