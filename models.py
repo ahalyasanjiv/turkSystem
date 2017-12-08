@@ -116,8 +116,8 @@ class Client:
     def __init__(self, username):
         df = pd.read_csv('database/Client.csv')
 
-        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
-            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0, 100],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings', 'balance'])
         df.to_csv('database/Client.csv', index=False)
 
     @staticmethod
@@ -163,7 +163,7 @@ class Client:
 
         usernames = []
         for index, row in sorted_df.iterrows():
-            usernames.append(row['username'])
+            usernames.append(User.get_user_info(row['username']))
 
         return usernames
 
@@ -201,17 +201,20 @@ class Client:
         tags = ""
         for index in projects:
             demand = Demand.get_info(index)
-            tags += demand['tags']
+            tags += demand['tags'] + " "
         print("tag", tags)
         similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
+        print(similar_projects)
         similar_clients = []
+        similar_clients_usernames=[]
 
         for index in similar_projects:
             if len(similar_clients) == 3:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['client_username'] not in similar_clients:
+                if demand['client_username'] not in similar_clients_usernames:
+                    similar_clients_usernames.append(demand['client_username'])
                     similar_clients.append(User.get_user_info(demand['client_username']))
 
         return similar_clients
@@ -223,8 +226,8 @@ class Developer:
     def __init__(self, username):
         df = pd.read_csv('database/Developer.csv')
 
-        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0],
-            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings'])
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0, 0],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings', 'balance'])
         df.to_csv('database/Developer.csv', index=False)
 
     @staticmethod
@@ -271,7 +274,7 @@ class Developer:
 
         usernames = []
         for index, row in sorted_df.iterrows():
-            usernames.append(row['username'])
+            usernames.append(User.get_user_info(row['username']))
 
         return usernames
 
@@ -291,17 +294,19 @@ class Developer:
         tags = ""
         for index in projects:
             demand = Demand.get_info(index)
-            tags += demand['tags']
+            tags += demand['tags'] + " "
         print("tag", tags)
         similar_projects = Demand.get_filtered_demands(None, None, None, None, tags, None, None)
         similar_developers = []
+        similar_developers_usernames = []
 
         for index in similar_projects:
             if len(similar_developers) == 3:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['chosen_developer_username'] not in similar_developers:
+                if demand['chosen_developer_username'] not in similar_developers_usernames:
+                    similar_developers_usernames.append(demand['chosen_developer_username'])
                     similar_developers.append(User.get_user_info(demand['chosen_developer_username']))
 
         return similar_developers
@@ -574,6 +579,24 @@ class Demand:
 
         return filtered.sort_values(['date_posted'], ascending=[True]).index.tolist()[::-1]
 
+    @staticmethod
+    def choose_developer(demand_id, developer_username, client_username, bid_amount):
+        """
+        Update the Demand table when a client chooses a developer for a certain demand.
+        Also half of the bid amount is transferred from the client to the developer.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        df.loc[int(demand_id), 'chosen_developer_username'] = developer_username
+        df.to_csv('database/Demand.csv', index=False)
+
+        # notify the developer that he/she was chosen to implement the system
+        demand_title = Demand.get_info(demand_id)['title']
+        message = 'Congratulations! You were chosen by {} for the {} demand.'.format(client_username, demand_title)
+        Notification(developer_username, client_username, message)
+
+        # transfer money from client to developer
+        Transaction(developer_username, client_username, float(bid_amount) / 2)
+
 class Bid:
     """
     Bid class. Has methods that inserts to Bid table.
@@ -803,3 +826,14 @@ class Warning:
         df.loc[df.warning_id == warning_id, 'status'] = 'active'
         df.loc[df.warning_id == warning_id, 'reason'] = reason
         df.to_csv('database/Warning.csv', index=False)
+
+class Transaction:
+    """
+    Transactions between users (sender and recipient).
+    """
+    def __init__(self, recipient, sender, amount, message=None):
+        df = pd.read_csv('database/Transaction.csv')
+        df.loc[len(df)] = pd.Series(data=[len(df), recipient, sender, amount, 'pending', message],
+            index=['transaction_id', 'recipient','sender','amount','status', 'optional_message'])
+        df.to_csv('database/Transaction.csv', index=False)
+

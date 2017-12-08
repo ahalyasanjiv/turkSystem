@@ -36,6 +36,7 @@
         <div class="navbar-end">
           <!-- navbar end items -->
           {% if session.username %}
+            <p class="navbar-item">Welcome, {{ session.username }}</p>
             <a class="navbar-item" href="/logout">Logout</a>
           {% else %} 
             <a class="navbar-item" href="/apply">Apply</a>

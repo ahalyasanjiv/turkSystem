@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-</section>
+<section class="hero">
   <div class ="hero-body">
     <div class="container has-text-centered">
       <div class="columns">
@@ -71,7 +71,34 @@
               <!-- tools for the client who made the demand -->
               {% if session.role == 'client' %}
                 {% if session.username == client_info.username %}
-                  hi
+                  {% if demand_info.bidding_deadline_passed %}
+                    <!-- client is able to choose a developer from those who made bids -->
+                    {% if bidders_info|length > 0 %}
+                      <article class="message is-success">
+                        <div class="message-header">
+                          <p>Deadline for Bidding Passed</p>
+                        </div>
+                        <div class="message-body">
+                          Choose a developer to implement your system.<br>
+
+                          <div class="has-text-centered">
+                            <a href="{{ url_for('choose_developer', demand_id=demand_id) }}" class="button">See All Developers</a>
+                          </div>
+                        </div>
+                      </article>
+                      
+                    <!-- if no one made any bids, the system demand is closed automatically -->
+                    {% else %}
+                      <article class="message is-danger">
+                        <div class="message-header">
+                          <p>No one made a bid!</p>
+                        </div>
+                        <div class="message-body">
+                          No one made a bid on your demand before the bidding deadline. You are charged $10.
+                        </div>
+                      </article>
+                    {% endif %}
+                  {% endif %}
                 {% endif %}
               {% endif %}
             </div>
@@ -107,4 +134,5 @@
       </div>
     </div>
   </div>
+</section>
 {% endblock %}

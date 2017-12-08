@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">List of Bidders</h1>
+      <h2 class="subtitle">Choose a developer to implement your system demand.</h2>
+    </div>
+  </div>
+</section>
+<br>
+
+<div class="container">
+  <div class="columns">
+    <div class="column is-offset-3 is-half">
+      {% for username in bidders_info %}
+        <article class="media">
+          <!-- profile icon -->
+          <figure class="media-left">
+            <p class="image is-64x64">
+              <img src="https://bulma.io/images/placeholders/128x128.png">
+            </p>
+          </figure>
+
+          <!-- user info and bid amount -->
+          <div class="media-content">
+            <div class="content">
+              <p>
+                <strong>
+                  {{ bidders_info[username].first_name }} {{ bidders_info[username].last_name }}
+                </strong>
+                <small><a href="{{ url_for('user', name=username) }}">@{{ username }}</a></small>
+                <br>
+
+                Rating:
+                 <!-- developer rating, represented with stars -->
+                {% for full_star in range(bidders_info[username].full_stars) %}
+                  <i class="fa fa-star" aria-hidden="true"></i>
+                {% endfor %}
+                {% if bidders_info[username].has_half_star %}
+                  <i class="fa fa-star-half-o" aria-hidden="true"></i>
+                  {% for empty_star in range(4 - bidders_info[username].full_stars) %}
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                  {% endfor %}
+                {% else %}
+                  {% for empty_star in range(5 - bidders_info[username].full_stars) %}
+                    <i class="fa fa-star-o" aria-hidden="true"></i>
+                  {% endfor %}
+                {% endif %}
+                <br>
+
+                Bid amount: ${{ bidders_info[username].lowest_bid }}
+              </p>
+            </div>
+          </div>
+
+          <!-- choose developer button -->
+          <form action="{{ url_for('choose_developer', demand_id=demand_id) }}" method="POST">
+            <div class="media-right">
+              <input type="hidden" name="developer" value="{{ username }}">
+              <input type="submit" name="choose" value="Choose Developer" class="button is-success">
+              
+            </div>
+          </form>
+        </article>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
