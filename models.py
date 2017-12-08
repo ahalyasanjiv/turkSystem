@@ -33,10 +33,17 @@ class User:
         After a user is approved, the user can set his/her official username and password.
         This method stores this information in the User table.
         """
+        # Change the login credentials in Applicant database
+        df = pd.read_csv('database/Applicant.csv')
+        df.loc[df.email == email, 'username'] = username
+        df.loc[df.email == email, 'password'] = hash_password(password)
+        df.to_csv('database/Applicant.csv', index=False)
+        # Change the login credentials in User database
         df = pd.read_csv('database/User.csv')
         df.loc[df.email == email, 'username'] = username
         df.loc[df.email == email, 'password'] = hash_password(password)
         df.to_csv('database/User.csv', index=False)
+
     
     @staticmethod
     def use_old_credentials(username, email):
@@ -432,11 +439,6 @@ class Applicant:
                 df.loc[df.user_id == user_id, 'status'] = 'approved'
                 df.to_csv('database/Applicant.csv', index=False)
 
-                # add the user to the corresponding table
-                if user['type_of_user'].item() == 'client':
-                    Client(user_id)
-                elif user['type_of_user'].item() == 'developer':
-                    Developer(user_id)
 
     @staticmethod
     def reject(user_id, reason):
@@ -576,6 +578,24 @@ class Demand:
             filtered = filtered.loc[filtered.has_tag == True]
 
         return filtered.sort_values(['date_posted'], ascending=[True]).index.tolist()[::-1]
+
+    @staticmethod
+    def choose_developer(demand_id, developer_username, client_username, bid_amount):
+        """
+        Update the Demand table when a client chooses a developer for a certain demand.
+        Also half of the bid amount is transferred from the client to the developer.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        df.loc[int(demand_id), 'chosen_developer_username'] = developer_username
+        df.to_csv('database/Demand.csv', index=False)
+
+        # notify the developer that he/she was chosen to implement the system
+        demand_title = Demand.get_info(demand_id)['title']
+        message = 'Congratulations! You were chosen by {} for the {} demand.'.format(client_username, demand_title)
+        Notification(developer_username, client_username, message)
+
+        # transfer money from client to developer
+        Transaction(developer_username, client_username, float(bid_amount) / 2)
 
 class Bid:
     """
@@ -768,3 +788,13 @@ class Notification:
                     'read_status': row['read_status']}
             notifs.append(temp)
         return notifs
+
+class Transaction:
+    """
+    Transactions between users (sender and recipient).
+    """
+    def __init__(self, recipient, sender, amount):
+        df = pd.read_csv('database/Transaction.csv')
+        df.loc[len(df)] = pd.Series(data=[len(df), recipient, sender, amount, 'pending'],
+            index=['transaction_id', 'recipient','sender','amount','status'])
+        df.to_csv('database/Transaction.csv', index=False)

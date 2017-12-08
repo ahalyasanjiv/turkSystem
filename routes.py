@@ -9,7 +9,6 @@ from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedU
 app = Flask(__name__)
 app.secret_key = 'development-key'
 
-
 @app.route("/")
 def index():
     number_of_clients = Client.get_number_of_clients()
@@ -86,12 +85,23 @@ def dashboard_applicant():
                 User.use_old_credentials(info['user_id'],info['email'])
                 session['type_of_user'] = 'user'
                 session['role'] = info['type_of_user']
+                # Create a new client or developer in database depending on type of user
+                if info['type_of_user'] == 'client':
+                    Client(info['user_id'])
+                elif info['type_of_user'] == 'developer':
+                    Developer(info['user_id'])
                 return redirect(url_for('dashboard'))
+
             elif form.validate():
                 User.set_credentials(form.username.data,form.password.data,info['email'])
                 session['username'] = form.username.data
                 session['type_of_user'] = 'user'
                 session['role'] = info['type_of_user']
+                # Create a new client or developer in database depending on type of user
+                if info['type_of_user'] == 'client':
+                    Client(form.username.data)
+                elif info['type_of_user'] == 'developer':
+                    Developer(form.username.data)
                 return redirect(url_for('dashboard'))
             else:
                 flash('Login credentials are invalid. Please check that all fields are filled correctly.')
@@ -271,6 +281,51 @@ def bidInfo(demand_id):
 
     elif request.method == 'GET':
         return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid, form=form, demand_id=demand_id)
+
+@app.route('/bid/<demand_id>/choose-developer', methods=['GET', 'POST'])
+def choose_developer(demand_id):
+    """
+    The '/bid/<demand_id>/choose-developer' route directs a client to a page
+    where he/she can select the developer he/she wants to hire to implement the
+    system that was demanded.
+    """
+    demand_info = Demand.get_info(demand_id)
+
+    bids = Bid.get_bids_for_demand(demand_id)
+    bids_info = []
+    bidders_info = {}
+
+    for bid in bids:
+        info = Bid.get_info(bid)
+        bids_info.append(info)
+
+        if info['developer_username'] not in bidders_info:
+            username = info['developer_username']
+            bidders_info[username] = User.get_user_info(username)
+            bidders_info[username]['lowest_bid'] = info['bid_amount']
+
+            rating = Developer.get_info(username)['avg_rating']
+            # round rating to the nearest 0.5
+            rating = round(0.5 * round(float(rating) / 0.5), 1)
+            bidders_info[username]['full_stars'] = int(rating)
+            bidders_info[username]['has_half_star'] = rating % 1 == .5
+
+    if request.method == 'POST':
+        chosen_developer = request.form['developer']
+
+        # if the chosen developer had the lowest bid,
+        # update the demand's chosen developer
+        if chosen_developer == bids_info[0]['developer_username']:
+            # updates the table, notifies the developer, and also starts the transaction request
+            Demand.choose_developer(demand_id, chosen_developer, demand_info['client_username'], bids_info[0]['bid_amount'])
+
+        # if the chosen developer did not have the lowest bid,
+        # the client must provide a reason for choosing this developer
+        else:
+            pass
+        return render_template("developer_chosen.html", demand_id=demand_id, bidders_info=bidders_info)
+    if request.method == 'GET':
+        return render_template("choose_developer.html", demand_id=demand_id, bidders_info=bidders_info)
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
