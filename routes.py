@@ -241,9 +241,12 @@ def logout():
     session.pop('role', None)
     return redirect(url_for('index'))
 
-@app.route("/warning/protest")
+@app.route("/warnings/<warning_id>/protest", methods=['GET', 'POST'])
 def protestWarning():
-    return render_template("protestWarning.html")
+    form = ProtestForm()
+    if request.method == 'GET':
+        return render_template("protestWarning.html",form=form, warning_id=warning_id)
+    elif request.method == 'POST'
 
 @app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
