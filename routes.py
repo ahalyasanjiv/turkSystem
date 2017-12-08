@@ -246,7 +246,8 @@ def protestWarning():
     form = ProtestForm()
     if request.method == 'GET':
         return render_template("protestWarning.html",form=form, warning_id=warning_id)
-    elif request.method == 'POST'
+    elif request.method == 'POST':
+        pass
 
 @app.route("/bid/<demand_id>", methods=['GET', 'POST'])
 def bidInfo(demand_id):
@@ -327,7 +328,6 @@ def choose_developer(demand_id):
         # if the chosen developer did not have the lowest bid,
         # the client must provide a reason for choosing this developer
         else:
-            # Demand.choose_developer(demand_id, chosen_developer, demand_info['client_username'], bids_info[0]['bid_amount'])
             return redirect(url_for('justify_developer_choice', demand_id=demand_id))
     if request.method == 'GET':
         return render_template("choose_developer.html", demand_id=demand_id, bidders_info=bidders_info)
