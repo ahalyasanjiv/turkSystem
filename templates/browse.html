@@ -41,7 +41,7 @@
 
                     <!-- current lowest bid, if there is one -->
                     {% if demand.min_bid is not none %}
-                      <small><em>Lowest bid: {{ demand.min_bid }}</em></small>
+                      <small><em>Lowest bid: ${{ demand.min_bid }}</em></small>
                     {% else %}
                       <small><em>No bids were made yet!</em></small>
                     {% endif %}

@@ -580,7 +580,7 @@ class Demand:
         return filtered.sort_values(['date_posted'], ascending=[True]).index.tolist()[::-1]
 
     @staticmethod
-    def choose_developer(demand_id, developer_username, client_username, bid_amount):
+    def choose_developer(demand_id, developer_username, client_username, bid_amount, reason=None):
         """
         Update the Demand table when a client chooses a developer for a certain demand.
         Also half of the bid amount is transferred from the client to the developer.
@@ -595,7 +595,7 @@ class Demand:
         Notification(developer_username, client_username, message)
 
         # transfer money from client to developer
-        Transaction(developer_username, client_username, float(bid_amount) / 2)
+        Transaction(developer_username, client_username, float(bid_amount) / 2, reason)
 
 class Bid:
     """
