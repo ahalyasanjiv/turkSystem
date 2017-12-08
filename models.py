@@ -163,7 +163,7 @@ class Client:
 
         usernames = []
         for index, row in sorted_df.iterrows():
-            usernames.append(row['username'])
+            usernames.append(User.get_user_info(row['username']))
 
         return usernames
 
@@ -274,7 +274,7 @@ class Developer:
 
         usernames = []
         for index, row in sorted_df.iterrows():
-            usernames.append(row['username'])
+            usernames.append(User.get_user_info(row['username']))
 
         return usernames
 
