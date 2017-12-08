@@ -205,7 +205,7 @@ class Client:
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
                 if demand['client_username'] not in similar_clients:
-                    similar_clients.append(demand['client_username'])
+                    similar_clients.append(User.get_user_info(demand['client_username']))
 
         return similar_clients
 
@@ -295,7 +295,7 @@ class Developer:
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
                 if demand['chosen_developer_username'] not in similar_developers:
-                    similar_developers.append(demand['chosen_developer_username'])
+                    similar_developers.append(User.get_user_info(demand['chosen_developer_username']))
 
         return similar_developers
 

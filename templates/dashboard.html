@@ -118,7 +118,7 @@
 
           <div class="notification is-info">
             <h2 class="title is-4">{{ recs.client_rec_des }}</h2>
-            {% for name in recs.client_rec %}
+            {% for user in recs.client_rec %}
               <article class="media">
                 <figure class="media-left">
                   <p class="image is-64x64">
@@ -128,9 +128,9 @@
                 <div class="media-content">
                   <div class="content">
                     <p>
-                      <strong>{{ name }}</strong>
+                      <strong>{{ user.username }}</strong>
                       <br>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+                      {{ user.about }}
                     </p>
                   </div>
                 </div>
@@ -140,7 +140,7 @@
 
           <div class="notification is-primary">
             <h2 class="title is-4">{{ recs.dev_rec_des }}</h2>
-            {% for name in recs.dev_rec %}
+            {% for user in recs.dev_rec %}
               <article class="media">
                 <figure class="media-left">
                   <p class="image is-64x64">
@@ -150,9 +150,9 @@
                 <div class="media-content">
                   <div class="content">
                     <p>
-                      <strong>{{ name }}</strong>
+                      <strong>{{ user.username }}</strong>
                       <br>
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
+                      {{ user.about }}
                     </p>
                   </div>
                 </div>
