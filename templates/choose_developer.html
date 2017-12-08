@@ -30,33 +30,38 @@
                 <strong>
                   {{ bidders_info[username].first_name }} {{ bidders_info[username].last_name }}
                 </strong>
-                 <small><a href="{{ url_for('user', name=username) }}">@{{ username }}</a></small>
-                 <br>
+                <small><a href="{{ url_for('user', name=username) }}">@{{ username }}</a></small>
+                <br>
 
+                Rating:
                  <!-- developer rating, represented with stars -->
-                {% for full_star in range(bidders_info[username].rating) %}
+                {% for full_star in range(bidders_info[username].full_stars) %}
                   <i class="fa fa-star" aria-hidden="true"></i>
                 {% endfor %}
-                {% if half_star %}
+                {% if bidders_info[username].has_half_star %}
                   <i class="fa fa-star-half-o" aria-hidden="true"></i>
-                  {% for empty_star in range(4 - bidders_info[username].rating) %}
+                  {% for empty_star in range(4 - bidders_info[username].full_stars) %}
                     <i class="fa fa-star-o" aria-hidden="true"></i>
                   {% endfor %}
                 {% else %}
-                  {% for empty_star in range(5 - bidders_info[username].rating) %}
+                  {% for empty_star in range(5 - bidders_info[username].full_stars) %}
                     <i class="fa fa-star-o" aria-hidden="true"></i>
                   {% endfor %}
                 {% endif %}
                 <br>
 
-                Bid amount: {{ bidders_info[username].lowest_bid }}
+                Bid amount: ${{ bidders_info[username].lowest_bid }}
               </p>
             </div>
           </div>
 
           <!-- choose developer button -->
+          <form method="POST" action="{{ url_for('choose_developer', demand_id=demand_id) }}">
+            
+          </form>
+
           <div class="media-right">
-            <a href="" class="button is-success">Choose Developer</a>
+            <a href="{{ url_for('choose_developer', demand_id=demand_id, developer_username=username) }}" class="button is-success">Choose Developer</a>
           </div>
         </article>
       {% endfor %}

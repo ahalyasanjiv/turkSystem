@@ -9,7 +9,6 @@ from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedU
 app = Flask(__name__)
 app.secret_key = 'development-key'
 
-
 @app.route("/")
 def index():
     number_of_clients = Client.get_number_of_clients()
@@ -265,6 +264,39 @@ def bidInfo(demand_id):
 
     elif request.method == 'GET':
         return render_template("bidPage.html", demand_info=demand_info, client_info=client_info, bids_info=bids_info, bidders_info=bidders_info, lowest_bid=lowest_bid, form=form, demand_id=demand_id)
+
+@app.route('/bid/<demand_id>/choose-developer', methods=['GET', 'POST'])
+def choose_developer(demand_id):
+    """
+    The '/bid/<demand_id>/choose-developer' route directs a client to a page
+    where he/she can select the developer he/she wants to hire to implement the
+    system that was demanded.
+    """
+    demand_info = Demand.get_info(demand_id)
+
+    bids = Bid.get_bids_for_demand(demand_id)
+    bids_info = []
+    bidders_info = {}
+
+    for bid in bids:
+        info = Bid.get_info(bid)
+        bids_info.append(info)
+
+        if info['developer_username'] not in bidders_info:
+            username = info['developer_username']
+            bidders_info[username] = User.get_user_info(username)
+            bidders_info[username]['lowest_bid'] = info['bid_amount']
+
+            rating = Developer.get_info(username)['avg_rating']
+            # round rating to the nearest 0.5
+            rating = round(0.5 * round(float(rating) / 0.5), 1)
+            bidders_info[username]['full_stars'] = int(rating)
+            bidders_info[username]['has_half_star'] = rating % 1 == .5
+
+    if request.method == 'POST':
+        return render_template("")
+    if request.method == 'GET':
+        return render_template("choose_developer.html", bidders_info=bidders_info)
 
 @app.route("/createDemand", methods=['GET', 'POST'])
 def createDemand():
