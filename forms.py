@@ -155,3 +155,11 @@ class RatingMessageForm(FlaskForm):
 	"""
 	message = TextAreaField(label='Send Feedback', id="message", validators=[DataRequired('Please give a rating.')] )
 	submit = SubmitField('Submit')
+
+class TransactionApprovalForm(FlaskForm):
+	"""
+	Form for the page where the superuser can approve/reject a transaction
+	"""
+	decision = SelectField(label='Please select your decision', id='decision', validators=[DataRequired('Please choose an option.')], choices = [('approve','Approve'),('deny','Deny')],)
+	submit = SubmitField('Submit')
+

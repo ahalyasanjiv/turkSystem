@@ -831,13 +831,6 @@ class SuperUser:
         hashed = hash_password(password)
         df.loc[len(df)] = pdf.Series(data=[username, hashed],
             index=['username', 'password'])
-    
-    # def hash_password(self, password):
-    #     """
-    #     Returns the hash of the given password.
-    #     """
-    #     hash_object = hashlib.sha256(password.encode())
-    #     return hash_object.hexdigest()
 
     @staticmethod
     def get_superuser_info(username):
@@ -866,6 +859,7 @@ class SuperUser:
         if not user.empty:
             pwhash = user['password'].item()
             return pwhash == hash_password(password) 
+
 
 class Notification:
     """
@@ -1027,6 +1021,44 @@ class Transaction:
         df.loc[len(df)] = pd.Series(data=[len(df), recipient, sender, amount, 'pending', message],
             index=['transaction_id', 'recipient','sender','amount','status', 'optional_message'])
         df.to_csv('database/Transaction.csv', index=False)
+
+    @staticmethod
+    def get_transaction_info(transaction_id):
+        """
+        Returns a dictionary of the transaction's information.
+        """
+        df = pd.read_csv('database/Transaction.csv')
+        transaction = df.loc[df['transaction_id'] == int(transaction_id)]
+
+        if not transaction.empty:
+            return {'transaction_id': transaction['transaction_id'].item(),
+                    'recipient': transaction['recipient'].item(),
+                    'sender': transaction['sender'].item(),
+                    'amount': transaction['amount'].item(),
+                    'optional_message': transaction['optional_message'].item()}
+
+    @staticmethod
+    def approve_transaction(transaction_id):
+        """
+        Approves a transaction
+        """
+        df = pd.read_csv('database/Transaction.csv')
+        transaction = df.loc[df['transaction_id'] == transaction_id]
+        df.loc[df.transaction_id == transaction_id, 'status'] = 'approved'
+        df.to_csv('database/Transaction.csv', index=False)
+
+    @staticmethod
+    def deny_transaction(transaction_id):
+        """
+        Denies a transaction
+        """
+        df = pd.read_csv('database/Transaction.csv')
+        transaction = df.loc[df['transaction_id'] == transaction_id]
+        df.loc[df.transaction_id == transaction_id, 'status'] = 'denied'
+        df.to_csv('database/Transaction.csv', index=False)
+        # Issues a warning to the sender
+        sender = transaction['sender'].item()
+        SystemWarning(sender,'active')
 
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()

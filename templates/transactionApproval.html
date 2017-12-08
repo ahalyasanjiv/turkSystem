@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero is-info">
+<div class="hero-body">
+  <div class="container">
+    <h1 class="title">
+      Transaction Approval
+    </h1>
+    </h2>
+  </div>
+</div>
+</section>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      	<div class="column is-4"></div>
+      	<div class="column is-4">
+		<div class="notification">
+			<form method="POST" action={{  url_for('transaction_approval', transaction_id=transaction_id)  }}>
+			  		<h2 class="subtitle">Transaction Details</h2>
+		            <ul>
+		            <li>Transaction ID: {{ info['transaction_id'] }}</li>
+		            <li>Recipient: {{ info['recipient'] }}</li>
+		            <li>Sender: {{ info['sender'] }}</li>
+		            <li>Amount: {{ info['amount'] }}</li>
+		            <li>Has enough money in balance? 
+		            {% if enough_money %} Yes
+		        	{% else %} No
+		        	{% endif %}</li>
+
+		            {% if info['optional_message'] %}
+		              <li>Message: {{ info['optional_message'] }}</li>
+		            {% endif %}
+		            </ul>
+		          </a>
+		        </div><br>
+  				{{ form.hidden_tag() }}
+	            {% with messages = get_flashed_messages() %}
+	              {% if messages %}
+	                  <div class=flashes>
+	                    {% for message in messages %}
+	                        {{ message }}
+	                    {% endfor %}
+	                  </div>
+	              {% endif %}
+	            {% endwith %}
+
+				<div class="field has-text-centered">
+					<div class="label is-medium">{{ form.decision.label }}</div>
+			        <div class="control has-text-centered">
+			        	<div class="select">{{ form.decision(placeholder="Select a decision", class="is-medium") }}</div>
+			        </div>
+			        {% if form.decision.errors %}
+			          {% for error in form.decision.errors %}
+			            <p class="is-danger">{{ error }}</p>
+			          {% endfor %}
+			        {% endif %}
+
+		      	</div>
+				<div class="field has-text-centered">
+		      		{{ form.submit(class="button is-link") }}
+				</div>
+			</form>
+		</div>
+	  	</div>
+	</div>
+  </div>
+ </section>
+{% endblock %}

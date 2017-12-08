@@ -4,8 +4,8 @@ import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm
-from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm, TransactionApprovalForm
+from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Transaction
 import helpers
 
 app = Flask(__name__)
@@ -144,7 +144,8 @@ def dashboard_superuser():
         info = SuperUser.get_superuser_info(session['username'])
         pending_applicants = helpers.get_pending_applicants()
         protests = helpers.get_protests()
-        return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants, protests=protests)
+        pending_transactions = helpers.get_pending_transactions()
+        return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants, protests=protests, pending_transactions=pending_transactions)
     else:
         return render_template("index.html")
 
@@ -535,6 +536,28 @@ def protest_approval(warning_id):
             else:
                 SystemWarning.keep_warning(warning_id)
                 Notification(username,session['username'],'Your protest for warning#'+ str(warning_id) +' was not approved. Your warning remains.')
+            return redirect(url_for('dashboard_superuser'))
+        else:
+            return render_template("protestApproval.html", warning_id=warning_id, info=info, form=form, avg_rating=avg_rating)
+
+@app.route("/transaction_approval/<transaction_id>", methods=["GET", "POST"])
+def transaction_approval(transaction_id):
+    form = TransactionApprovalForm()
+    info = Transaction.get_transaction_info(transaction_id)
+    transaction_id = int(transaction_id)
+
+    if request.method == 'GET':
+        enough_money = helpers.does_user_have_enough_money(info['sender'],int(info['amount']))
+        return render_template("transactionApproval.html", form=form, transaction_id=transaction_id,info=info,enough_money=enough_money)
+    if request.method == 'POST':
+        if form.validate():
+            if form.decision.data == 'approve':
+                Transaction.approve_transaction(transaction_id)
+                Notification(info['sender'],session['username'],'Your transaction (Transaction#'+ str(transaction_id) +') was approved.')
+            else:
+                Transaction.deny_transaction(transaction_id)
+                Notification(info['sender'],session['username'],'Your transaction (Transaction#'+ str(transaction_id) +') was denied.')
+                SystemWarning(info['sender'],'active')
             return redirect(url_for('dashboard_superuser'))
         else:
             return render_template("protestApproval.html", warning_id=warning_id, info=info, form=form, avg_rating=avg_rating)

@@ -57,38 +57,21 @@
         <h1 class="title is-4">
           Transactions to Approve
         </h1>
-        <article class="media">
-          <figure class="media-left">
-           <p class="image is-64x64">
-            <img src="https://bulma.io/images/placeholders/128x128.png">
-          </p>
-          </figure>
-          <div class="media-content">
-            <div class="content">
-              <p>
-                <strong>Project Name</strong> <small>Posted by Client</small>
-                <br>
-                <small>Closes: 1/1/2018 12:00 AM</small>
-              </p>
-            </div>
-          </div>
-        </article>  
-        <article class="media">
-          <figure class="media-left">
-           <p class="image is-64x64">
-            <img src="https://bulma.io/images/placeholders/128x128.png">
-          </p>
-          </figure>
-          <div class="media-content">
-            <div class="content">
-              <p>
-                <strong>Project Name</strong> 
-                <small>Posted by Client</small> <br>
-                <small>Closes: 1/1/2018 12:00 AM</small>
-              </p>
-            </div>
-          </div>
-        </article> 
+        {% for transaction in pending_transactions %}
+        <div class="transaction">  
+          <a href={{  url_for('transaction_approval', transaction_id=transaction['transaction_id']) }} style="margin-right:10px; padding: 0 30px 0 30px;" class="button is-info is-fullwidth has-text-centered">
+            <ul>
+            <li>Transaction ID: {{ transaction['transaction_id'] }}</li>
+            <!-- <li>Recipient: {{ transaction['recipient'] }}</li>
+            <li>Sender: {{ transaction['sender'] }}</li>
+            <li>Amount: {{ transaction['amount'] }}</li>
+            {% if transaction['optional_message'] %}
+              <li>Message: {{ transaction['optional_message'] }}</li>
+            {% endif %} -->
+            </ul>
+          </a>
+        </div><br>
+        {% endfor %}
         
         <hr>
         <h1 class="title is-4">Account Deletion Requests</h1>
