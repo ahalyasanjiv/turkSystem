@@ -469,8 +469,8 @@ class Demand:
         format = '%m-%d-%Y %I:%M %p'
         date_posted = now.strftime(format)
 
-        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False],
-            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed'])
+        df.loc[len(df)] = pd.Series(data=[client_username, date_posted, title, tags, specifications, bidding_deadline, submission_deadline, False, False],
+            index=['client_username', 'date_posted', 'title', 'tags', 'specifications', 'bidding_deadline', 'submission_deadline', 'is_completed', 'bidding_deadline_approaching_notif_sent'])
 
         df.to_csv('database/Demand.csv', index=False)
 
@@ -531,7 +531,7 @@ class Demand:
         filtered['date_posted'] = pd.to_datetime(filtered['date_posted'])
         filtered['bidding_deadline'] = pd.to_datetime(filtered['bidding_deadline'])
 
-        # filter by date
+        # filter by date posted
         if start_date is not None and start_date != '':
             filtered = filtered.loc[filtered.date_posted >= start_date]
 
@@ -596,6 +596,27 @@ class Demand:
 
         # transfer money from client to developer
         Transaction(developer_username, client_username, float(bid_amount) / 2, reason)
+
+    @staticmethod
+    def check_approaching_bidding_deadlines():
+        """
+        Checks for any approaching bidding deadlines for all of the demands.
+        If the deadline is within 24 hours, a notification will be sent to the client
+        who created the demand. Only one notification will be sent.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        # df['bidding_deadline'] = pd.to_datetime(df['bidding_deadline'], format='%m-%d-%Y %I:%M %p')
+        now = datetime.datetime.now()
+
+        for index, row in df.iterrows():
+            dt = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p')
+            time_diff = (dt - now).days
+            if time_diff <= 1 and (not row['bidding_deadline_approaching_notif_sent']):
+                message = 'The deadline for your {} demand is approaching.'.format(row['title'])
+                Notification(row['client_username'], 'superuser0', message)
+                df.loc[index, 'bidding_deadline_approaching_notif_sent'] = True
+
+        df.to_csv('database/Demand.csv', index=False)
 
 class Bid:
     """
@@ -837,3 +858,4 @@ class Transaction:
             index=['transaction_id', 'recipient','sender','amount','status', 'optional_message'])
         df.to_csv('database/Transaction.csv', index=False)
 
+Demand.check_approaching_bidding_deadlines()
