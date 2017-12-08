@@ -36,6 +36,19 @@
               {% if session.role == 'developer' %}
                 <!-- if deadline did not pass yet, developers can still bid -->
                 {% if demand_info.bidding_deadline_passed %}
+                  {% if demand_info.chosen_developer_username == session['username'] %}
+                    <article class="message is-info">
+                      <div class="message-header">
+                        <p>Submit System</p>
+                      </div>
+                      <div class="message-body">
+                        Congrats! You are chosen to develop this system.
+                        <div class="has-text-centered">
+                          <a href="{{ url_for('choose_developer', demand_id=demand_id) }}" class="button">See All Developers</a>
+                        </div>
+                      </div>
+                    </article>
+                  {% endif %}
                   <article class="message is-danger">
                     <div class="message-header">
                       <p>Deadline for Bidding Passed</p>
