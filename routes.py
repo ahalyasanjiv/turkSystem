@@ -494,5 +494,15 @@ def protest_approval(warning_id):
         else:
             return render_template("protestApproval.html", warning_id=warning_id, info=info, form=form, avg_rating=avg_rating)
 
+@app.route("/warnings")
+def warning():
+    if session['type_of_user'] == 'superuser':
+        return redirect(url_for('dashboard_superuser'))
+    if session['type_of_user'] == 'applicant':
+        return redirect(url_for('dashboard_applicant'))
+    username = session['username']
+    warnings = helpers.get_user_warnings(username)
+    return render_template("warnings.html", warnings=warnings)
+
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero is-info">
+<div class="hero-body">
+  <div class="container">
+    <h1 class="title">
+    	Warnings
+    </h1>
+  </div>
+</div>
+</section>
+
+<section class="section">
+  	<div class="container">
+    	<div class="columns">
+    		<div class="column is-4">
+    			{% if not warnings %}
+    				<div class="notification is-warning">
+			          You currently do not have any warnings.
+			        </div>
+    			{% else %}
+    				{% for warning in warnings %}
+    					<div class="notification is-warning">
+    						<ul>
+				          	<li><strong>Warning ID:</strong> {{ warning['warning_id'] }}</li>
+						  	<li><strong>Status: </strong> 
+						  		{% if warning['status'] == 'active' %}
+						  			Active
+						  		{% elif warning['status'] == 'pending' %}
+						  			Protested and pending response
+						  		{% elif warning['status'] == 'active_and_denied' %}
+						  			Protest not approved
+						  		{% else %}
+						  			Inactive
+						  		{% endif %}
+						  	</li>
+						  	</ul>
+				        </div>
+    				{% endfor %}
+    			{% endif %}
+    		</div>
+    	</div>
+    </div>
+</section>
+
+{% endblock %}
+
+

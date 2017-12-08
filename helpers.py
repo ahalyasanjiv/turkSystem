@@ -23,3 +23,9 @@ def get_pending_applicants():
 	get_apps = df.loc[df['status'] == 'pending']
 	pending_applicants = get_apps['user_id'].values.tolist()
 	return pending_applicants
+
+def get_user_warnings(username):
+	df = pd.read_csv('database/Warning.csv')
+	get_warnings = df.loc[df['warned_user'] == username]
+	warnings = get_warnings.T.to_dict().values()
+	return warnings
