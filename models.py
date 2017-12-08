@@ -803,6 +803,24 @@ class BlacklistedUser:
             index=['user_id', 'blacklisted_until'])
         df.to_csv('database/BlacklistedUser.csv', index=False)
 
+    @staticmethod
+    def is_blacklisted(username):
+        """
+        Checks if a user is on the blacklist.
+        """
+        df = pd.read_csv('database/BlacklistedUser.csv')
+        return len(df.loc[df['user_id'] == username]) > 0
+
+    @staticmethod
+    def get_info(username):
+        """
+        Returns a dictionary of information for the given developer.
+        """
+        df = pd.read_csv('database/BlacklistedUser.csv')
+        blacklisteduser = df.loc[df.user_id == username]
+
+        return {'username': username,
+                'blacklisted_until': blacklisteduser['blacklisted_until'].item()}
 class SuperUser:
     """
     SuperUser class.

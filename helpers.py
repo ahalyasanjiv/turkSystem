@@ -29,3 +29,12 @@ def get_user_warnings(username):
 	get_warnings = df.loc[df['warned_user'] == username]
 	warnings = get_warnings.T.to_dict().values()
 	return warnings
+
+def should_be_blacklisted(username):
+	df = pd.read_csv('database/Warning.csv')
+	get_warnings = df.loc[df['warned_user'] == username and (df['status'] == 'active' or df['status'] == 'active_and_denied')]
+	warnings = get_warnings.T.to_dict().values()
+	num_of_warnings = len(warnings)
+	if num_of_warnings >=2:
+		return True
+	return False

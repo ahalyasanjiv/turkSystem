@@ -226,15 +226,22 @@ def apply():
 def login():
     if 'username' in session:
         return redirect(url_for('dashboard'))
+
     form = LoginForm()
     if request.method == 'POST' and form.validate():
         username = form.username.data
         password = form.password.data
         # Check if username exists and if password matches
+        if BlacklistedUser.is_blacklisted(username):
+            session['username'] = username
+            return redirect(url_for('blacklist'))
         if User.check_password(username, password):
             session['username'] = username
             session['role'] = User.get_user_info(username)['type_of_user']
             session['type_of_user'] = 'user'
+            if helpers.should_be_blacklisted(username):
+                BlacklistedUser(username)
+                return redirect(url_for('blacklist'))
             return redirect(url_for('dashboard'))
         if Applicant.check_password(username, password):
             session['username'] = username
@@ -263,6 +270,15 @@ def logout():
     session.pop('username', None)
     session.pop('role', None)
     return redirect(url_for('index'))
+
+@app.route("/blacklist")
+def blacklist():
+    if 'username' in session:
+        info = BlacklistedUser.get_info(session['username'])
+        return render_template('blacklist.html', info=info)
+
+    return redirect(url_for('index'))
+
 
 @app.route("/warnings/<warning_id>/protest", methods=['GET', 'POST'])
 def protestWarning(warning_id):
