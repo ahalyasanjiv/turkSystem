@@ -498,8 +498,10 @@ def protest_approval(warning_id):
         if form.validate():
             if form.decision.data == 'remove':
                 SystemWarning.remove_warning(warning_id)
+                Notification(username,session['username'],'Your protest for warning#'+ str(warning_id) +' was approved. Your warning has been deleted.')
             else:
                 SystemWarning.keep_warning(warning_id)
+                Notification(username,session['username'],'Your protest for warning#'+ str(warning_id) +' was not approved. Your warning remains.')
             return redirect(url_for('dashboard_superuser'))
         else:
             return render_template("protestApproval.html", warning_id=warning_id, info=info, form=form, avg_rating=avg_rating)
