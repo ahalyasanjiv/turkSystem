@@ -517,6 +517,7 @@ class Demand:
                     'is_completed': demand['is_completed'],
                     'bidding_deadline_passed': deadline_passed,
                     'chosen_developer_username' : demand['chosen_developer_username'],
+                    'chosen_bid_amount': demand['bid_amount'],
                     'min_bid': lowest_bid,
                     'link_to_client': '/user/' + demand['client_username'],
                     'link_to_demand': '/bid/' + str(demand_id)}
@@ -609,6 +610,7 @@ class Demand:
         """
         df = pd.read_csv('database/Demand.csv')
         df.loc[int(demand_id), 'chosen_developer_username'] = developer_username
+        df.loc[int(demand_id), 'bid_amount'] = bid_amount
         df.to_csv('database/Demand.csv', index=False)
 
         # notify the developer that he/she was chosen to implement the system
@@ -650,17 +652,44 @@ class Demand:
         now = datetime.datetime.now()
 
         for index, row in df.iterrows():
-            dt = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p')
-            # time_diff = now - dt
-            num_bids = len(Bid.get_bids_for_demand(index))
+            if not row['is_expired']:
+                dt = datetime.datetime.strptime(row['bidding_deadline'], '%m-%d-%Y %I:%M %p')
+                num_bids = len(Bid.get_bids_for_demand(index))
 
-            # if the bidding deadline passed and there are no bids for this demand,
-            # make it expired
-            if (now > dt) and (num_bids == 0):
-                df.loc[index, 'is_expired'] = True
-                message = 'Your {} demand expired at {}. $10 is taken off of your balance.'.format(row['title'], row['bidding_deadline'])
-                Notification(row['client_username'], 'superuser0', message)
-                Transaction('superuser0', row['client_username'], 10)
+                # if the bidding deadline passed and there are no bids for this demand,
+                # make it expired
+                if (now > dt) and (num_bids == 0):
+                    df.loc[index, 'is_expired'] = True
+                    message = 'Your {} demand expired at {}. $10 is taken off of your balance.'.format(row['title'], row['bidding_deadline'])
+                    Notification(row['client_username'], 'superuser0', message)
+                    Transaction('superuser0', row['client_username'], 10)
+
+        df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def check_overdue_demands():
+        """
+        Checks for any demands that are passed their submission deadlines and are
+        not already completed by the chosen developers. These systems are arked as expired,
+        and the chosen developer has to pay back the amount of money that was originally
+        given to them at the beginning, along with a fee of $10.
+        """
+        df = pd.read_csv('database/Demand.csv')
+        now = datetime.datetime.now()
+
+        for index, row in df.iterrows():
+            if not row['is_expired']:
+                dt = datetime.datetime.strptime(row['submission_deadline'], '%m-%d-%Y %I:%M %p')
+                chosen_developer = row['chosen_developer_username']
+
+                if (now > dt) and (chosen_developer is not None) and not row['is_completed']:
+                    df.loc[index, 'is_expired'] = True
+                    fee = round(row['bid_amount'] + 10, 2)
+                    message = 'The deadline for submitting the system demand {} is over. ${} is taken off your balance as a penalty fee.'.format(Demand.get_info(index)['title'], fee)
+                    Notification(chosen_developer, 'superuser0', message)
+                    Transaction(chosen_developer, row['client_username'], fee)
+
+                    # automatically give this developer a rating of 1
 
         df.to_csv('database/Demand.csv', index=False)
 
@@ -918,3 +947,4 @@ class Transaction:
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()
 Demand.check_expired_demands()
+Demand.check_overdue_demands()
