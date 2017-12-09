@@ -91,7 +91,7 @@
                 <div class="media-content">
                   <div class="content">
                     <p>
-                      <a href="user/{{ user.username }}"><strong>{{ user.username }}</strong></a>
+                      {{ user.first_name }} {{ user.last_name}} <a href="user/{{ user.username }}"><strong>@{{ user.username }}</strong></a>
                       <br>
                       {{ user.about }}
                     </p>
@@ -113,7 +113,7 @@
                 <div class="media-content">
                   <div class="content">
                     <p>
-                      <a href="user/{{ user.username }}"><strong>{{ user.username }}</strong></a>
+                      {{ user.first_name }} {{ user.last_name}} <a href="user/{{ user.username }}"><strong>{{ user.username }}</strong></a>
                       <br>
                       {{ user.about }}
                     </p>
