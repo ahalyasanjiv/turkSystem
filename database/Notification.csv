@@ -9,31 +9,38 @@ message_id,recipient,sender,date_sent,message,read_status
 7,testuser0,testuser1,12-07-2017 10:48 PM,testuser1 made a bid of $1.40 on your test demand,True
 8,testuser0,testuser1,12-07-2017 10:48 PM,testuser1 made a bid of $0.90 on your test demand,True
 9,testuser1,testuser0,12-08-2017 02:40 AM,Congratulations! You were chosen by testuser0 for the test demand.,True
-10,testuser0,testuser0,12-08-2017 04:29 AM,Congratulations! You were chosen by testuser0 for the test demand.,False
+10,testuser0,testuser0,12-08-2017 04:29 AM,Congratulations! You were chosen by testuser0 for the test demand.,True
 11,testuser1,testuser0,12-08-2017 04:30 AM,Congratulations! You were chosen by testuser0 for the test demand.,False
-12,testuser0,testuser0,12-08-2017 04:30 AM,Congratulations! You were chosen by testuser0 for the test demand.,False
-15,testuser0,superuser0,12-08-2017 05:13 AM,The deadline for your test demand is approaching.,False
-16,testuser0,superuser0,12-08-2017 05:13 AM,The deadline for your ldfg demand is approaching.,False
-15,testuser0,superuser0,12-08-2017 06:48 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-16,testuser0,superuser0,12-08-2017 06:48 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-17,testuser0,superuser0,12-08-2017 06:49 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
+12,testuser0,testuser0,12-08-2017 04:30 AM,Congratulations! You were chosen by testuser0 for the test demand.,True
+15,testuser0,superuser0,12-08-2017 05:13 AM,The deadline for your test demand is approaching.,True
+16,testuser0,superuser0,12-08-2017 05:13 AM,The deadline for your ldfg demand is approaching.,True
+15,testuser0,superuser0,12-08-2017 06:48 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+16,testuser0,superuser0,12-08-2017 06:48 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+17,testuser0,superuser0,12-08-2017 06:49 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
 18,feliciadunn4,superuser0,12-08-2017 06:49 AM,Your protest for warning#2 was approved. Your warning has been deleted.,False
-19,testuser0,superuser0,12-08-2017 07:05 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-20,testuser0,superuser0,12-08-2017 07:05 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-21,testuser0,superuser0,12-08-2017 07:33 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-22,testuser0,superuser0,12-08-2017 07:33 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-23,testuser0,superuser0,12-08-2017 07:33 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-24,testuser0,superuser0,12-08-2017 07:34 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-25,testuser0,superuser0,12-08-2017 07:46 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-26,testuser0,superuser0,12-08-2017 07:46 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,False
-27,testuser0,superuser0,12-08-2017 08:12 AM,Your testing demand1 demand expired at 12-07-2017 12:00 AM. $10 is taken off of your balance.,False
-28,testuser0,superuser0,12-08-2017 12:54 PM,Your transaction (Transaction#10) was approved.,False
-29,testuser0,superuser0,12-08-2017 12:57 PM,Your transaction (Transaction#13) was approved.,False
-30,testuser0,superuser0,12-08-2017 12:57 PM,Your transaction (Transaction#9) was approved.,False
-31,testuser0,superuser0,12-08-2017 12:57 PM,Your transaction (Transaction#11) was denied.,False
-32,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#3) was approved.,False
-33,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#4) was denied.,False
-34,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#6) was denied.,False
-35,testuser0,superuser0,12-08-2017 01:59 PM,Your transaction (Transaction#0) was approved.,False
+19,testuser0,superuser0,12-08-2017 07:05 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+20,testuser0,superuser0,12-08-2017 07:05 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+21,testuser0,superuser0,12-08-2017 07:33 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+22,testuser0,superuser0,12-08-2017 07:33 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+23,testuser0,superuser0,12-08-2017 07:33 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+24,testuser0,superuser0,12-08-2017 07:34 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+25,testuser0,superuser0,12-08-2017 07:46 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+26,testuser0,superuser0,12-08-2017 07:46 AM,Your ldfg demand expired at 12-01-2017 12:00 AM. $10 is taken off of your balance.,True
+27,testuser0,superuser0,12-08-2017 08:12 AM,Your testing demand1 demand expired at 12-07-2017 12:00 AM. $10 is taken off of your balance.,True
+28,testuser0,superuser0,12-08-2017 12:54 PM,Your transaction (Transaction#10) was approved.,True
+29,testuser0,superuser0,12-08-2017 12:57 PM,Your transaction (Transaction#13) was approved.,True
+30,testuser0,superuser0,12-08-2017 12:57 PM,Your transaction (Transaction#9) was approved.,True
+31,testuser0,superuser0,12-08-2017 12:57 PM,Your transaction (Transaction#11) was denied.,True
+32,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#3) was approved.,True
+33,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#4) was denied.,True
+34,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#6) was denied.,True
+35,testuser0,superuser0,12-08-2017 01:59 PM,Your transaction (Transaction#0) was approved.,True
 36,testuser1,testuser0,12-08-2017 02:56 PM,testuser0 made a bid of $3.00 on your Real test demand,False
-37,testuser0,testuser1,12-08-2017 02:58 PM,testuser1 made a bid of $5.00 on your new demand demand,False
+37,testuser0,testuser1,12-08-2017 02:58 PM,testuser1 made a bid of $5.00 on your new demand demand,True
+38,testuser0,superuser0,12-08-2017 03:07 PM,The deadline for your new demand demand is approaching.,True
+39,testuser0,superuser0,12-08-2017 03:26 PM,Your transaction (Transaction#1) was approved.,True
+40,testuser0,superuser0,12-08-2017 03:28 PM,Your protest for warning#3 was approved. Your warning has been deleted.,True
+41,javocado0,testuser1,12-08-2017 04:04 PM,testuser1 made a bid of $5.00 on your Build a toast demand,False
+42,testuser0,superuser0,12-08-2017 04:06 PM,Your transaction (Transaction#2) was approved.,True
+43,testuser1,testuser0,12-08-2017 04:08 PM,Congratulations! You were chosen by testuser0 for the new demand demand.,False
+44,testuser0,testuser1,12-08-2017 04:08 PM,"The system for the new demand demand has been uploaded. Please rate testuser1 <a href=""/bid/11/rating/testuser1"">here</a>.",True
