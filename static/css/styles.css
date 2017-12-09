@@ -1,12 +1,16 @@
-#loginBox h2 {
+#login-box h2 {
 	color:black;
 }
 
-#application_status {
+#application-status {
 	font-weight: bold;
 }
 
 div.applicant a {
 	clear:both;
 	margin-bottom: 20px;
+}
+
+div#delete-account-box.box {
+	padding: 4em 2em;
 }
