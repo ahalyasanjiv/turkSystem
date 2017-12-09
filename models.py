@@ -1005,7 +1005,7 @@ class SystemWarning:
     @staticmethod
     def get_warned_user(warning_id):
         """
-        Get tbe recipient of a particular warning's username
+        Get the recipient of a particular warning's username
         """
         df = pd.read_csv('database/Warning.csv')
         if len(df.loc[df.warning_id == warning_id]) > 0:
@@ -1015,7 +1015,7 @@ class SystemWarning:
     @staticmethod
     def get_warning_status(warning_id):
         """
-        Get tbe recipient of a particular warning's username
+        Get the recipient of a particular warning's username
         """
         df = pd.read_csv('database/Warning.csv')
         if len(df.loc[df.warning_id == warning_id]) > 0:
@@ -1097,6 +1097,9 @@ class Rating:
 
     @staticmethod
     def get_avg_rating(username):
+        """
+        Gets the average rating of [username]
+        """
         df = pd.read_csv('database/Rating.csv')
         ratings = df.loc[df.recipient == username]
         average = ratings["rating"].mean()
@@ -1141,7 +1144,7 @@ class DeleteRequest:
     @staticmethod
     def get_delete_request_status(delete_request_id):
         """
-        Retrieves the status of the delete request with the id of [delete_request_id]
+        Gets the status of the delete request with the id of [delete_request_id]
         """
         df = pd.read_csv('database/DeleteRequest.csv')
         status = df.loc[df.delete_request_id == delete_request_id, 'status'] 
@@ -1155,6 +1158,18 @@ class DeleteRequest:
         df = pd.read_csv('database/DeleteRequest.csv')
         df.loc[df.delete_request_id == delete_request_id, 'status'] = status
         df.to_csv('database/DeleteRequest.csv', index=false)
+
+    @staticmethod
+    def is_account_deleted(username)
+        df = pd.read_csv('database/DeleteRequest.csv')
+        # Check if user has requested a deletion.
+        df = df.loc[df.username == username]
+        # If they have, check if that request has been approved
+        if len(df) > 0:
+            df = df.loc[df.status == 'approved']
+            if len(df) > 0:
+                return True
+        return False
 
 
 # run these checks here (not as good as real triggers, but good enough)

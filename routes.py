@@ -5,7 +5,7 @@ from csv import reader
 import datetime
 from dateutil import parser
 from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm, DeleteAccountForm
-from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating, Transaction
+from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating, Transaction, DeleteRequest
 import helpers
 
 app = Flask(__name__)
@@ -714,6 +714,7 @@ def deleteAccount():
         if form.validate():
             if form.delete.data:
 
+                return redirect(url_for('dashboard_superuser'))
             else:
                 return redirect(url_for('dashboard'))
 
