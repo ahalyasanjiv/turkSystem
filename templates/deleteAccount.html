@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero is-warning">
+	<div class="hero-body">
+		<div class="container">
+			<h1 class="title">Delete Your Account</h1>
+		</div>
+	</div>
+</section>
+<section class="hero-body">
+	<div class="columns">
+		<div class="column is-one-quarter"></div>
+		<div class="column is-half has-text-centered">
+			<div id="delete-account-box" class="box">
+				<h2 class="subtitle">Are your sure you want to request you account to be deleted?</h2>
+				<div class="has-text-centered">
+		    		{{ form.delete(class="button is-danger is-medium") }}
+		    		{{ form.cancel(class="button is-info is-medium") }}
+
+		    	</div>
+			</div>
+		</div>
+	</div>
+</section>
+{% endblock %}
