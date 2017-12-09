@@ -521,6 +521,9 @@ class Demand:
         else:
             lowest_bid = None
 
+
+        print(pd.isnull(demand['chosen_developer_username']))
+
         if not demand.empty:
             return {'client_username': demand['client_username'],
                     'date_posted': demand['date_posted'],
@@ -530,9 +533,11 @@ class Demand:
                     'bidding_deadline': demand['bidding_deadline'],
                     'submission_deadline': demand['submission_deadline'],
                     'is_completed': demand['is_completed'],
+                    'is_expired': demand['is_expired'],
                     'bidding_deadline_passed': deadline_passed,
                     'chosen_developer_username' : demand['chosen_developer_username'],
                     'chosen_bid_amount': demand['bid_amount'],
+                    'developer_was_chosen': not pd.isnull(demand['chosen_developer_username']),
                     'min_bid': lowest_bid,
                     'link_to_client': '/user/' + demand['client_username'],
                     'link_to_demand': '/bid/' + str(demand_id)}
@@ -718,6 +723,7 @@ class Demand:
                 dt = datetime.datetime.strptime(row['submission_deadline'], '%m-%d-%Y %I:%M %p')
                 chosen_developer = row['chosen_developer_username']
 
+                # the chosen developer did not complete the system in time
                 if (now > dt) and (chosen_developer is not None) and not row['is_completed']:
                     df.loc[index, 'is_expired'] = True
                     fee = round(row['bid_amount'] + 10, 2)
