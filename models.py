@@ -1123,6 +1123,34 @@ class Rating:
                     return True
         return False
 
+class DeleteRequest:
+    """
+    Delete requests created by users
+    """
+    def __init__(self, username):
+        df = pd.read_csv('database/DeleteRequest.csv')
+        df.loc[len(df)] = pd.Series(data=[len(df), username, 'pending'],
+            index=['delete_request_id', 'username', 'status'])
+
+    @staticmethod
+    def get_delete_request_status(delete_request_id):
+        """
+        Retrieves the status of the delete request with the id of [delete_request_id]
+        """
+        df = pd.read_csv('database/DeleteRequest.csv')
+        status = df.loc[df.delete_request_id == delete_request_id, 'status'] 
+        return status
+
+    @staticmethod
+    def set_delete_request_status(delete_request_id, status):
+        """
+        Sets the status of the delete request with the id of [delete_request_id] to [status]
+        """
+        df = pd.read_csv('database/DeleteRequest.csv')
+        df.loc[df.delete_request_id == delete_request_id, 'status'] = status
+        df.to_csv('database/DeleteRequest.csv', index=false)
+
+
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()
 Demand.check_approaching_submission_deadlines()
