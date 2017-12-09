@@ -1041,7 +1041,6 @@ class Transaction:
             index=['transaction_id', 'recipient','sender','amount','status', 'optional_message'])
         df.to_csv('database/Transaction.csv', index=False)
 
-<<<<<<< HEAD
     @staticmethod
     def get_transaction_info(transaction_id):
         """
@@ -1079,7 +1078,7 @@ class Transaction:
         # Issues a warning to the sender
         sender = transaction['sender'].item()
         SystemWarning(sender,'active')
-=======
+
 class Rating:
     """
     Ratings between developers and clients.
@@ -1123,7 +1122,6 @@ class Rating:
                     # there has not yet been a rating for this recipient
                     return True
         return False
->>>>>>> 6f847c79b1ca835aeb77834f09a5deeab0e041fe
 
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()
