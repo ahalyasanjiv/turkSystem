@@ -1,7 +1,7 @@
 transaction_id,recipient,sender,amount,status,optional_message
 0,testuser1,testuser0,0.45,approved,
-1,testuser0,testuser0,2.5,pending,sdfl
-2,superuser0,testuser0,10.0,pending,
+1,testuser0,testuser0,2.5,approved,sdfl
+2,superuser0,testuser0,10.0,approved,
 3,superuser0,testuser0,10.0,approved,
 4,superuser0,testuser0,10.0,denied,
 5,superuser0,testuser0,10.0,pending,
@@ -14,3 +14,4 @@ transaction_id,recipient,sender,amount,status,optional_message
 12,superuser0,testuser0,10.0,pending,
 13,superuser0,testuser0,10.0,approved,
 14,superuser0,feliciadunn0,10.0,approved,
+15,testuser1,testuser0,2.5,pending,
