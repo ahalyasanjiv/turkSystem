@@ -5,12 +5,15 @@
 	<div class="container">
 		<a href="/dashboard" class="button" style="margin-bottom:10px">Back</a>
 		<h2 class="title" id="current">Current Projects</h2>
+		{% if not current %}
+		<p>You do not have any ongoing projects.</p>
+		{% endif %}
 		{% for demand in current%}
 		<article class="media notification">
 		  <div class="media-content">
 		    <div class="content">
 		      <p>
-		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by {{ demand.client_username }} on {{ demand.date_posted }}</small>
+		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by <a href="{{ demand.link_to_client }}">@{{ demand.client_username }}</a> on {{ demand.date_posted }}</small>
 		        <br>
 		        <br>
 		        <small>Deadline: {{ demand.submission_deadline}}</small>
@@ -22,8 +25,14 @@
 		<hr>
 		{% if user_type == "client" %}
 			<h2 class="title" id="mid">Opened Demands</h2>
+			{% if not mid %}
+				<p>You do not have any opened projects.</p>
+			{% endif %}
 		{% else %}
 			<h2 class="title" id="mid">Bidding Demands</h2>
+			{% if not mid %}
+				<p>You have not bidded on any projects.</p>
+			{% endif %}
 		{% endif %}
 
 		{% for demand in mid %}
@@ -31,7 +40,7 @@
 		  <div class="media-content">
 		    <div class="content">
 		      <p>
-		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by {{ demand.client_username }} on {{ demand.date_posted }}</small>
+		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by <a href="{{ demand.link_to_client }}">@{{ demand.client_username }}</a> on {{ demand.date_posted }}</small>
 		        <br>
 		        <br>
 		        <small>Lowest Bid Price: {{ demand.min_bid }}</small>
@@ -46,12 +55,15 @@
 		<hr>
 
 		<h2 class="title" id="completed">Completed Projects</h2>
+		{% if not completed %}
+		<p>You do not have any completed projects.</p>
+		{% endif %}
 		{% for demand in completed %}
 		<article class="media notification">
 		  <div class="media-content">
 		    <div class="content">
 		      <p>
-		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by {{ demand.client_username }} on {{ demand.date_posted }}</small>
+		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by <a href="{{ demand.link_to_client }}">@{{ demand.client_username }}</a> on {{ demand.date_posted }}</small>
 		      </p>
 		    </div>
 		  </div>
