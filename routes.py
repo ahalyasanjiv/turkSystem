@@ -3,7 +3,7 @@ import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm, DeleteAccountForm
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm, DeleteAccountForm, DeleteAccountApprovalForm
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating, Transaction, DeleteRequest
 import helpers
 
@@ -694,7 +694,6 @@ def transaction_approval(transaction_id):
             else:
                 Transaction.deny_transaction(transaction_id)
                 Notification(info['sender'],session['username'],'Your transaction (Transaction#'+ str(transaction_id) +') was denied.')
-                SystemWarning(info['sender'],'active')
             return redirect(url_for('dashboard_superuser'))
         else:
             return render_template("protestApproval.html", warning_id=warning_id, info=info, form=form, avg_rating=avg_rating)
@@ -736,6 +735,35 @@ def deleteAccount():
             return redirect(url_for('dashboard'))
         elif form.cancel.data:
             return redirect(url_for('dashboard'))
+
+@app.route("/delete_acount_approval/<delete_request_id>", methods=["GET", "POST"])
+def delete_account_approval(delete_request_id):
+    """
+    The '/delete_acount_approval' route directs a superuser to a form where they can approve/deny an account deletion request.
+    """
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    if session['type_of_user'] == 'user':
+        return redirect(url_for('dashboard'))
+    if session['type_of_user'] == 'applicant':
+        return redirect(url_for('dashboard_applicant'))
+
+    form = DeleteAccountApprovalForm()
+    delete_request_id = int(delete_request_id)
+    info = DeleteRequest.get_delete_request_info(delete_request_id)
+
+    if request.method == 'GET':
+        return render_template("deleteAccountApproval.html", form=form,info=info)
+    if request.method == 'POST':
+        if form.validate():
+            if form.decision.data == 'approve':
+                DeleteRequest.approve_delete_request(delete_request_id)
+            else:
+                DeleteRequest.deny_delete_request(delete_request_id)
+                Notification(info['username'],session['username'],'Your delete account request (ID#'+ str(info['delete_request_id']) +') was denied.')
+            return redirect(url_for('dashboard_superuser'))
+        else:
+            return render_template("deleteAccountApproval.html", form=form,info=info)
 
 if __name__ == "__main__":
     app.run(debug=True)

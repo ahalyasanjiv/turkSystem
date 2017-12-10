@@ -17,7 +17,8 @@ class User:
                            index=['username', 'password', 'first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user'])
         df.to_csv('database/User.csv', index=False)
 
-    def has_user_id(self, username):
+    @staticmethod
+    def has_user_id(username):
         """
         Returns True if the username exists in the User table.
         Returns False otherwise.
@@ -128,6 +129,27 @@ class User:
             user = df.loc[df.username == username]
             balance = user['balance'].item()
         return balance >= amount
+
+    @staticmethod
+    def delete_user(username):
+        """
+        Deletes [username]'s account
+        """
+        if User.has_user_id(username):
+            df = pd.read_csv('database/User.csv')
+            type_of_user = df.loc[df.username == username]['type_of_user'].item()
+            df = df.loc[df.username != username]
+            df.to_csv('database/User.csv', index=False)
+
+            if type_of_user == 'client':
+                df = pd.read_csv('database/Client.csv')
+                df = df.loc[df.username != username]
+                df.to_csv('database/Client.csv', index=False)
+
+            elif type_of_user == 'developer':
+                df = pd.read_csv('database/Developer.csv')
+                df = df.loc[df.username != username]
+                df.to_csv('database/Developer.csv', index=False)
 
 class Client:
     """
@@ -1238,7 +1260,7 @@ class DeleteRequest:
         """
         df = pd.read_csv('database/DeleteRequest.csv')
         df.loc[df.delete_request_id == delete_request_id, 'status'] = status
-        df.to_csv('database/DeleteRequest.csv', index=false)
+        df.to_csv('database/DeleteRequest.csv', index=False)
 
     @staticmethod
     def is_account_deleted(username):
@@ -1268,6 +1290,36 @@ class DeleteRequest:
         get_warnings = df.loc[df['warned_user'] == username]
         warnings = get_warnings.T.to_dict().values()
         return warnings
+
+    @staticmethod
+    def get_delete_request_info(delete_request_id):
+        """
+        Returns a dictionary of the delete request's information.
+        """
+        df = pd.read_csv('database/DeleteRequest.csv')
+        delete_request = df.loc[df.delete_request_id == delete_request_id]
+
+        if not delete_request.empty:
+            return {'delete_request_id': delete_request_id,
+                    'username': delete_request['username'].item(),
+                    'status': delete_request['status'].item()}
+
+    @staticmethod
+    def approve_delete_request(delete_request_id):
+        """
+        Deletes the account of the user that requested their account to be deleted and changes the status
+        of the delete request.
+        """
+        info = DeleteRequest.get_delete_request_info(delete_request_id)
+        print(info['username'])
+        User.delete_user(info['username'])
+        DeleteRequest.set_delete_request_status(delete_request_id,'approved')
+
+
+    @staticmethod
+    def deny_delete_request(delete_request_id):
+        DeleteRequest.set_delete_request_status(delete_request_id,'denied')
+
 
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()

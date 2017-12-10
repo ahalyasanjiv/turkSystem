@@ -17,81 +17,91 @@
 <section class="section">
   <div class="container">
     <div class="columns">
-      <div class="column is-4">
+      <div class="column is-6">
+
+        <!-- Application Approvals -->
         <h1 class="title is-4">
           Applications to Approve
         </h1>
-        {% if not pending_applicants %}
-          <div class="notification is-warning">
-            There are no applications to approve.
+        <div id="pending-applicant-requests" class="superuser-notifs notification is-link">
+          {% if not pending_applicants %}
+          <div class="is-info is-fullwidth has-text-centered">
+            There are no pending applications to approve.
           </div>
-        {% endif %}
-        {% for applicant in pending_applicants %}
-        <div class="applicant">  
-          <a href={{  url_for('applicant_approval', applicant_id=applicant) }} style="margin-right:10px; padding: 0 30px 0 30px;" class="button is-info is-fullwidth has-text-centered">
-            Applicant User ID: {{ applicant }}
-          </a>
+          {% else %}
+          {% for applicant in pending_applicants %}
+              <a href={{  url_for('applicant_approval', applicant_id=applicant) }} class="button is-link is-fullwidth has-text-centered">
+                Applicant User ID: {{ applicant }}
+              </a><hr>
+          {% endfor %}
+          {% endif %}
         </div>
-        {% endfor %}
-        
-
         <br>
         <div class="button">See All</div>
         <hr>
+
+        <!-- Warning Removal Requests -->
         <h1 class="title is-4">
           Warning Removal Requests
         </h1>
-        {% if not protests %}
-        <div class="notification is-warning">
-          There are no pending warning protests.
-        </div>
-        {% endif %}
-        {% for protest in protests %}
-        <div class="applicant">  
-          <a href={{  url_for('protest_approval', warning_id=protest) }} style="margin-right:10px; padding: 0 30px 0 30px;" class="button is-warning is-fullwidth has-text-centered">
+        <div id="pending-warnings" class="superuser-notifs notification is-warning">
+          {% if not protests %}
+          <div class="is-info is-fullwidth has-text-centered">
+            There are no pending warning protests.
+          </div>
+          {% else %}
+          {% for protest in protests %}
+              <a href={{  url_for('protest_approval', warning_id=protest) }} class="button is-warning is-fullwidth has-text-centered">
             Warning No. {{ protest }}
-          </a>
+          </a><hr>
+          {% endfor %}
+          {% endif %}
         </div>
-        {% endfor %}
         <br>
         <div class="button">See All</div>
+     
       </div>
-      <div class="column is-1"></div>
-      <div class="column is-7">
+
+      <div class="column is-6">
+        <!-- Transaction Approvals -->
         <h1 class="title is-4">
           Transactions to Approve
         </h1>
-        <div id="pending-transactions" class="notification is-primary">
-        {% if not pending_transactions %}
-        
-          There are no pending transactions.
-        {% endif %}
-        {% for transaction in pending_transactions %} 
-            <a href={{  url_for('transaction_approval', transaction_id=transaction['transaction_id']) }} " class="button is-fullwidth is-primary has-text-centered">
-              <ul>
-              <li>Transaction ID: {{ transaction['transaction_id'] }}</li>
-              <li>Recipient: {{ transaction['recipient'] }}</li>
-              <li>Sender: {{ transaction['sender'] }}</li>
-              </ul>
-            </a><hr>
-        {% endfor %}
+        <div id="pending-transactions" class="superuser-notifs notification is-primary">
+          {% if not pending_transactions %}
+            There are no pending transactions.
+          {% endif %}
+          {% for transaction in pending_transactions %} 
+              <a href={{  url_for('transaction_approval', transaction_id=transaction['transaction_id']) }} " class="button is-fullwidth is-primary has-text-centered">
+                <ul>
+                <li>Transaction ID: {{ transaction['transaction_id'] }}</li>
+                <li>Recipient: {{ transaction['recipient'] }}</li>
+                <li>Sender: {{ transaction['sender'] }}</li>
+                </ul>
+              </a><hr>
+          {% endfor %}
         </div>
         
         <hr>
+        <!-- Account Deletion Approvals -->
         <h1 class="title is-4">Account Deletion Requests</h1>
-        <article class="media">
+        <div id="pending-delete-requests" class="superuser-notifs notification is-info">
+          {% if not pending_delete_requests %}
+          <div class="is-info is-fullwidth has-text-centered">
+            There are no pending account deletion requests.
+          </div>
+          {% endif %}
           {% for delete_request in pending_delete_requests %}
-            <hr>
-            <div class="transaction">  
-              <a href=# style="margin-right:10px; padding: 30px 30px 30px 30px;" class="button is-info is-fullwidth has-text-centered">
+              <a href= {{ url_for('delete_account_approval', delete_request_id=delete_request['delete_request_id']) }} class="button is-info is-fullwidth has-text-centered">
                 <ul>
                 <li>Delete Request ID: {{ delete_request['delete_request_id'] }}</li>
                 <li>Username: {{ delete_request['username'] }}</li>
                 </ul>
-              </a>
-            </div>
+              </a><hr>
           {% endfor %}
-        </article>
+        </div>
+
+        </div>
         </div>
       </div>
     </div>

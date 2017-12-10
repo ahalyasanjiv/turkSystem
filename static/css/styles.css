@@ -15,16 +15,37 @@ div#delete-account-box.box {
 	padding: 4em 2em;
 }
 
-#pending-transactions {
+.superuser-notifs {
 	padding: 0;
 }
 
-#pending-transactions a.button {
+.superuser-notifs hr {
+	margin: 0;
+}
+
+.superuser-notifs a {
 	margin-bottom:0; 
 	padding: 3em 0;
 }
 
-#pending-transactions hr{
-	margin:0;
+.superuser-notifs div {
+	margin-bottom:0; 
+	padding: 2.25em 0;
+}
+
+#pending-transactions hr {
 	background-color: #3D9970;
+}
+
+#pending-delete-requests hr {
+	background-color: #0074D9;
+}
+
+#pending-applicant-requests hr {
+	background-color: #082DB3;
+}
+
+
+#pending-warnings hr {
+	background-color: #D9B32A;
 }

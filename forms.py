@@ -170,3 +170,11 @@ class DeleteAccountForm(FlaskForm):
 	delete = SubmitField(label='Yes')
 	cancel = SubmitField(label='No')
 
+class DeleteAccountApprovalForm(FlaskForm):
+	"""
+	Form for the page where the superuser can approve/reject a transaction
+	"""
+	decision = SelectField(label='Please select your decision', id='decision', validators=[DataRequired('Please choose an option.')], choices = [('approve','Approve'),('deny','Deny')],)
+	submit = SubmitField('Submit')
+
+

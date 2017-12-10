@@ -1,26 +1,62 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="hero is-warning">
-	<div class="hero-body">
-		<div class="container">
-			<h1 class="title">Approve Account Deletion Request</h1>
-		</div>
-	</div>
+<section class="hero is-info">
+<div class="hero-body">
+  <div class="container">
+    <h1 class="title">
+      Protest Against Warning
+    </h1>
+  </div>
+</div>
 </section>
-<section class="hero-body">
-	<div class="columns">
-		<div class="column is-one-quarter"></div>
-		<div class="column is-half has-text-centered">
-			<div id="delete-account-box" class="box">
-				<h2 class="subtitle">Are your sure you want to request you account to be deleted?</h2>
-				<form method="POST" action={{ url_for('deleteAccount') }}>
-				<div class="has-text-centered">
-		    		{{ form.approve(class="button is-info is-medium") }}
-		    		{{ form.deny(class="button is-info is-medium") }}
-		    	</div>
-			</div>
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      	<div class="column is-4"></div>
+      	<div class="column is-4">
+		<div class="notification">
+			<form method="POST" action={{  url_for('delete_account_approval', delete_request_id=info['delete_request_id'])  }}>
+			  	
+  				<h2 class="title is-4">
+			     	Delete Request Information
+			    </h2>
+			  	<ul>
+			  	<li><strong>Delete Request ID:</strong> {{ info['delete_request_id'] }}</li>
+			  	<li><strong>Username:</strong> {{ info['username'] }}</li>
+			  	<li><strong>Status:</strong> {{ info['status'] }}</li>
+			  	</ul><br>
+  				{{ form.hidden_tag() }}
+	            {% with messages = get_flashed_messages() %}
+	              {% if messages %}
+	                  <div class=flashes>
+	                    {% for message in messages %}
+	                        {{ message }}
+	                    {% endfor %}
+	                  </div>
+	              {% endif %}
+	            {% endwith %}
+
+				<div class="field">
+			        <div class="control has-text-centered">
+			        	<div class="select">{{ form.decision(placeholder="Select a decision", class="is-medium") }}</div>
+			        </div>
+			        {% if form.decision.errors %}
+			          {% for error in form.decision.errors %}
+			            <p class="is-danger">{{ error }}</p>
+			          {% endfor %}
+			        {% endif %}
+
+		      	</div>
+		      	
+		      	{{ form.submit(class="button is-link") }}
+					
+			</form>
 		</div>
+	  	</div>
 	</div>
-</section>
+  </div>
+ </section>
+
 {% endblock %}
+

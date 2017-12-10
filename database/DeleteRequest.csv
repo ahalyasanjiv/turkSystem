@@ -1,1 +1,3 @@
-﻿delete_request_id,username,status0,someone,pending
+delete_request_id,username,status
+0,testuser4,pending
+1,testuser5,pending

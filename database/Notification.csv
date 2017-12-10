@@ -44,3 +44,5 @@ message_id,recipient,sender,date_sent,message,read_status
 42,testuser0,superuser0,12-08-2017 04:06 PM,Your transaction (Transaction#2) was approved.,True
 43,testuser1,testuser0,12-08-2017 04:08 PM,Congratulations! You were chosen by testuser0 for the new demand demand.,False
 44,testuser0,testuser1,12-08-2017 04:08 PM,"The system for the new demand demand has been uploaded. Please rate testuser1 <a href=""/bid/11/rating/testuser1"">here</a>.",True
+45,testuser0,superuser0,12-10-2017 10:27 AM,Your transaction (Transaction#15) was approved.,False
+46,testuser0,superuser0,12-10-2017 10:27 AM,Your transaction (Transaction#7) was approved.,False
