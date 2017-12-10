@@ -1,11 +1,10 @@
 from flask import Flask, flash, render_template, request, session, redirect, url_for
-import pandas as pd
 import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm
-from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating, Transaction
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm, DeleteAccountForm
+from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating, Transaction, DeleteRequest
 import helpers
 
 app = Flask(__name__)
@@ -27,6 +26,9 @@ def index():
 
 @app.route("/dashboard")
 def dashboard():
+    """
+    The '/dashboard' route directs a user to view their dashboard.
+    """
     if 'username' in session:
         info = User.get_user_info(session['username'])
         if (info == None):
@@ -63,6 +65,9 @@ def dashboard():
 
 @app.route("/dashboard/projects")
 def my_projects():
+    """
+    The '/dashboard/projects' route directs a user to view their projects.
+    """
     if 'username' in session:
         user_type = User.get_user_info(session['username'])['type_of_user']
         current = list(Demand.get_info(x) for x in Demand.get_current_projects(session['username']))
@@ -99,6 +104,9 @@ def view_transactions():
 
 @app.route("/dashboard/notifications")
 def view_notifications():
+    """
+    The '/dashboard/notifications' route directs a user to view their notifications.
+    """
     if 'username' in session:
         unread = Notification.get_number_of_unread(session['username'])
         notifications = Notification.get_all_notif_to_recipient(session['username'])
@@ -108,6 +116,10 @@ def view_notifications():
 
 @app.route("/dashboard_applicant", methods=["GET", "POST"])
 def dashboard_applicant():
+    """
+    The 'dashboard_applicant' route directs an applicant to their dashboard. 
+    They can view the status of their application here.
+    """
     if session['username']:
         form = BecomeUserForm()
         info = Applicant.get_applicant_info(session['username'])
@@ -151,17 +163,30 @@ def dashboard_applicant():
 
 @app.route("/dashboard_superuser")
 def dashboard_superuser():
+    """
+    The 'dashboard_superuser' route directs a superuser to their dashboard.
+    """
     if session['username']:
         info = SuperUser.get_superuser_info(session['username'])
-        pending_applicants = helpers.get_pending_applicants()
-        protests = helpers.get_protests()
-        pending_transactions = helpers.get_pending_transactions()
-        return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants, protests=protests, pending_transactions=pending_transactions)
+        pending_applicants = Applicant.get_pending_applicants()
+        protests = SystemWarning.get_protests()
+        pending_transactions = Transaction.get_pending_transactions()
+        pending_delete_requests = DeleteRequest.get_pending_delete_requests()
+        return render_template("dashboard_superuser.html", 
+                                info=info, 
+                                pending_applicants=pending_applicants, 
+                                protests=protests, 
+                                pending_transactions=pending_transactions,
+                                pending_delete_requests=pending_delete_requests)
     else:
         return render_template("index.html")
 
 @app.route("/browse")
 def browse():
+    """
+    The '/browse' route directs anyone on the website to a page where they can browse the 
+    demands in the system.
+    """
     start_date = request.args.get('start_date', default=None, type=str)
     end_date = request.args.get('end_date', default=None, type=str)
     client = request.args.get('client', default=None, type=str)
@@ -191,6 +216,10 @@ def browse():
 
 @app.route("/user/<name>")
 def user(name):
+    """
+    The '/user/<name>' route directs a user to the profile page of the user with the username
+    of [name].
+    """
     # if User.has_user_id(name):
     # get basic info
     info = User.get_user_info(name)
@@ -215,9 +244,19 @@ def user(name):
 
 @app.route("/apply", methods=["GET", "POST"])
 def apply():
-    if 'username' in session:
-        return redirect(url_for('dashboard_applicant'))
+    """
+    The '/apply route directs a user that is not logged in to the application page.
+    """
 
+    # If the user is logged into the system, direct them to their dashboard
+    if 'username' in session:
+        if session['type_of_user'] == 'user':
+            return redirect(url_for('dashboard'))
+        if session['type_of_user'] == 'applicant':
+            return redirect(url_for('dashboard_applicant'))
+        if session['type_of_user'] == 'superuser':
+            return redirect(url_for('dashboard_superuser'))
+        
     form = SignupForm()
 
     if request.method == 'POST':
@@ -236,8 +275,19 @@ def apply():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    """
+    The '/login' route directs the user to the login page if they are not already logged in.
+    """
+
+    # If the user is logged into the system, direct them to their dashboard
+
     if 'username' in session:
-        return redirect(url_for('dashboard'))
+        if session['type_of_user'] == 'user':
+            return redirect(url_for('dashboard'))
+        if session['type_of_user'] == 'applicant':
+            return redirect(url_for('dashboard_applicant'))
+        if session['type_of_user'] == 'superuser':
+            return redirect(url_for('dashboard_superuser'))
 
     form = LoginForm()
     if request.method == 'POST' and form.validate():
@@ -251,7 +301,7 @@ def login():
             session['username'] = username
             session['role'] = User.get_user_info(username)['type_of_user']
             session['type_of_user'] = 'user'
-            if helpers.should_be_blacklisted(username):
+            if SystemWarning.should_be_blacklisted(username):
                 BlacklistedUser(username)
                 return redirect(url_for('blacklist'))
             return redirect(url_for('dashboard'))
@@ -434,6 +484,10 @@ def justify_developer_choice(demand_id):
 
 @app.route("/bid/<demand_id>/upload-system", methods=['GET', 'POST'])
 def upload_system(demand_id):
+    """
+    The '/bid/<demand_id>/upload-system' route is where the developer can upload the system that
+    they have created for a demand they have been chosen for.
+    """
     form = SubmitSystemForm()
     demand_info = Demand.get_info(demand_id)
     client = demand_info['client_username']
@@ -444,7 +498,6 @@ def upload_system(demand_id):
             # project is now completed
             Developer.submit_system(demand_id, session['username'])
             return redirect(url_for('rating', demand_id=demand_id, recipient=client))
-            # return render_template("system_uploaded.html", demand_id=demand_id, recipient=client)
         else:
             return render_template("upload_system.html", demand_id=demand_id, form=form)
 
@@ -453,6 +506,10 @@ def upload_system(demand_id):
 
 @app.route("/bid/<demand_id>/rating/<recipient>", methods=["GET", "POST"])
 def rating(demand_id, recipient):
+    """
+    The '/bid/<demand_id>/rating/<recipient>' route is where the user can rate another user 
+    for a demand they were involved in.
+    """
     if 'username' not in session:
         return redirect(url_for('login'))
 
@@ -474,19 +531,29 @@ def rating(demand_id, recipient):
         if request.method == "GET":
             return render_template("rating.html", form=form, recipient=recipient, demand_id=demand_id)
         elif request.method == "POST":
-            if form.rating.data <= 2: #low rating
+            # low rating
+            if form.rating.data <= 2:
                 session['rating'+demand_id] = form.rating.data
                 return redirect(url_for('ratingMessage', demand_id=demand_id, recipient=recipient))
             elif form.rating.data == None:
                 return render_template('rating.html', form=form, recipient=recipient, demand_id=demand_id)
             else:
-                #add to form data
+                # add to form data
                 Rating(demand_id, recipient, session['username'], form.rating.data)
+
+                # if the client gave a good rating to a developer (<= 3)
+                # the remaining half of the bid amount gets transferred over to the developer
+                if session['role'] == 'client':
+                    Transaction(recipient, session['username'], round(Demand.get_info(demand_id)['chosen_bid_amount'] / 2), 2)
                 return render_template('ratingFinished.html', recipient=recipient)
     return render_template('access_denied.html')
 
 @app.route("/bid/<demand_id>/rating/<recipient>/message", methods=["GET", "POST"])
 def ratingMessage(demand_id, recipient):
+    """
+    The '/bid/<demand_id>/rating/<recipient>/message' route directs the user to explain their
+    rating if it is below a certain amount.
+    """
     if 'username' not in session:
         return redirect(url_for('login'))
 
@@ -535,6 +602,10 @@ def createDemand():
 
 @app.route("/applicant_approval/<applicant_id>", methods=["GET", "POST"])
 def applicant_approval(applicant_id):
+    """
+    The '/applicant_approval/<applicant_id>' route directs a superuser to approve an application with
+    the id of [applicant_id].
+    """
     if session['type_of_user'] == 'user':
         return redirect(url_for('dashboard'))
     if session['type_of_user'] == 'applicant':
@@ -560,6 +631,10 @@ def applicant_approval(applicant_id):
 
 @app.route("/protest_approval/<warning_id>", methods=["GET", "POST"])
 def protest_approval(warning_id):
+    """
+    The '/protest_approval/<warning_id>' route directs a superuser to approve a protest against a warning
+    with the id of [warning_id].
+    """
     if session['type_of_user'] == 'user':
         return redirect(url_for('dashboard'))
     if session['type_of_user'] == 'applicant':
@@ -593,12 +668,23 @@ def protest_approval(warning_id):
 
 @app.route("/transaction_approval/<transaction_id>", methods=["GET", "POST"])
 def transaction_approval(transaction_id):
+    """
+    The '/transaction_approval/<transaction_id>' route directs a superuser to approve a transaction with
+    the id of [transaction_id].
+    """
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    if session['type_of_user'] == 'user':
+        return redirect(url_for('dashboard'))
+    if session['type_of_user'] == 'applicant':
+        return redirect(url_for('dashboard_applicant'))
+
     form = TransactionApprovalForm()
     info = Transaction.get_transaction_info(transaction_id)
     transaction_id = int(transaction_id)
 
     if request.method == 'GET':
-        enough_money = helpers.does_user_have_enough_money(info['sender'],int(info['amount']))
+        enough_money = User.does_user_have_enough_money(info['sender'],int(info['amount']))
         return render_template("transactionApproval.html", form=form, transaction_id=transaction_id,info=info,enough_money=enough_money)
     if request.method == 'POST':
         if form.validate():
@@ -615,13 +701,41 @@ def transaction_approval(transaction_id):
 
 @app.route("/warnings")
 def warning():
+    """
+    The '/warnings' route directs a user to view all their warnings.
+    """
+    if 'username' not in session:
+        return redirect(url_for('login'))
     if session['type_of_user'] == 'superuser':
         return redirect(url_for('dashboard_superuser'))
     if session['type_of_user'] == 'applicant':
         return redirect(url_for('dashboard_applicant'))
     username = session['username']
-    warnings = helpers.get_user_warnings(username)
+    warnings = SystemWarning.get_user_warnings(username)
     return render_template("warnings.html", warnings=warnings)
+
+@app.route("/deleteAccount", methods=["GET", "POST"])
+def deleteAccount():
+    """
+    The '/deleteAccount' route directs a user to a form where they can request the superuser
+    to delete their account.
+    """
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    if session['type_of_user'] == 'superuser':
+        return redirect(url_for('dashboard_superuser'))
+    if session['type_of_user'] == 'applicant':
+        return redirect(url_for('dashboard_applicant'))
+    form = DeleteAccountForm()
+
+    if request.method == 'GET':
+        return render_template("deleteAccount.html",form=form)
+    elif request.method == 'POST':
+        if form.delete.data:
+            DeleteRequest(session['username'])
+            return redirect(url_for('dashboard'))
+        elif form.cancel.data:
+            return redirect(url_for('dashboard'))
 
 if __name__ == "__main__":
     app.run(debug=True)

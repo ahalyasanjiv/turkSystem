@@ -19,7 +19,7 @@
             <div class="content">
               <!-- client information -->
               <p>
-              <strong>{{ client_info.first_name }} {{ client_info.last_name }}</strong> <small><a>@{{ demand_info.client_username }}</a></small>
+              <strong>{{ client_info.first_name }} {{ client_info.last_name }}</strong> <small><a href="{{ url_for('user', name=demand_info.client_username) }}">@{{ demand_info.client_username }}</a></small>
               <br>
 
               <!-- date posted and bidding deadline -->
@@ -34,15 +34,16 @@
 
               <!-- bidding form for developer -->
               {% if session.role == 'developer' %}
-                <!-- if deadline did not pass yet, developers can still bid -->
+                <!-- bidding deadline passed -->
                 {% if demand_info.bidding_deadline_passed %}
+                  <!-- this developer was chosen to develop the system, so there is an option to submit the completed system -->
                   {% if demand_info.chosen_developer_username == session['username'] %}
                     <article class="message is-info">
                       <div class="message-header">
                         <p>Submit System</p>
                       </div>
                       <div class="message-body">
-                        Congrats! You are chosen to develop this system.
+                        Congrats! You were chosen to develop this system.
                         <div class="has-text-centered">
                           <a href="{{ url_for('upload_system', demand_id=demand_id) }}" class="button">Upload System</a>
                         </div>
@@ -51,13 +52,15 @@
                   {% else %}
                     <article class="message is-danger">
                       <div class="message-header">
-                        <p>Deadline for Bidding Passed</p>
+                        <p>Bidding is Over!</p>
                       </div>
                       <div class="message-body">
-                        You can no longer make bids on this system demand.
+                        The deadline for bidding passed. You can no longer make a bid on this system demand.
                       </div>
                     </article>
                   {% endif %}
+
+                <!-- bidding deadline did not pass. there is a form for developers to make a bid -->
                 {% else %}
                   <div class="has-text-centered">
                     <form method="POST" action="{{ url_for('bidInfo', demand_id=demand_id) }}">
@@ -85,32 +88,73 @@
               <!-- tools for the client who made the demand -->
               {% if session.role == 'client' %}
                 {% if session.username == client_info.username %}
-                  {% if demand_info.bidding_deadline_passed %}
-                    
-                    {% if bidders_info|length > 0 %}
-                      <article class="message is-success">
-                        <div class="message-header">
-                          <p>Deadline for Bidding Passed</p>
-                        </div>
-                        <div class="message-body">
-                          Choose a developer to implement your system.<br>
 
-                          <div class="has-text-centered">
-                            <a href="{{ url_for('choose_developer', demand_id=demand_id) }}" class="button">See All Developers</a>
+                  <!-- bidding deadline passed -->
+                  {% if demand_info.bidding_deadline_passed %}
+
+                    <!-- the client chose a developer already -->
+                    {% if demand_info.developer_was_chosen %}
+                      {% if demand_info.is_expired %}
+                        <article class="message is-danger">
+                          <div class="message-header">
+                            <p>Demand Not Submitted in Time</p>
                           </div>
-                        </div>
-                      </article>
-                      
-                    <!-- if no one made any bids, the system demand is closed automatically -->
+                          <div class="message-body">
+                            {{ demand_info.chosen_developer_username }} did not submit the system before the submission deadline.
+                          </div>
+                        </article>
+
+                      <!-- there is still time left before the submission deadline -->
+                      {% else %}
+                        {% if demand_info.is_completed %}
+                          <article class="message is-success">
+                            <div class="message-header">
+                              <p>Developer Submitted System</p>
+                            </div>
+                            <div class="message-body">
+                              {{ demand_info.chosen_developer_username }} submitted the system! If you haven't already, rate the developer <a href="{{ url_for('rating', demand_id=demand_id, recipient=demand_info.chosen_developer_username) }}">here</a>.
+                            </div>
+                          </article>
+                        {% else %}
+                          <article class="message is-info">
+                            <div class="message-header">
+                              <p>Developer was Chosen</p>
+                            </div>
+                            <div class="message-body">
+                              You chose {{ demand_info.chosen_developer_username }} to implement your system demand.
+                            </div>
+                          </article>
+                        {% endif %}
+                      {% endif %}
+
+                    <!-- the client did not choose a developer yet -->
                     {% else %}
-                      <article class="message is-danger">
-                        <div class="message-header">
-                          <p>No one made a bid!</p>
-                        </div>
-                        <div class="message-body">
-                          No one made a bid on your demand before the bidding deadline. You are charged $10.
-                        </div>
-                      </article>
+                      <!-- there is at least one developer who made a bid -->
+                      {% if bidders_info|length > 0 %}
+                        <article class="message is-success">
+                          <div class="message-header">
+                            <p>Deadline for Bidding Passed</p>
+                          </div>
+                          <div class="message-body">
+                            Choose a developer to implement your system.<br>
+
+                            <div class="has-text-centered">
+                              <a href="{{ url_for('choose_developer', demand_id=demand_id) }}" class="button">See All Developers</a>
+                            </div>
+                          </div>
+                        </article>
+                        
+                      <!-- if no one made any bids, the system demand is closed automatically -->
+                      {% else %}
+                        <article class="message is-danger">
+                          <div class="message-header">
+                            <p>No one made a bid!</p>
+                          </div>
+                          <div class="message-body">
+                            No one made a bid on your demand before the bidding deadline. You are charged $10.
+                          </div>
+                        </article>
+                      {% endif %}
                     {% endif %}
                   {% endif %}
                 {% endif %}

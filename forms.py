@@ -144,7 +144,7 @@ class RatingForm(FlaskForm):
 		(1,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
 		(2,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
 		(3,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
-		(4, '<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
+		(4,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star-o" aria-hidden="true"></i>'),
 		(5,'<i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i><i class="fa fa-star" aria-hidden="true"></i>')], 
 		coerce=int)
 	submit = SubmitField('Submit')
@@ -162,3 +162,11 @@ class TransactionApprovalForm(FlaskForm):
 	"""
 	decision = SelectField(label='Please select your decision', id='decision', validators=[DataRequired('Please choose an option.')], choices = [('approve','Approve'),('deny','Deny')],)
 	submit = SubmitField('Submit')
+
+class DeleteAccountForm(FlaskForm):
+	"""
+	Form for users to delete their account
+	"""
+	delete = SubmitField(label='Yes')
+	cancel = SubmitField(label='No')
+

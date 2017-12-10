@@ -1,12 +1,30 @@
-#loginBox h2 {
+#login-box h2 {
 	color:black;
 }
 
-#application_status {
+#application-status {
 	font-weight: bold;
 }
 
 div.applicant a {
 	clear:both;
 	margin-bottom: 20px;
+}
+
+div#delete-account-box.box {
+	padding: 4em 2em;
+}
+
+#pending-transactions {
+	padding: 0;
+}
+
+#pending-transactions a.button {
+	margin-bottom:0; 
+	padding: 3em 0;
+}
+
+#pending-transactions hr{
+	margin:0;
+	background-color: #3D9970;
 }
