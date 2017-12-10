@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section">
+	<div class="container">
+		<a href="/dashboard" class="button" style="margin-bottom:10px">Back</a>
+		<h2 class="title" id="current">Transactions</h2>
+		<p>Current Funds: <a href="/dashboard/transactions/add" class="button">Add Funds</a> </p>
+		<hr>
+		{% if not current %}
+		<p>You do not have any transactions.</p>
+		{% endif %}
+		{% for demand in current%}
+		<article class="media notification">
+		  <div class="media-content">
+		    <div class="content">
+		      <p>
+		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by <a href="{{ demand.link_to_client }}">@{{ demand.client_username }}</a> on {{ demand.date_posted }}</small>
+		        <br>
+		        <br>
+		        <small>Deadline: {{ demand.submission_deadline}}</small>
+		      </p>
+		    </div>
+		  </div>
+		</article>
+		{% endfor %}
+
+
+	</div> <!-- container -->
+</section>
+{% endblock %}

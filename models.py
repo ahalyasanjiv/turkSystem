@@ -173,7 +173,8 @@ class Client:
 
         usernames = []
         for index, row in sorted_df.iterrows():
-            usernames.append(User.get_user_info(row['username']))
+            if not BlacklistedUser.is_blacklisted(row['username']):
+                usernames.append(User.get_user_info(row['username']))
 
         return usernames
 
@@ -223,7 +224,7 @@ class Client:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['client_username'] not in similar_clients_usernames:
+                if demand['client_username'] not in similar_clients_usernames and not BlacklistedUser.is_blacklisted(demand['client_username']):
                     similar_clients_usernames.append(demand['client_username'])
                     similar_clients.append(User.get_user_info(demand['client_username']))
 
@@ -284,7 +285,8 @@ class Developer:
 
         usernames = []
         for index, row in sorted_df.iterrows():
-            usernames.append(User.get_user_info(row['username']))
+            if not BlacklistedUser.is_blacklisted(row['username']):
+                usernames.append(User.get_user_info(row['username']))
 
         return usernames
 
@@ -315,7 +317,7 @@ class Developer:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['chosen_developer_username'] not in similar_developers_usernames:
+                if demand['chosen_developer_username'] not in similar_developers_usernames and not BlacklistedUser.is_blacklisted(demand['chosen_developer_username']):
                     similar_developers_usernames.append(demand['chosen_developer_username'])
                     similar_developers.append(User.get_user_info(demand['chosen_developer_username']))
 
