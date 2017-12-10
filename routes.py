@@ -3,7 +3,7 @@ import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm, DeleteAccountForm, DeleteAccountApprovalForm
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm, DeleteAccountForm, DeleteAccountApprovalForm, AddFundsForm
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating, Transaction, DeleteRequest
 import helpers
 
@@ -18,7 +18,7 @@ def index():
     # clients with the most projects
     top_clients = Client.get_clients_with_most_projects()
     # developers making the most money
-    top_devs =[]
+    top_devs = Developer.get_top_earners()
     return render_template("index.html",number_of_clients=number_of_clients, 
                             number_of_developers=number_of_developers,
                             top_clients = top_clients,
@@ -30,6 +30,9 @@ def dashboard():
     The '/dashboard' route directs a user to view their dashboard.
     """
     if 'username' in session:
+        if not session['type_of_user'] == "user":
+            return render_template("access_denied.html")
+
         info = User.get_user_info(session['username'])
         if (info == None):
             return render_template("dashboard.html", first_name=" ")
@@ -69,6 +72,9 @@ def my_projects():
     The '/dashboard/projects' route directs a user to view their projects.
     """
     if 'username' in session:
+        if not session['type_of_user'] == "user":
+            return render_template("access_denied.html")
+
         user_type = User.get_user_info(session['username'])['type_of_user']
         current = list(Demand.get_info(x) for x in Demand.get_current_projects(session['username']))
         mid = []
@@ -97,10 +103,60 @@ def my_projects():
 
 @app.route("/dashboard/transactions")
 def view_transactions():
+    """
+    Transaction history page for user's dashboard.
+    """
     if 'username' not in session:
         return redirect(url_for('login'))
     else:
-        return render_template("myTransactions.html")
+        if not session['type_of_user'] == "user":
+            return render_template("access_denied.html")
+
+        balance = 0
+        if session['type_of_user'] == "developer":
+            balance = Developer.get_info(session['username'])["balance"]
+        else:
+            balance = Client.get_info(session['username'])["balance"]
+
+        outgoing = Transaction.get_transactions_by_sender(session['username'])
+        incoming = Transaction.get_transactions_by_recipient(session['username'])
+        return render_template("myTransactions.html", balance=balance, outgoing=outgoing, incoming=incoming)
+
+@app.route("/dashboard/transactions/add", methods =["GET", "POST"])
+def add_funds():
+    """
+    Allows the user to add funds to their account.
+    """
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    else:
+        if session['type_of_user'] == "user":
+            cc = str(User.get_user_info(session['username'])["credit_card"])
+            cc = "******" + cc[-4:]
+
+            balance = 0
+            if session['type_of_user'] == "developer":
+                balance = Developer.get_info(session['username'])["balance"]
+            else:
+                balance = Client.get_info(session['username'])["balance"]
+
+            form = AddFundsForm()
+
+            if request.method == "GET":
+                return render_template("addFunds.html", cc=cc,form=form, balance=balance, added=False)
+            elif request.method == "POST":
+                if form.amount.validate(form):
+                    if session['type_of_user'] == "developer":
+                        Developer.add_earnings(session['username'], form.amount.data)
+                        balance = Developer.get_info(session['username'])["balance"]
+                    else:
+                        Client.add_to_balance(session['username'], form.amount.data)
+                        balance = Client.get_info(session['username'])["balance"]
+                    return render_template("addFunds.html",cc=cc, form=form, balance=balance, added=True)
+                else:
+                    return render_template("addFunds.html", cc=cc, form=form, balance=balance, added=False)
+        else:
+            return render_template("access_denied.html")
 
 @app.route("/dashboard/notifications")
 def view_notifications():
@@ -108,9 +164,12 @@ def view_notifications():
     The '/dashboard/notifications' route directs a user to view their notifications.
     """
     if 'username' in session:
-        unread = Notification.get_number_of_unread(session['username'])
-        notifications = Notification.get_all_notif_to_recipient(session['username'])
-        return render_template('notifications.html', notifications=notifications, unread=unread)
+        if session['type_of_user'] == 'user':
+            unread = Notification.get_number_of_unread(session['username'])
+            notifications = Notification.get_all_notif_to_recipient(session['username'])
+            return render_template('notifications.html', notifications=notifications, unread=unread)
+        else:
+            return render_template('access_denied.html')
     else:
         return redirect(url_for('login'))
 
@@ -167,6 +226,8 @@ def dashboard_superuser():
     The 'dashboard_superuser' route directs a superuser to their dashboard.
     """
     if session['username']:
+        if not session['type_of_user'] == "superuser":
+            return render_template("access_denied.html")
         info = SuperUser.get_superuser_info(session['username'])
         pending_applicants = Applicant.get_pending_applicants()
         protests = SystemWarning.get_protests()
@@ -544,7 +605,12 @@ def rating(demand_id, recipient):
                 # if the client gave a good rating to a developer (<= 3)
                 # the remaining half of the bid amount gets transferred over to the developer
                 if session['role'] == 'client':
-                    Transaction(recipient, session['username'], round(Demand.get_info(demand_id)['chosen_bid_amount'] / 2), 2)
+                    bid_amount = Demand.get_info(demand_id)['chosen_bid_amount']
+                    Transaction(recipient, session['username'], round(bid_amount / 2, 2))
+
+                    # update developer's earnings
+                    Developer.add_earnings(recipient, bid_amount)
+
                 return render_template('ratingFinished.html', recipient=recipient)
     return render_template('access_denied.html')
 

@@ -3,29 +3,66 @@
 {% block content %}
 <section class="section">
 	<div class="container">
-		<a href="/dashboard" class="button" style="margin-bottom:10px">Back</a>
-		<h2 class="title" id="current">Transactions</h2>
-		<p>Current Funds: <a href="/dashboard/transactions/add" class="button">Add Funds</a> </p>
-		<hr>
-		{% if not current %}
-		<p>You do not have any transactions.</p>
-		{% endif %}
-		{% for demand in current%}
-		<article class="media notification">
-		  <div class="media-content">
-		    <div class="content">
-		      <p>
-		        <a href="{{ demand.link_to_demand }}"><strong>{{ demand.title }}</strong></a> <small>Posted by <a href="{{ demand.link_to_client }}">@{{ demand.client_username }}</a> on {{ demand.date_posted }}</small>
-		        <br>
-		        <br>
-		        <small>Deadline: {{ demand.submission_deadline}}</small>
-		      </p>
-		    </div>
-		  </div>
-		</article>
-		{% endfor %}
+		<div class="columns">
+				<div class="column is-12">
+				<a href="/dashboard" class="button">Back</a>
+			</div>
+		</div>
+		<div class="columns">
+			<div class="column is-8">
+			<h2 class="title">Incoming Transactions</h2>
+			{% if not incoming %}
+			<p>You do not have any incoming transactions.</p>
+			{% endif %}
+			{% for transaction in incoming %}
+			<article class="media notification">
+			  <div class="media-content">
+			    <div class="content">
+			      <p>
+			        Transaction #{{ transaction.transaction_id }} 
+			        <br>
+			        <small><b>Status</b>: {{ transaction.status }}</small>
+			        <br>
+			        <small><b>Sender</b>: {{ transaction.sender }}</small>
+			        <br>
+			        <small><b>Amount</b>: ${{ transaction.amount }}</small>
+			      </p>
+			    </div>
+			  </div>
+			</article>
+			{% endfor %}
+			<hr>
+			<h2 class="title">Outgoing Transactions</h2>
+			{% if not outgoing %}
+				<p>You do not have any outgoing transactions.</p>
+			{% endif %}
+			{% for transaction in outgoing %}
+			<article class="media notification">
+			  <div class="media-content">
+			    <div class="content">
+			      <p>
+			        Transaction #{{ transaction.transaction_id }} 
+			        <br>
+			        <small><b>Status</b>: {{ transaction.status }}</small>
+			        <br>
+			        <small><b>Recipient</b>: {{ transaction.recipient }}</small>
+			        <br>
+			        <small><b>Amount</b>: ${{ transaction.amount }}</small>
+			      </p>
+			    </div>
+			  </div>
+			</article>
+			{% endfor %}
+		</div>
 
-
+		<div class="column is-4">
+			<div class="box">
+			<p><b>Current Balance</b>: ${{ balance }} </p>
+			<br>
+			<a href="/dashboard/transactions/add" class="button is-primary">Add Funds</a> 
+			</div>
+		</div>
+		</div> <!-- columns -->
 	</div> <!-- container -->
 </section>
 {% endblock %}

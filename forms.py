@@ -177,4 +177,10 @@ class DeleteAccountApprovalForm(FlaskForm):
 	decision = SelectField(label='Please select your decision', id='decision', validators=[DataRequired('Please choose an option.')], choices = [('approve','Approve'),('deny','Deny')],)
 	submit = SubmitField('Submit')
 
-
+class AddFundsForm(FlaskForm):
+	"""
+	Form for user to add funds to their acccount.
+	"""
+	amount = DecimalField(label='Amount', id='amount', validators=[DataRequired('Please enter an amount to add to your funds.')])
+	# , validate_bid_amount])
+	submit = SubmitField('Add Funds')

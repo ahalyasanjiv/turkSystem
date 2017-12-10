@@ -10,7 +10,7 @@ message_id,recipient,sender,date_sent,message,read_status
 8,testuser0,testuser1,12-07-2017 10:48 PM,testuser1 made a bid of $0.90 on your test demand,True
 9,testuser1,testuser0,12-08-2017 02:40 AM,Congratulations! You were chosen by testuser0 for the test demand.,True
 10,testuser0,testuser0,12-08-2017 04:29 AM,Congratulations! You were chosen by testuser0 for the test demand.,True
-11,testuser1,testuser0,12-08-2017 04:30 AM,Congratulations! You were chosen by testuser0 for the test demand.,False
+11,testuser1,testuser0,12-08-2017 04:30 AM,Congratulations! You were chosen by testuser0 for the test demand.,True
 12,testuser0,testuser0,12-08-2017 04:30 AM,Congratulations! You were chosen by testuser0 for the test demand.,True
 15,testuser0,superuser0,12-08-2017 05:13 AM,The deadline for your test demand is approaching.,True
 16,testuser0,superuser0,12-08-2017 05:13 AM,The deadline for your ldfg demand is approaching.,True
@@ -35,14 +35,20 @@ message_id,recipient,sender,date_sent,message,read_status
 33,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#4) was denied.,True
 34,testuser0,superuser0,12-08-2017 12:58 PM,Your transaction (Transaction#6) was denied.,True
 35,testuser0,superuser0,12-08-2017 01:59 PM,Your transaction (Transaction#0) was approved.,True
-36,testuser1,testuser0,12-08-2017 02:56 PM,testuser0 made a bid of $3.00 on your Real test demand,False
+36,testuser1,testuser0,12-08-2017 02:56 PM,testuser0 made a bid of $3.00 on your Real test demand,True
 37,testuser0,testuser1,12-08-2017 02:58 PM,testuser1 made a bid of $5.00 on your new demand demand,True
 38,testuser0,superuser0,12-08-2017 03:07 PM,The deadline for your new demand demand is approaching.,True
 39,testuser0,superuser0,12-08-2017 03:26 PM,Your transaction (Transaction#1) was approved.,True
 40,testuser0,superuser0,12-08-2017 03:28 PM,Your protest for warning#3 was approved. Your warning has been deleted.,True
 41,javocado0,testuser1,12-08-2017 04:04 PM,testuser1 made a bid of $5.00 on your Build a toast demand,False
 42,testuser0,superuser0,12-08-2017 04:06 PM,Your transaction (Transaction#2) was approved.,True
-43,testuser1,testuser0,12-08-2017 04:08 PM,Congratulations! You were chosen by testuser0 for the new demand demand.,False
+43,testuser1,testuser0,12-08-2017 04:08 PM,Congratulations! You were chosen by testuser0 for the new demand demand.,True
 44,testuser0,testuser1,12-08-2017 04:08 PM,"The system for the new demand demand has been uploaded. Please rate testuser1 <a href=""/bid/11/rating/testuser1"">here</a>.",True
-45,testuser0,superuser0,12-10-2017 10:27 AM,Your transaction (Transaction#15) was approved.,False
-46,testuser0,superuser0,12-10-2017 10:27 AM,Your transaction (Transaction#7) was approved.,False
+45,testuser1,testuser0,12-09-2017 05:02 PM,Congratulations! You were chosen by testuser0 for the new demand demand.,True
+46,testuser1,testuser0,12-09-2017 05:22 PM,Congratulations! You were chosen by testuser0 for the new demand demand.,True
+47,testuser1,testuser0,12-09-2017 05:34 PM,Congratulations! You were chosen by testuser0 for the new demand demand.,True
+48,testuser0,testuser1,12-09-2017 11:35 PM,testuser1 made a bid of $4.50 on your new demand 2 demand,False
+49,testuser0,jane-dev,12-09-2017 11:37 PM,jane-dev made a bid of $3.00 on your new demand 2 demand,False
+50,testuser1,testuser0,12-09-2017 11:41 PM,Congratulations! You were chosen by testuser0 for the new demand 2 demand.,True
+51,testuser0,testuser1,12-09-2017 11:42 PM,"The system for the new demand 2 demand has been uploaded. Please rate testuser1 <a href=""/bid/13/rating/testuser1"">here</a>.",False
+52,testuser0,superuser0,12-10-2017 12:15 AM,The deadline for your new demand 2 demand is approaching.,False

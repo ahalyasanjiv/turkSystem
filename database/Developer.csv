@@ -1,4 +1,5 @@
-username,avg_rating,avg_given_rating,num_of_completed_projects,num_of_warnings,balance
-feliciadunn4,5,0,0,0,0
-testuser1,0,0,0,0,0
-testuser4,0,0,0,0,0
+username,avg_rating,avg_given_rating,num_of_completed_projects,num_of_warnings,balance,earnings
+feliciadunn4,5,0,0,0,0,0.0
+testuser1,0,0,0,0,0,4.5
+jane-dev,0,0,0,0,0,0.0
+testuser4,0,0,0,0,0,0.0

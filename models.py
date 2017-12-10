@@ -87,6 +87,7 @@ class User:
                     'email': user['email'].item(),
                     'phone': user['phone'].item(),
                     'type_of_user': user['type_of_user'].item(),
+                    'credit_card': user['credit_card'].item(),
                     'about': user['about'].item(),
                     'link_to_user': '/user/' + username}
 
@@ -174,7 +175,8 @@ class Client:
                 'avg_rating': client['avg_rating'].item(),
                 'avg_given_rating': client['avg_given_rating'].item(),
                 'num_of_completed_projects': client['num_of_completed_projects'].item(),
-                'num_of_warnings': client['num_of_warnings'].item()}
+                'num_of_warnings': client['num_of_warnings'].item(),
+                'balance': client['balance'].item()}
 
     @staticmethod
     def get_projects_posted(username):
@@ -266,11 +268,22 @@ class Client:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['client_username'] not in similar_clients_usernames and not BlacklistedUser.is_blacklisted(demand['client_username']):
+                if demand['client_username'] not in similar_clients_usernames and not BlacklistedUser.is_blacklisted(demand['client_username']) and not DeleteRequest.is_account_deleted(demand['client_username']):
                     similar_clients_usernames.append(demand['client_username'])
                     similar_clients.append(User.get_user_info(demand['client_username']))
 
         return similar_clients
+
+    @staticmethod
+    def add_to_balance(username, amount):
+        """
+        Adds amount of funds to balance.
+        """
+        df = pd.read_csv('database/Client.csv')
+        client = df.loc[df.username == username]
+        df.loc[df.username == username, 'balance'] = amount + client['balance'].item()
+        df.to_csv('database/Client.csv', index=False)
+
 
 class Developer:
     """
@@ -279,8 +292,8 @@ class Developer:
     def __init__(self, username):
         df = pd.read_csv('database/Developer.csv')
 
-        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0, 0],
-            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings', 'balance'])
+        df.loc[len(df)] = pd.Series(data=[username, 0, 0, 0, 0, 0, 0],
+            index=['username', 'avg_rating', 'avg_given_rating', 'num_of_completed_projects', 'num_of_warnings', 'balance', 'earnings'])
         df.to_csv('database/Developer.csv', index=False)
 
     @staticmethod
@@ -295,7 +308,8 @@ class Developer:
                 'avg_rating': developer['avg_rating'].item(),
                 'avg_given_rating': developer['avg_given_rating'].item(),
                 'num_of_completed_projects': developer['num_of_completed_projects'].item(),
-                'num_of_warnings': developer['num_of_warnings'].item()}
+                'num_of_warnings': developer['num_of_warnings'].item(),
+                'balance': developer['balance'].item()}
 
     @staticmethod
     def get_past_projects(username):
@@ -359,14 +373,28 @@ class Developer:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['chosen_developer_username'] not in similar_developers_usernames and not BlacklistedUser.is_blacklisted(demand['chosen_developer_username']):
+                if demand['chosen_developer_username'] not in similar_developers_usernames and not BlacklistedUser.is_blacklisted(demand['chosen_developer_username']) and not DeleteRequest.is_account_deleted(demand['chosen_developer_username']):
                     similar_developers_usernames.append(demand['chosen_developer_username'])
                     similar_developers.append(User.get_user_info(demand['chosen_developer_username']))
 
         return similar_developers
 
     @staticmethod
-    def submit_system(demand_id, developer_username):
+    def get_top_earners():
+        """
+        Returns a list of usernames belonging to the three developers with the most earnings.
+        """
+        df = pd.read_csv('database/Developer.csv')
+        df = df.loc[df.earnings > 0]
+        sorted_df = df.sort_values(by='earnings', ascending=False)
+
+        if (len(sorted_df) > 3):
+            return sorted_df.username.tolist()[:3]
+        else:
+            return sorted_df.username.tolist()
+
+    @staticmethod
+    def submit_system(demand_id, username):
         """
         Updates the Demand table so that the project is complete.
         Also notifies the client that the project is complete.
@@ -376,9 +404,19 @@ class Developer:
 
         demand_info = Demand.get_info(demand_id)
 
-        message = 'The system for the {} demand has been uploaded. Please rate {} <a href="/bid/{}/rating/{}">here</a>.'.format(demand_info['title'], developer_username, demand_id, developer_username)
-        Notification(demand_info['client_username'], developer_username, message)
+        message = 'The system for the {} demand has been uploaded. Please rate {} <a href="/bid/{}/rating/{}">here</a>.'.format(demand_info['title'], username, demand_id, username)
+        Notification(demand_info['client_username'], username, message)
         df.to_csv('database/Demand.csv', index=False)
+
+    @staticmethod
+    def add_earnings(username, amount):
+        """
+        Updates the Developer table.
+        Adds amount to the developer's current amount of earnings.
+        """
+        df = pd.read_csv('database/Developer.csv')
+        df.loc[df['username'] == username, 'earnings'] += amount
+        df.to_csv('database/Developer.csv', index=False)
 
 class Applicant:
     """
@@ -574,9 +612,6 @@ class Demand:
             lowest_bid = Bid.get_info(bids[0])['bid_amount']
         else:
             lowest_bid = None
-
-
-        print(pd.isnull(demand['chosen_developer_username']))
 
         if not demand.empty:
             return {'client_username': demand['client_username'],
@@ -1128,8 +1163,6 @@ class SystemWarning:
                 return True
         return False 
 
-
-
 class Transaction:
     """
     Transactions between users (sender and recipient).
@@ -1187,6 +1220,32 @@ class Transaction:
         get_pending_transactions = df.loc[df['status'] == 'pending']
         pending_transactions = get_pending_transactions.T.to_dict().values()
         return pending_transactions
+
+    @staticmethod
+    def get_transactions_by_recipient(username):
+        """
+        Get all transactions where username is recipient.
+        """
+        df = pd.read_csv("database/Transaction.csv")
+        transactions = df.loc[(df.recipient == username)]
+        dict_transactions = transactions.T.to_dict().values()
+
+        print(dict_transactions)
+
+        return dict_transactions
+
+    @staticmethod
+    def get_transactions_by_sender(username):
+        """
+        Get all transactions where username is sender.
+        """
+        df = pd.read_csv("database/Transaction.csv")
+        transactions = df.loc[(df.sender == username)]
+        dict_transactions = transactions.T.to_dict().values()
+
+        print(dict_transactions)
+
+        return dict_transactions
 
 class Rating:
     """

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero is-primary">
+<div class="hero-body">
+  <div class="container">
+    <h1 class="title">
+    	Add Funds
+    </h1>
+  </div>
+</div>
+</section>
+
+<section class="section">
+	<div class="container">
+		<div class="columns">
+			<div class="column is-4 is-offset-4">
+				<div class="notification">
+					{% if not added %}
+						<p class="subtitle"> Payment Method</p>
+						<p>Credit Card: {{ cc }}</p>
+						<p>Current Balance: ${{ balance }}</p>
+						<br>
+						<form method="POST" action="/dashboard/transactions/add" class="has-text-centered">
+							<div class="field">
+								<div class="label">{{ form.amount.label }}</div>
+								<div class="control">
+									{{ form.amount(class="input") }}
+								</div>
+								{% if form.amount.errors %}
+					            {% for error in form.amount.errors %}
+					              <p class="is-danger">{{ error }}</p>
+					            {% endfor %}
+								{% endif %}
+							</div>
+
+							<div class="field">
+								{{ form.submit(class="button is-link") }}
+							</div>
+						</form>
+					{% else %}
+						<p class="subtitle">Funds added!</p>
+						<p>Your new balance is: ${{balance}} </p>
+						<p class="has-text-centered"><a href="/dashboard" class="button">Back</a></p>
+					{% endif %}
+				</div>
+			</div>
+		</div> <!-- columns -->
+	</div> <!--container-->
+</section>
+{% endblock %}

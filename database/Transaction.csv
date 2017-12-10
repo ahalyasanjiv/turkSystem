@@ -14,4 +14,9 @@ transaction_id,recipient,sender,amount,status,optional_message
 12,superuser0,testuser0,10.0,pending,
 13,superuser0,testuser0,10.0,approved,
 14,superuser0,feliciadunn0,10.0,approved,
-15,testuser1,testuser0,2.5,approved,
+15,testuser1,testuser0,2.5,pending,
+16,testuser1,testuser0,2.5,pending,
+17,testuser1,testuser0,2.5,pending,
+18,testuser1,testuser0,2.5,pending,
+19,testuser1,testuser0,2.25,pending,"good reason, surely"
+20,testuser1,testuser0,2.25,pending,

@@ -36,6 +36,9 @@
 						  		{% endif %}
 						  	</li>
 						  	</ul>
+                            {% if warning['status'] == 'active' %}
+                            <a class="button" href="/warnings/{{warning.warning_id}}/protest">Protest Warning</a>
+                            {% endif %}
 				        </div>
     				{% endfor %}
     			{% endif %}
