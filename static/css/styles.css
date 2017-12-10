@@ -14,3 +14,17 @@ div.applicant a {
 div#delete-account-box.box {
 	padding: 4em 2em;
 }
+
+#pending-transactions {
+	padding: 0;
+}
+
+#pending-transactions a.button {
+	margin-bottom:0; 
+	padding: 3em 0;
+}
+
+#pending-transactions hr{
+	margin:0;
+	background-color: #3D9970;
+}

@@ -4,7 +4,7 @@
 <section class="hero is-warning">
 	<div class="hero-body">
 		<div class="container">
-			<h1 class="title">Delete Your Account</h1>
+			<h1 class="title">Approve Account Deletion Request</h1>
 		</div>
 	</div>
 </section>
@@ -16,9 +16,8 @@
 				<h2 class="subtitle">Are your sure you want to request you account to be deleted?</h2>
 				<form method="POST" action={{ url_for('deleteAccount') }}>
 				<div class="has-text-centered">
-		    		{{ form.delete(class="button is-danger is-medium") }}
-		    		{{ form.cancel(class="button is-info is-medium") }}
-
+		    		{{ form.approve(class="button is-info is-medium") }}
+		    		{{ form.deny(class="button is-info is-medium") }}
 		    	</div>
 			</div>
 		</div>

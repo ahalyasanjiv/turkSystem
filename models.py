@@ -193,7 +193,8 @@ class Client:
 
         usernames = []
         for index, row in sorted_df.iterrows():
-            usernames.append(User.get_user_info(row['username']))
+            if not BlacklistedUser.is_blacklisted(row['username']):
+                usernames.append(User.get_user_info(row['username']))
 
         return usernames
 
@@ -243,7 +244,7 @@ class Client:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['client_username'] not in similar_clients_usernames:
+                if demand['client_username'] not in similar_clients_usernames and not BlacklistedUser.is_blacklisted(demand['client_username']):
                     similar_clients_usernames.append(demand['client_username'])
                     similar_clients.append(User.get_user_info(demand['client_username']))
 
@@ -304,7 +305,8 @@ class Developer:
 
         usernames = []
         for index, row in sorted_df.iterrows():
-            usernames.append(User.get_user_info(row['username']))
+            if not BlacklistedUser.is_blacklisted(row['username']):
+                usernames.append(User.get_user_info(row['username']))
 
         return usernames
 
@@ -335,7 +337,7 @@ class Developer:
                 break
             demand = Demand.get_info(index)
             if not (demand['client_username'] == username) and not (demand['chosen_developer_username'] == username):
-                if demand['chosen_developer_username'] not in similar_developers_usernames:
+                if demand['chosen_developer_username'] not in similar_developers_usernames and not BlacklistedUser.is_blacklisted(demand['chosen_developer_username']):
                     similar_developers_usernames.append(demand['chosen_developer_username'])
                     similar_developers.append(User.get_user_info(demand['chosen_developer_username']))
 
@@ -1102,7 +1104,7 @@ class SystemWarning:
     @staticmethod
     def get_user_warnings(username):
         """
-        Gets all warnings given to [username]
+        Gets a dictionary of all the warnings given to [username]
         """
         df = pd.read_csv('database/Warning.csv')
         get_warnings = df.loc[df['warned_user'] == username]
@@ -1259,6 +1261,9 @@ class DeleteRequest:
 
     @staticmethod
     def is_account_deleted(username):
+        """
+        Checks if [username]'s account is deleted
+        """
         df = pd.read_csv('database/DeleteRequest.csv')
         # Check if user has requested a deletion.
         df = df.loc[df.username == username]
@@ -1269,6 +1274,19 @@ class DeleteRequest:
                 return True
         return False
 
+    @staticmethod
+    def get_pending_delete_requests():
+        """
+        Gets a dictionary of all pending delete requests that are waiting on approval from the superuser.
+        """
+        df = pd.read_csv('database/DeleteRequest.csv')
+        pending_delete_requests = df.loc[df['status']=='pending'].T.to_dict().values()
+        return pending_delete_requests
+
+        df = pd.read_csv('database/Warning.csv')
+        get_warnings = df.loc[df['warned_user'] == username]
+        warnings = get_warnings.T.to_dict().values()
+        return warnings
 
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()

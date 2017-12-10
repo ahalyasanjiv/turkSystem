@@ -68,29 +68,39 @@ def my_projects():
     """
     The '/dashboard/projects' route directs a user to view their projects.
     """
-    user_type = User.get_user_info(session['username'])['type_of_user']
-    current = list(Demand.get_info(x) for x in Demand.get_current_projects(session['username']))
-    mid = []
-    completed = []
-    if user_type == "developer":
-        bids_by_username = Bid.get_bids_by_username(session['username'])
-        temp = []
+    if 'username' in session:
+        user_type = User.get_user_info(session['username'])['type_of_user']
+        current = list(Demand.get_info(x) for x in Demand.get_current_projects(session['username']))
+        mid = []
+        completed = []
+        if user_type == "developer":
+            bids_by_username = Bid.get_bids_by_username(session['username'])
+            temp = []
 
-        for i in bids_by_username:
-            info = Bid.get_info(i)['demand_id']
-            if info not in temp:
-                temp.append(info)
+            for i in bids_by_username:
+                info = Bid.get_info(i)['demand_id']
+                if info not in temp:
+                    temp.append(info)
 
-        mid = list(Demand.get_info(y) for y in temp)
-        completed = list(Demand.get_info(x) for x in Developer.get_past_projects(session['username']))
+            mid = list(Demand.get_info(y) for y in temp)
+            completed = list(Demand.get_info(x) for x in Developer.get_past_projects(session['username']))
+        else:
+            temp = (Demand.get_info(x) for x in Demand.get_filtered_demands(None, None, session['username'], None, None, None, True))
+            for demand in temp:
+                if demand['chosen_developer_username'] is np.nan:
+                    mid.append(demand)
+            completed = list(Demand.get_info(x) for x in Client.get_past_projects(session['username']))
+
+        return render_template("myProjects.html", user_type = user_type, current=current, mid=mid, completed=completed)
     else:
-        temp = (Demand.get_info(x) for x in Demand.get_filtered_demands(None, None, session['username'], None, None, None, True))
-        for demand in temp:
-            if demand['chosen_developer_username'] is np.nan:
-                mid.append(demand)
-        completed = list(Demand.get_info(x) for x in Client.get_past_projects(session['username']))
+        return redirect(url_for('login'))
 
-    return render_template("myProjects.html", user_type = user_type, current=current, mid=mid, completed=completed)
+@app.route("/dashboard/transactions")
+def view_transactions():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    else:
+        return render_template("myTransactions.html")
 
 @app.route("/dashboard/notifications")
 def view_notifications():
@@ -161,7 +171,13 @@ def dashboard_superuser():
         pending_applicants = Applicant.get_pending_applicants()
         protests = SystemWarning.get_protests()
         pending_transactions = Transaction.get_pending_transactions()
-        return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants, protests=protests, pending_transactions=pending_transactions)
+        pending_delete_requests = DeleteRequest.get_pending_delete_requests()
+        return render_template("dashboard_superuser.html", 
+                                info=info, 
+                                pending_applicants=pending_applicants, 
+                                protests=protests, 
+                                pending_transactions=pending_transactions,
+                                pending_delete_requests=pending_delete_requests)
     else:
         return render_template("index.html")
 
@@ -719,13 +735,12 @@ def deleteAccount():
 
     if request.method == 'GET':
         return render_template("deleteAccount.html",form=form)
-    else:
-        if form.validate():
-            if form.delete.data:
-
-                return redirect(url_for('dashboard_superuser'))
-            else:
-                return redirect(url_for('dashboard'))
+    elif request.method == 'POST':
+        if form.delete.data:
+            DeleteRequest(session['username'])
+            return redirect(url_for('dashboard'))
+        elif form.cancel.data:
+            return redirect(url_for('dashboard'))
 
 if __name__ == "__main__":
     app.run(debug=True)
