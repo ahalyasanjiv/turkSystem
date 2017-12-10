@@ -18,7 +18,7 @@ def index():
     # clients with the most projects
     top_clients = Client.get_clients_with_most_projects()
     # developers making the most money
-    top_devs =[]
+    top_devs = Developer.get_top_earners()
     return render_template("index.html",number_of_clients=number_of_clients, 
                             number_of_developers=number_of_developers,
                             top_clients = top_clients,
@@ -528,7 +528,12 @@ def rating(demand_id, recipient):
                 # if the client gave a good rating to a developer (<= 3)
                 # the remaining half of the bid amount gets transferred over to the developer
                 if session['role'] == 'client':
-                    Transaction(recipient, session['username'], round(Demand.get_info(demand_id)['chosen_bid_amount'] / 2), 2)
+                    bid_amount = Demand.get_info(demand_id)['chosen_bid_amount']
+                    Transaction(recipient, session['username'], round(bid_amount / 2, 2))
+
+                    # update developer's earnings
+                    Developer.add_earnings(recipient, bid_amount)
+
                 return render_template('ratingFinished.html', recipient=recipient)
     return render_template('access_denied.html')
 
