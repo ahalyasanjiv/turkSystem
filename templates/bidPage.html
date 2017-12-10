@@ -22,10 +22,10 @@
               <strong>{{ client_info.first_name }} {{ client_info.last_name }}</strong> <small><a href="{{ url_for('user', name=demand_info.client_username) }}">@{{ demand_info.client_username }}</a></small>
               <br>
 
-              <!-- date posted and bidding deadline -->
-              <strong>Posted:</strong> {{ demand_info.date_posted }}
-              <br><strong>Bidding deadline:</strong> {{ demand_info.bidding_deadline }}
-              <br>
+              <!-- date posted and deadlines -->
+              <strong>Posted:</strong> {{ demand_info.date_posted }}<br>
+              <strong>Bidding deadline:</strong> {{ demand_info.bidding_deadline }}<br>
+              <strong>Submission deadline:</strong> {{ demand_info.submission_deadline }}<br>
 
               <!-- specifications -->
               <strong>Specifications:</strong><br>
