@@ -170,3 +170,10 @@ class DeleteAccountForm(FlaskForm):
 	delete = SubmitField(label='Yes')
 	cancel = SubmitField(label='No')
 
+class AddFundsForm(FlaskForm):
+	"""
+	Form for user to add funds to their acccount.
+	"""
+	amount = DecimalField(label='Amount', id='amount', validators=[DataRequired('Please enter an amount to add to your funds.')])
+	# , validate_bid_amount])
+	submit = SubmitField('Add Funds')
