@@ -161,7 +161,13 @@ def dashboard_superuser():
         pending_applicants = Applicant.get_pending_applicants()
         protests = SystemWarning.get_protests()
         pending_transactions = Transaction.get_pending_transactions()
-        return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants, protests=protests, pending_transactions=pending_transactions)
+        pending_delete_requests = DeleteRequest.get_pending_delete_requests()
+        return render_template("dashboard_superuser.html", 
+                                info=info, 
+                                pending_applicants=pending_applicants, 
+                                protests=protests, 
+                                pending_transactions=pending_transactions,
+                                pending_delete_requests=pending_delete_requests)
     else:
         return render_template("index.html")
 
@@ -709,13 +715,12 @@ def deleteAccount():
 
     if request.method == 'GET':
         return render_template("deleteAccount.html",form=form)
-    else:
-        if form.validate():
-            if form.delete.data:
-
-                return redirect(url_for('dashboard_superuser'))
-            else:
-                return redirect(url_for('dashboard'))
+    elif request.method == 'POST':
+        if form.delete.data:
+            DeleteRequest(session['username'])
+            return redirect(url_for('dashboard'))
+        elif form.cancel.data:
+            return redirect(url_for('dashboard'))
 
 if __name__ == "__main__":
     app.run(debug=True)

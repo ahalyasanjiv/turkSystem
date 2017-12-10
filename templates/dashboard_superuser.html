@@ -21,7 +21,11 @@
         <h1 class="title is-4">
           Applications to Approve
         </h1>
-
+        {% if not pending_applicants %}
+          <div class="notification is-warning">
+            There are no applications to approve.
+          </div>
+        {% endif %}
         {% for applicant in pending_applicants %}
         <div class="applicant">  
           <a href={{  url_for('applicant_approval', applicant_id=applicant) }} style="margin-right:10px; padding: 0 30px 0 30px;" class="button is-info is-fullwidth has-text-centered">
@@ -57,63 +61,36 @@
         <h1 class="title is-4">
           Transactions to Approve
         </h1>
-        {% for transaction in pending_transactions %}
-        <div class="transaction">  
-          <a href={{  url_for('transaction_approval', transaction_id=transaction['transaction_id']) }} style="margin-right:10px; padding: 0 30px 0 30px;" class="button is-info is-fullwidth has-text-centered">
-            <ul>
-            <li>Transaction ID: {{ transaction['transaction_id'] }}</li>
-            <!-- <li>Recipient: {{ transaction['recipient'] }}</li>
-            <li>Sender: {{ transaction['sender'] }}</li>
-            <li>Amount: {{ transaction['amount'] }}</li>
-            {% if transaction['optional_message'] %}
-              <li>Message: {{ transaction['optional_message'] }}</li>
-            {% endif %} -->
-            </ul>
-          </a>
-        </div><br>
+        <div id="pending-transactions" class="notification is-primary">
+        {% if not pending_transactions %}
+        
+          There are no pending transactions.
+        {% endif %}
+        {% for transaction in pending_transactions %} 
+            <a href={{  url_for('transaction_approval', transaction_id=transaction['transaction_id']) }} " class="button is-fullwidth is-primary has-text-centered">
+              <ul>
+              <li>Transaction ID: {{ transaction['transaction_id'] }}</li>
+              <li>Recipient: {{ transaction['recipient'] }}</li>
+              <li>Sender: {{ transaction['sender'] }}</li>
+              </ul>
+            </a><hr>
         {% endfor %}
+        </div>
         
         <hr>
         <h1 class="title is-4">Account Deletion Requests</h1>
         <article class="media">
-          <figure class="media-left">
-           <p class="image is-64x64">
-            <img src="https://bulma.io/images/placeholders/128x128.png">
-          </p>
-          </figure>
-          <div class="media-content">
-            <div class="content">
-              <p>
-                <strong>Project Name</strong> <small>Posted by Client on 1/1/2018 11:59 PM</small>
-                <br>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                <br>
-                <small><strong>Current Lowest Bid: $1500</strong></small>
-                <br>
-                <small><em>Closes: 2/1/2018 11:50 PM</em></small>
-              </p>
+          {% for delete_request in pending_delete_requests %}
+            <hr>
+            <div class="transaction">  
+              <a href=# style="margin-right:10px; padding: 30px 30px 30px 30px;" class="button is-info is-fullwidth has-text-centered">
+                <ul>
+                <li>Delete Request ID: {{ delete_request['delete_request_id'] }}</li>
+                <li>Username: {{ delete_request['username'] }}</li>
+                </ul>
+              </a>
             </div>
-          </div>
-        </article>
-        <article class="media">
-          <figure class="media-left">
-           <p class="image is-64x64">
-            <img src="https://bulma.io/images/placeholders/128x128.png">
-          </p>
-          </figure>
-          <div class="media-content">
-            <div class="content">
-              <p>
-                <strong>Project Name</strong> <small>Posted by Client on 1/1/2018 11:59 PM</small>
-                <br>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin ornare magna eros, eu pellentesque tortor vestibulum ut. Maecenas non massa sem. Etiam finibus odio quis feugiat facilisis.
-                <br>
-                <small><strong>Current Lowest Bid: $1500</strong></small>
-                <br>
-                <small><em>Closes: 2/1/2018 11:50 PM</em></small>
-              </p>
-            </div>
-          </div>
+          {% endfor %}
         </article>
         </div>
       </div>
