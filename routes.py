@@ -488,7 +488,6 @@ def upload_system(demand_id):
             # project is now completed
             Developer.submit_system(demand_id, session['username'])
             return redirect(url_for('rating', demand_id=demand_id, recipient=client))
-            # return render_template("system_uploaded.html", demand_id=demand_id, recipient=client)
         else:
             return render_template("upload_system.html", demand_id=demand_id, form=form)
 
@@ -522,14 +521,20 @@ def rating(demand_id, recipient):
         if request.method == "GET":
             return render_template("rating.html", form=form, recipient=recipient, demand_id=demand_id)
         elif request.method == "POST":
-            if form.rating.data <= 2: #low rating
+            # low rating
+            if form.rating.data <= 2:
                 session['rating'+demand_id] = form.rating.data
                 return redirect(url_for('ratingMessage', demand_id=demand_id, recipient=recipient))
             elif form.rating.data == None:
                 return render_template('rating.html', form=form, recipient=recipient, demand_id=demand_id)
             else:
-                #add to form data
+                # add to form data
                 Rating(demand_id, recipient, session['username'], form.rating.data)
+
+                # if the client gave a good rating to a developer (<= 3)
+                # the remaining half of the bid amount gets transferred over to the developer
+                if session['role'] == 'client':
+                    Transaction(recipient, session['username'], round(Demand.get_info(demand_id)['chosen_bid_amount'] / 2), 2)
                 return render_template('ratingFinished.html', recipient=recipient)
     return render_template('access_denied.html')
 

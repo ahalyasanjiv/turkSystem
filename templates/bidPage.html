@@ -19,7 +19,7 @@
             <div class="content">
               <!-- client information -->
               <p>
-              <strong>{{ client_info.first_name }} {{ client_info.last_name }}</strong> <small><a>@{{ demand_info.client_username }}</a></small>
+              <strong>{{ client_info.first_name }} {{ client_info.last_name }}</strong> <small><a href="{{ url_for('user', name=demand_info.client_username) }}">@{{ demand_info.client_username }}</a></small>
               <br>
 
               <!-- date posted and bidding deadline -->
