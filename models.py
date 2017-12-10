@@ -109,6 +109,26 @@ class User:
         df = pd.read_csv('database/User.csv')
         return df['username'].count() # does not count NaNs
 
+    @staticmethod
+    def does_user_have_enough_money(username,amount):
+        """
+        Returns whether [username] has enough balance in their account to afford a transaction of 
+        [amount] dollars.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df.username == username]
+        type_of_user = user['type_of_user'].item()
+        balance = 0
+        if type_of_user == 'client':
+            df = pd.read_csv('database/Client.csv')
+            user = df.loc[df.username == username]
+            balance = user['balance'].item()
+        elif type_of_user == 'developer':
+            df = pd.read_csv('database/Developer.csv')
+            user = df.loc[df.username == username]
+            balance = user['balance'].item()
+        return balance >= amount
+
 class Client:
     """
     Client class. Has methods that inserts to and reads from the Client table.
@@ -479,6 +499,16 @@ class Applicant:
             df.loc[df.user_id == user_id, 'reason'] = reason
             df.to_csv('database/Applicant.csv', index=False)
 
+    @staticmethod
+    def get_pending_applicants():
+        """
+        Gets all applicants with a status of 'pending'
+        """
+        df = pd.read_csv('database/Applicant.csv')
+        get_apps = df.loc[df['status'] == 'pending']
+        pending_applicants = get_apps['user_id'].values.tolist()
+        return pending_applicants
+
 class Demand:
     """
     Demand class. Has methods that inserts to, reads from, and modifies Demand table.
@@ -846,6 +876,8 @@ class BlacklistedUser:
 
         return {'username': username,
                 'blacklisted_until': blacklisteduser['blacklisted_until'].item()}
+
+
 class SuperUser:
     """
     SuperUser class.
@@ -1005,7 +1037,7 @@ class SystemWarning:
     @staticmethod
     def get_warned_user(warning_id):
         """
-        Get tbe recipient of a particular warning's username
+        Get the recipient of a particular warning's username
         """
         df = pd.read_csv('database/Warning.csv')
         if len(df.loc[df.warning_id == warning_id]) > 0:
@@ -1015,7 +1047,7 @@ class SystemWarning:
     @staticmethod
     def get_warning_status(warning_id):
         """
-        Get tbe recipient of a particular warning's username
+        Get the recipient of a particular warning's username
         """
         df = pd.read_csv('database/Warning.csv')
         if len(df.loc[df.warning_id == warning_id]) > 0:
@@ -1035,6 +1067,43 @@ class SystemWarning:
                     'warned_user': warning['warned_user'].item(),
                     'status': warning['status'].item(),
                     'reason': warning['reason'].item()}
+
+    @staticmethod
+    def get_protests():
+        """
+        Gets all pending protest requests.
+        """
+        df = pd.read_csv('database/Warning.csv')
+        get_protests = df.loc[df['status'] == 'pending']
+        protests = get_protests['warning_id'].values.tolist()
+        return protests
+
+    @staticmethod
+    def get_user_warnings(username):
+        """
+        Gets all warnings given to [username]
+        """
+        df = pd.read_csv('database/Warning.csv')
+        get_warnings = df.loc[df['warned_user'] == username]
+        warnings = get_warnings.T.to_dict().values()
+        return warnings
+
+    @staticmethod
+    def should_be_blacklisted(username):
+        """
+        Returns whether [username] should be blacklisted (if they have more than 2 active warnings)
+        """
+        df = pd.read_csv('database/Warning.csv')
+        get_warnings = df.loc[df['warned_user'] == username]
+        warnings = get_warnings.T.to_dict().values()
+        num_of_warnings = 0
+        for warning in warnings:
+            if warning['status'] == 'active' or warning['status'] == 'active_and_denied':
+                num_of_warnings+=1
+            if num_of_warnings >=2:
+                return True
+        return False 
+
 
 
 class Transaction:
@@ -1085,6 +1154,16 @@ class Transaction:
         sender = transaction['sender'].item()
         SystemWarning(sender,'active')
 
+    @staticmethod
+    def get_pending_transactions():
+        """
+        Gets all pending transactions that are waiting on approval from the superuser.
+        """
+        df = pd.read_csv('database/Transaction.csv')
+        get_pending_transactions = df.loc[df['status'] == 'pending']
+        pending_transactions = get_pending_transactions.T.to_dict().values()
+        return pending_transactions
+
 class Rating:
     """
     Ratings between developers and clients.
@@ -1097,6 +1176,9 @@ class Rating:
 
     @staticmethod
     def get_avg_rating(username):
+        """
+        Gets the average rating of [username]
+        """
         df = pd.read_csv('database/Rating.csv')
         ratings = df.loc[df.recipient == username]
         average = ratings["rating"].mean()
@@ -1128,6 +1210,46 @@ class Rating:
                     # there has not yet been a rating for this recipient
                     return True
         return False
+
+class DeleteRequest:
+    """
+    Delete requests created by users
+    """
+    def __init__(self, username):
+        df = pd.read_csv('database/DeleteRequest.csv')
+        df.loc[len(df)] = pd.Series(data=[len(df), username, 'pending'],
+            index=['delete_request_id', 'username', 'status'])
+
+    @staticmethod
+    def get_delete_request_status(delete_request_id):
+        """
+        Gets the status of the delete request with the id of [delete_request_id]
+        """
+        df = pd.read_csv('database/DeleteRequest.csv')
+        status = df.loc[df.delete_request_id == delete_request_id, 'status'] 
+        return status
+
+    @staticmethod
+    def set_delete_request_status(delete_request_id, status):
+        """
+        Sets the status of the delete request with the id of [delete_request_id] to [status]
+        """
+        df = pd.read_csv('database/DeleteRequest.csv')
+        df.loc[df.delete_request_id == delete_request_id, 'status'] = status
+        df.to_csv('database/DeleteRequest.csv', index=false)
+
+    @staticmethod
+    def is_account_deleted(username):
+        df = pd.read_csv('database/DeleteRequest.csv')
+        # Check if user has requested a deletion.
+        df = df.loc[df.username == username]
+        # If they have, check if that request has been approved
+        if len(df) > 0:
+            df = df.loc[df.status == 'approved']
+            if len(df) > 0:
+                return True
+        return False
+
 
 # run these checks here (not as good as real triggers, but good enough)
 Demand.check_approaching_bidding_deadlines()

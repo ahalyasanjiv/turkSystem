@@ -1,11 +1,10 @@
 from flask import Flask, flash, render_template, request, session, redirect, url_for
-import pandas as pd
 import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
 from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm, DeleteAccountForm
-from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating, Transaction
+from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating, Transaction, DeleteRequest
 import helpers
 
 app = Flask(__name__)
@@ -159,9 +158,9 @@ def dashboard_superuser():
     """
     if session['username']:
         info = SuperUser.get_superuser_info(session['username'])
-        pending_applicants = helpers.get_pending_applicants()
-        protests = helpers.get_protests()
-        pending_transactions = helpers.get_pending_transactions()
+        pending_applicants = Applicant.get_pending_applicants()
+        protests = SystemWarning.get_protests()
+        pending_transactions = Transaction.get_pending_transactions()
         return render_template("dashboard_superuser.html", info=info, pending_applicants=pending_applicants, protests=protests, pending_transactions=pending_transactions)
     else:
         return render_template("index.html")
@@ -286,7 +285,7 @@ def login():
             session['username'] = username
             session['role'] = User.get_user_info(username)['type_of_user']
             session['type_of_user'] = 'user'
-            if helpers.should_be_blacklisted(username):
+            if SystemWarning.should_be_blacklisted(username):
                 BlacklistedUser(username)
                 return redirect(url_for('blacklist'))
             return redirect(url_for('dashboard'))
@@ -669,7 +668,7 @@ def transaction_approval(transaction_id):
     transaction_id = int(transaction_id)
 
     if request.method == 'GET':
-        enough_money = helpers.does_user_have_enough_money(info['sender'],int(info['amount']))
+        enough_money = User.does_user_have_enough_money(info['sender'],int(info['amount']))
         return render_template("transactionApproval.html", form=form, transaction_id=transaction_id,info=info,enough_money=enough_money)
     if request.method == 'POST':
         if form.validate():
@@ -696,7 +695,7 @@ def warning():
     if session['type_of_user'] == 'applicant':
         return redirect(url_for('dashboard_applicant'))
     username = session['username']
-    warnings = helpers.get_user_warnings(username)
+    warnings = SystemWarning.get_user_warnings(username)
     return render_template("warnings.html", warnings=warnings)
 
 @app.route("/deleteAccount", methods=["GET", "POST"])
@@ -713,7 +712,15 @@ def deleteAccount():
         return redirect(url_for('dashboard_applicant'))
     form = DeleteAccountForm()
 
-    return render_template("deleteAccount.html",form=form)
+    if request.method == 'GET':
+        return render_template("deleteAccount.html",form=form)
+    else:
+        if form.validate():
+            if form.delete.data:
+
+                return redirect(url_for('dashboard_superuser'))
+            else:
+                return redirect(url_for('dashboard'))
 
 if __name__ == "__main__":
     app.run(debug=True)
