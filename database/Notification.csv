@@ -52,3 +52,10 @@ message_id,recipient,sender,date_sent,message,read_status
 50,testuser1,testuser0,12-09-2017 11:41 PM,Congratulations! You were chosen by testuser0 for the new demand 2 demand.,True
 51,testuser0,testuser1,12-09-2017 11:42 PM,"The system for the new demand 2 demand has been uploaded. Please rate testuser1 <a href=""/bid/13/rating/testuser1"">here</a>.",False
 52,testuser0,superuser0,12-10-2017 12:15 AM,The deadline for your new demand 2 demand is approaching.,False
+53,testuser0,superuser0,12-11-2017 08:50 AM,Your transaction (Transaction#8) was approved.,False
+54,testuser0,superuser0,12-11-2017 08:50 AM,Your transaction (Transaction#5) was approved.,False
+55,testuser0,superuser0,12-11-2017 08:50 AM,Your transaction (Transaction#16) was approved.,False
+56,testuser0,superuser0,12-11-2017 08:50 AM,Your transaction (Transaction#18) was approved.,False
+57,testuser0,superuser0,12-11-2017 08:50 AM,Your transaction (Transaction#15) was approved.,False
+58,testuser0,superuser0,12-11-2017 08:50 AM,Your transaction (Transaction#20) was approved.,False
+59,testuser0,superuser0,12-11-2017 08:50 AM,Your transaction (Transaction#19) was approved.,False

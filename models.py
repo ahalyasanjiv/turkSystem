@@ -568,7 +568,7 @@ class Applicant:
         """
         df = pd.read_csv('database/Applicant.csv')
         get_apps = df.loc[df['status'] == 'pending']
-        pending_applicants = get_apps['user_id'].values.tolist()
+        pending_applicants = get_apps.T.to_dict().values()
         return pending_applicants
 
 class Demand:
@@ -1134,7 +1134,7 @@ class SystemWarning:
         """
         df = pd.read_csv('database/Warning.csv')
         get_protests = df.loc[df['status'] == 'pending']
-        protests = get_protests['warning_id'].values.tolist()
+        protests = get_protests.T.to_dict().values()
         return protests
 
     @staticmethod

@@ -394,6 +394,13 @@ def logout():
     session.pop('role', None)
     return redirect(url_for('index'))
 
+@app.route("/editProfile")
+def editProfile():
+    """
+    The '/editProfile' route will direct a logged in user to edit their profile
+    """
+    
+
 @app.route("/blacklist")
 def blacklist():
     if 'username' in session:
@@ -406,7 +413,7 @@ def blacklist():
 @app.route("/warnings/<warning_id>/protest", methods=['GET', 'POST'])
 def protestWarning(warning_id):
     """
-    The /warnings/<warning_id>/protest route directs the user to a page that allows them to protest
+    The '/warnings/<warning_id>/protest' route directs the user to a page that allows them to protest
     a warning
     """
 
