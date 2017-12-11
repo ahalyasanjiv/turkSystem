@@ -13,8 +13,8 @@ class User:
     def __init__(self, first_name, last_name, email, phone, credit_card, type_of_user):
         df = pd.read_csv('database/User.csv')
 
-        df.loc[len(df)] = pd.Series(data=[' ', ' ', first_name, last_name, email, phone, credit_card, type_of_user],
-                           index=['username', 'password', 'first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user'])
+        df.loc[len(df)] = pd.Series(data=[' ', ' ', first_name, last_name, email, phone, credit_card, type_of_user,'','','',''],
+                           index=['username', 'password', 'first_name', 'last_name', 'email', 'phone', 'credit_card', 'type_of_user','portfolio', 'about', 'resume', 'interests'])
         df.to_csv('database/User.csv', index=False)
 
     @staticmethod
@@ -89,19 +89,10 @@ class User:
                     'type_of_user': user['type_of_user'].item(),
                     'credit_card': user['credit_card'].item(),
                     'about': user['about'].item(),
-                    'link_to_user': '/user/' + username}
-
-    @staticmethod
-    def set_about(username, about):
-        """
-        Modifies the user's about/info.
-        """
-        df = pd.read_csv('database/User.csv')
-        user = df.loc[df['username'] == username]
-
-        if not user.empty:
-            df.loc[df.username == username, 'about'] = about
-            df.to_csv('database/User.csv')
+                    'link_to_user': '/user/' + username,
+                    'portfolio': user['portfolio'].item(),
+                    'interests': user['interests'].item(),
+                    'resume': user['resume'].item()}
 
     @staticmethod
     def get_number_of_users():
@@ -161,7 +152,7 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             df.loc[df.username == username, 'username'] = new_username
-            df.to_csv('database/User.csv')
+            df.to_csv('database/User.csv', index=False)
 
     @staticmethod
     def set_password(username,password):
@@ -172,18 +163,7 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             df.loc[df.username == username, 'password'] = hash_password(password)
-            df.to_csv('database/User.csv')
-
-    @staticmethod
-    def set_email(username,email):
-        """
-        Modifies the user's email.
-        """
-        df = pd.read_csv('database/User.csv')
-        user = df.loc[df['username'] == username]
-        if not user.empty:
-            df.loc[df.username == username, 'email'] = email
-            df.to_csv('database/User.csv')
+            df.to_csv('database/User.csv', index=False)
 
     @staticmethod
     def set_first_name(username,first_name):
@@ -194,7 +174,7 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             df.loc[df.username == username, 'first_name'] = first_name
-            df.to_csv('database/User.csv')
+            df.to_csv('database/User.csv', index=False)
 
     @staticmethod
     def set_last_name(username,last_name):
@@ -205,7 +185,19 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             df.loc[df.username == username, 'last_name'] = last_name
-            df.to_csv('database/User.csv')
+            df.to_csv('database/User.csv', index=False)
+
+    @staticmethod
+    def set_email(username,email):
+        """
+        Modifies the user's email.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'email'] = email
+            df.to_csv('database/User.csv', index=False)
+
 
     @staticmethod
     def set_phone(username,phone):
@@ -215,8 +207,20 @@ class User:
         df = pd.read_csv('database/User.csv')
         user = df.loc[df['username'] == username]
         if not user.empty:
-            df.loc[df.username == username, 'username'] = phone
-            df.to_csv('database/User.csv')
+            df.loc[df.username == username, 'phone'] = phone
+            df.to_csv('database/User.csv', index=False)
+
+    @staticmethod
+    def set_about(username, about):
+        """
+        Modifies the user's about/info.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+
+        if not user.empty:
+            df.loc[df.username == username, 'about'] = about
+            df.to_csv('database/User.csv', index=False)
 
     @staticmethod
     def set_resume(username,resume):
@@ -227,7 +231,7 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             df.loc[df.username == username, 'resume'] = resume
-            df.to_csv('database/User.csv')
+            df.to_csv('database/User.csv', index=False)
 
     @staticmethod
     def set_portfolio(username,portfolio):
@@ -238,7 +242,7 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             df.loc[df.username == username, 'portfolio'] = portfolio
-            df.to_csv('database/User.csv')
+            df.to_csv('database/User.csv', index=False)
 
     @staticmethod
     def set_interests(username,interests):
@@ -249,7 +253,7 @@ class User:
         user = df.loc[df['username'] == username]
         if not user.empty:
             df.loc[df.username == username, 'interests'] = interests
-            df.to_csv('database/User.csv')
+            df.to_csv('database/User.csv', index=False)
 
 class Client:
     """

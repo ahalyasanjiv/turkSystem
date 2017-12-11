@@ -3,7 +3,7 @@ import numpy as np
 from csv import reader
 import datetime
 from dateutil import parser
-from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm, DeleteAccountForm, DeleteAccountApprovalForm, AddFundsForm, EditProfileForm
+from forms import SignupForm, LoginForm, DemandForm, BidForm, ApplicantApprovalForm, BecomeUserForm, JustifyDeveloperChoiceForm, ProtestForm, ProtestApprovalForm, SubmitSystemForm, RatingForm,RatingMessageForm, TransactionApprovalForm, DeleteAccountForm, DeleteAccountApprovalForm, AddFundsForm, EditProfileForm, validate_user_id, validate_email
 from models import User, Client, Developer, Applicant, Demand, Bid, BlacklistedUser, SuperUser, SystemWarning, Notification, Rating, Transaction, DeleteRequest
 import helpers
 
@@ -407,17 +407,24 @@ def editProfile():
         return redirect(url_for('dashboard_applicant'))
 
     form = EditProfileForm()
-    info = User.get_user_info(session['username'])
-
+    username = session['username']
+    info = User.get_user_info(username)
     if request.method == 'GET':
         return render_template('editProfile.html', form=form, info=info)
     elif request.method == 'POST':
-        if form.validate():
-            User.set_username(username, form.username.data)
-            User.set_password(username, form.password.data)
+        if form.email.data != info['email'] and not Applicant.is_unique_email(form.email.data): 
+            flash('Email is taken. Please choose another email')
+            return render_template('editProfile.html', form=form, info=info)
+        else:
             User.set_email(username, form.email.data)
-            if len(form.about.data) > 0:
-                User.set_about(username, form.about.data)
+            
+        if form.validate():
+            if len(form.password.data) > 0:
+                User.set_password(username, form.password.data)
+            User.set_first_name(username, form.first_name.data)
+            User.set_last_name(username, form.last_name.data)
+            User.set_phone(username, form.phone.data)
+            User.set_about(username, form.about.data)
             if len(form.resume.data) > 0:
                 User.set_resume(username, form.resume.data)
             if len(form.interests.data) > 0:

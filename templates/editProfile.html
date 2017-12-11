@@ -12,137 +12,169 @@
 </section>
 
 <div class ="hero-body">
-		<div class="container ">
-  			<div class="columns">
-  				<div class="column is-one-quarter">
-  				</div>
-  				<div class="column is-half">
-  					<h2 class="title is-3 has-text-centered">
-				        User Application
-				    </h2>
-				    <form method="POST" action="/apply">
+	<div class="container ">
+		<div class="columns">
+			<div class="column is-one-third"></div>
+			<div class="column is-one-third">
+		    <form method="POST" action="/editProfile">
 
-						{{ form.hidden_tag() }}
-			    		{% with messages = get_flashed_messages() %}
-					        {% if messages %}
-					            <div class=flashes>
-					            	{% for message in messages %}
-					                	{{ message }}
-					            	{% endfor %}
-					            </div>
-					        {% endif %}
-				        {% endwith %}
+				{{ form.hidden_tag() }}
+	    		{% with messages = get_flashed_messages() %}
+			        {% if messages %}
+			            <div class=flashes>
+			            	{% for message in messages %}
+			                	{{ message }}
+			            	{% endfor %}
+			            </div>
+			        {% endif %}
+		        {% endwith %}
 
-						<h2 class="subtitle">
-					        User Information
-					    </h2>
-
-						<!-- First Name -->
-						<div class="field">
-						  	<div class="control">
-					        	{{ form.first_name(placeholder="First Name", class="form-control input is-medium") }}
-					    	</div>
-					    	{% if form.first_name.errors %}
-				              {% for error in form.first_name.errors %}
-				                <p class="is-danger">{{ error }}</p>
-				              {% endfor %}
-				            {% endif %}
-						</div>
-							
-						<!-- Last Name -->
-						<div class="field">
-						    <div class="control">
-						    	{{ form.last_name(placeholder="Last Name", class="form-control input is-medium") }}
-						    </div>
-							{% if form.last_name.errors %}
-				            	{% for error in form.last_name.errors %}
-				            		<p class="is-danger">{{ error }}</p>
-				            	{% endfor %}
-				            {% endif %}
-						</div>
-
-						<!-- Email Address" -->
-						<div class="field">
-				        	<div class="control has-icons-left">
-				        		{{ form.email(placeholder="Email Address", class="form-control input is-medium") }}
-				        		<span class="icon is-small is-left">
-						          <i class="fa fa-envelope"></i>
-						        </span>
-				        	</div>
-					        {% if form.email.errors %}
-					          	{% for error in form.email.errors %}
-					            	<p class="is-danger">{{ error }}</p>
-					          	{% endfor %}
-					        {% endif %}
-				      	</div>
-
-				      	<!-- Phone Number -->
-				      	<div class="field">
-				        	<div class="control has-icons-left">
-				        		{{ form.phone(placeholder="Phone Number", class="form-control input is-medium") }}
-				        		<span class="icon is-small is-left">
-						          <i class="fa fa-phone"></i>
-						        </span>
-				     		</div>
-					        {% if form.phone.errors %}
-					          	{% for error in form.phone.errors %}
-					            	<p class="is-danger">{{ error }}</p>
-					          	{% endfor %}
-					        {% endif %}
-				      	</div>
-
-
-				      	<br>
-						<h2 class="subtitle">
-					        Login Credentials
-					    </h2>
-				      	<!-- User ID -->
-						<div class="field">
-							<div class="control">{{ form.user_id(placeholder="User ID", class="form-control input is-medium") }}</div>
-					        {% if form.user_id.errors %}
-					          	{% for error in form.user_id.errors %}
-					            	<p class="is-danger">{{ error }}</p>
-					          	{% endfor %}
-					        {% endif %}
-						</div>
-
-				      	<!-- Password -->
-				      	<div class="field">
-							<div class="control">{{ form.password(placeholder="Password (must be at least 8 characters)", class="form-control input is-medium") }}</div>
-					        {% if form.password.errors %}
-					          	{% for error in form.password.errors %}
-					            	<p class="is-danger">{{ error }}</p>
-					          	{% endfor %}
-					        {% endif %}
-						</div>
-
-						<!-- Confirm Password -->
-						<div class="field">
-							<div class="control">{{ form.confirm_password(placeholder="Confirm Password", class="form-control input is-medium") }}</div>
-					        {% if form.confirm_password.errors %}
-					          	{% for error in form.confirm_password.errors %}
-					            	<p class="is-danger">{{ error }}</p>
-					          	{% endfor %}
-					        {% endif %}
-						</div>
-						<br>
-						<h2 class="subtitle">
-					        Role
-					    </h2>
-						<!-- Type of User -->
-						<div class="field">
-					        <div class="control"><div class="select">{{ form.role(placeholder="Select a role", class="is-medium") }}</div></div>
-					        {% if form.role.errors %}
-					          {% for error in form.role.errors %}
-					            <p class="is-danger">{{ error }}</p>
-					          {% endfor %}
-					        {% endif %}
-				      	</div>
-
-					</form>
-
+		        <h2 class="subtitle">
+			        Login Credentials
+			    </h2>
+		      	<!-- Password -->
+		      	<div class="field">
+					<div class="control">
+						{{ form.password.label }}: {{ form.password(value=info['password'], class="form-control input is-small") }}
+					</div>
+			        {% if form.password.errors %}
+			          	{% for error in form.password.errors %}
+			            	<p class="is-danger">{{ error }}</p>
+			          	{% endfor %}
+			        {% endif %}
 				</div>
-			</div>
+
+				<!-- Confirm Password -->
+				<div class="field">
+					<div class="control">
+						{{ form.confirm_password.label }}: {{ form.confirm_password(value=info['password'], class="form-control input is-small") }}
+					</div>
+			        {% if form.confirm_password.errors %}
+			          	{% for error in form.confirm_password.errors %}
+			            	<p class="is-danger">{{ error }}</p>
+			          	{% endfor %}
+			        {% endif %}
+				</div>
+				<br>
+
+				<h2 class="subtitle">
+			        User Information
+			    </h2>
+
+				<!-- First Name -->
+				<div class="field">
+				  	<div class="control">
+			        	{{ form.first_name.label }}: {{ form.first_name(value=info['first_name'], class="form-control input is-small") }}
+			    	</div>
+			    	{% if form.first_name.errors %}
+		              {% for error in form.first_name.errors %}
+		                <p class="is-danger">{{ error }}</p>
+		              {% endfor %}
+		            {% endif %}
+				</div>
+					
+				<!-- Last Name -->
+				<div class="field">
+				    <div class="control">
+				    	{{ form.last_name.label }}: {{ form.last_name(value=info['last_name'], class="form-control input is-small") }}
+				    </div>
+					{% if form.last_name.errors %}
+		            	{% for error in form.last_name.errors %}
+		            		<p class="is-danger">{{ error }}</p>
+		            	{% endfor %}
+		            {% endif %}
+				</div>
+
+				<!-- Email Address -->
+				<div class="field">
+					{{ form.email.label }}:
+		        	<div class="control has-icons-left">
+		        		{{ form.email(value=info['email'], class="form-control input is-small") }}
+		        		<span class="icon is-small is-left">
+				        	<i class="fa fa-envelope"></i>
+				        </span>
+		        	</div>
+			        {% if form.email.errors %}
+			          	{% for error in form.email.errors %}
+			            	<p class="is-danger">{{ error }}</p>
+			          	{% endfor %}
+			        {% endif %}
+		      	</div>
+
+		      	<!-- Phone Number -->
+		      	<div class="field">
+		      		{{ form.phone.label }}:
+		        	<div class="control has-icons-left">
+		        		{{ form.phone(value=info['phone'], class="form-control input is-small") }}
+		        		<span class="icon is-small is-left">
+				          <i class="fa fa-phone"></i>
+				        </span>
+		     		</div>
+			        {% if form.phone.errors %}
+			          	{% for error in form.phone.errors %}
+			            	<p class="is-danger">{{ error }}</p>
+			          	{% endfor %}
+			        {% endif %}
+		      	</div>
+
+		      	<!-- About -->
+		      	<div class="field">
+		      		{{ form.about.label }}:
+		        	<div class="control">
+		        		{{ form.about(value=info['about'], class="form-control input is-small") }}
+		     		</div>
+			        {% if form.about.errors %}
+			          	{% for error in form.about.errors %}
+			            	<p class="is-danger">{{ error }}</p>
+			          	{% endfor %}
+			        {% endif %}
+		      	</div>
+
+		      	<!-- Resume -->
+		      	<div class="field">
+		      		{{ form.resume.label }}:
+		        	<div class="control has-icons-left">
+		        		{{ form.resume(value=info['resume'], class="form-control input is-small") }}
+		        		<span class="icon is-small is-left">
+				          <i class="fa fa-file"></i>				       
+				        </span>
+		     		</div>
+			        {% if form.resume.errors %}
+			          	{% for error in form.resume.errors %}
+			            	<p class="is-danger">{{ error }}</p>
+			          	{% endfor %}
+			        {% endif %}
+		      	</div>
+
+		      	<!-- Portfolio -->
+		      	<div class="field">
+		      		{{ form.portfolio.label }}:
+		        	<div class="control">
+		        		{{ form.portfolio(value=info['portfolio'], class="form-control input is-small") }}
+		     		</div>
+			        {% if form.portfolio.errors %}
+			          	{% for error in form.portfolio.errors %}
+			            	<p class="is-danger">{{ error }}</p>
+			          	{% endfor %}
+			        {% endif %}
+		      	</div>
+
+		      	<!-- Interests -->
+		      	<div class="field">
+		      		{{ form.interests.label }}:
+		        	<div class="control">
+		        		{{ form.interests(value=info['interests'], class="form-control input is-small") }}
+		     		</div>
+			        {% if form.interests.errors %}
+			          	{% for error in form.interests.errors %}
+			            	<p class="is-danger">{{ error }}</p>
+			          	{% endfor %}
+			        {% endif %}
+		      	</div>
+		      	{{ form.submit(class="button is-small is-primary")}}
+			</form>
+		</div>
 		</div>
 	</div>
+</div>
 {% endblock %}
