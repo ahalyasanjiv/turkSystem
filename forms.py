@@ -184,3 +184,21 @@ class AddFundsForm(FlaskForm):
 	amount = DecimalField(label='Amount', id='amount', validators=[DataRequired('Please enter an amount to add to your funds.')])
 	# , validate_bid_amount])
 	submit = SubmitField('Add Funds')
+
+class EditProfileForm(FlaskForm):
+	"""
+	Form for users to edit their profile
+	"""
+	username = StringField(label='User ID', id='user_id', validators=[DataRequired('Please enter a user ID.'), validate_user_id])
+	password = PasswordField(label='Password', id='password', validators=[DataRequired('Please enter a password.'), Length(min=8, message='Your password must have at least 8 characters.')])
+	confirm_password = PasswordField(label='Confirm Password', id='confirm_password', validators=[DataRequired('Please confirm your password.')])
+	first_name = StringField(label='First Name', id='first_name', validators=[DataRequired('Please enter your first name.')])
+	last_name = StringField(label='Last Name', id='last_name', validators=[DataRequired('Please enter your last name.')])
+	phone = StringField(label='Phone Number', id='phone', validators=[DataRequired('Please enter a phone number.')])
+	email = StringField(label="Email Address", id='email', validators=[DataRequired('Please enter an email address.'), Email(message='Please enter a valid email address.'), validate_email])
+	resume = FileField(label="Resume", id='resume')
+	about = TextAreaField(label="About Me", id='about')
+	portfolio = StringField(label="Portfolio Link", id='portfolio')
+	interests = StringField(label="Interests", id='interests')
+	submit = SubmitField('Submit')
+

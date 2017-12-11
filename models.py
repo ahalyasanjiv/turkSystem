@@ -152,6 +152,105 @@ class User:
                 df = df.loc[df.username != username]
                 df.to_csv('database/Developer.csv', index=False)
 
+    @staticmethod
+    def set_username(username,new_username):
+        """
+        Modifies the user's username.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'username'] = new_username
+            df.to_csv('database/User.csv')
+
+    @staticmethod
+    def set_password(username,password):
+        """
+        Modifies the user's password.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'password'] = hash_password(password)
+            df.to_csv('database/User.csv')
+
+    @staticmethod
+    def set_email(username,email):
+        """
+        Modifies the user's email.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'email'] = email
+            df.to_csv('database/User.csv')
+
+    @staticmethod
+    def set_first_name(username,first_name):
+        """
+        Modifies the user's first name.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'first_name'] = first_name
+            df.to_csv('database/User.csv')
+
+    @staticmethod
+    def set_last_name(username,last_name):
+        """
+        Modifies the user's last name.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'last_name'] = last_name
+            df.to_csv('database/User.csv')
+
+    @staticmethod
+    def set_phone(username,phone):
+        """
+        Modifies the user's phone.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'username'] = phone
+            df.to_csv('database/User.csv')
+
+    @staticmethod
+    def set_resume(username,resume):
+        """
+        Modifies the user's resume.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'resume'] = resume
+            df.to_csv('database/User.csv')
+
+    @staticmethod
+    def set_portfolio(username,portfolio):
+        """
+        Modifies the user's portfolio.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'portfolio'] = portfolio
+            df.to_csv('database/User.csv')
+
+    @staticmethod
+    def set_interests(username,interests):
+        """
+        Modifies the user's interests.
+        """
+        df = pd.read_csv('database/User.csv')
+        user = df.loc[df['username'] == username]
+        if not user.empty:
+            df.loc[df.username == username, 'interests'] = interests
+            df.to_csv('database/User.csv')
+
 class Client:
     """
     Client class. Has methods that inserts to and reads from the Client table.
