@@ -431,7 +431,7 @@ def editProfile():
                 User.set_interests(username, form.interests.data)
             if len(form.portfolio.data) > 0:
                 User.set_portfolio(username, form.portfolio.data)
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('user', name=username))
         else:
             return render_template('editProfile.html', form=form, info=info)
 

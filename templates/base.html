@@ -36,7 +36,7 @@
         <div class="navbar-end">
           <!-- navbar end items -->
           {% if session.username %}
-            <p class="navbar-item">Welcome, {{ session.username }}</p>
+            <a class="navbar-item" href="{{ url_for('user', name=session.username) }}">Welcome, {{ session.username }}</a>
             {% if session.type_of_user == 'user' %}
               <a class="navbar-item" href="/editProfile">Edit Profile</a>
             {% endif %}

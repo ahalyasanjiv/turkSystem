@@ -49,6 +49,13 @@
             </div>
 
             <div class="notification">
+              <h2 class="title is-4">Interests</h2>
+              <p class="content">
+                {{ info.interests }}
+              </p>
+            </div>
+
+            <div class="notification">
               {% if info.type_of_user == 'client' %}
                 <h2 class="title is-4">Projects Posted</h2>
               {% elif info.type_of_user == 'developer' %}
@@ -56,11 +63,6 @@
               {% endif %}
               {% for project in projects %}
                 <article class="media">
-                  <figure class="media-left">
-                   <p class="image is-64x64">
-                    <img src="https://bulma.io/images/placeholders/128x128.png">
-                  </p>
-                  </figure>
                   <div class="media-content">
                     <div class="content">
                       <p>
@@ -81,7 +83,9 @@
               <div class="content">
                 <strong>Email:</strong> {{ info.email }}
                 <br>
-                <strong>Phone: </strong> {{ info.phone }}
+                <strong>Phone:</strong> {{ info.phone }}
+                <br>
+                <strong>Portfolio: </strong> {{ info.portfolio }}
               </div>
             </div>
           </div>
